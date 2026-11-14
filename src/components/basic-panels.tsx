@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "./ui/button";
-import { getSupabase } from "@/lib/supabase";
+import { getSupabase, rotatePlannerLink, revokePlannerLink } from "@/lib/supabase";
 import { DAY_NAMES, type Workspace, type Absence, type Requirement } from "@/lib/scheduler";
 
 type Props = { workspace: Workspace; commit: (workspace: Workspace, label: string) => void };
@@ -11,6 +11,7 @@ const message = (error: unknown) => error instanceof Error ? error.message : Str
 export function BasicAvailability({ workspace: w, commit }: Props) {
   const [error, setError] = useState("");
   const [kind, setKind] = useState("absence");
+  const [editing, setEditing] = useState<Absence | null>(null);
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); const f = new FormData(event.currentTarget); setError("");
     const employeeId = String(f.get("employee")), from = String(f.get("from")), to = String(f.get("to") || from);
@@ -21,17 +22,18 @@ export function BasicAvailability({ workspace: w, commit }: Props) {
       else { const day = Number(f.get("day")); commit({ ...w, employees: w.employees.map(e => e.id === employeeId ? { ...e, daysOff: e.daysOff.filter(d => d !== day), availability: [...(e.availability ?? []).filter(v => v.day !== day), { day, start, end }] } : e) }, "Ponavljajuća dostupnost u delu dana"); }
     } else {
       if (to < from) { setError("Kraj perioda ne može biti pre početka."); return; }
-      commit({ ...w, absences: [...(w.absences ?? []), { id: crypto.randomUUID(), employeeId, from, to, kind: kind as Absence["kind"], reason: String(f.get("reason") || "") }] }, "Unet zahtev ili odsustvo");
+      commit({ ...w, absences: [...(w.absences ?? []).filter(a => a.id !== editing?.id), { id: editing?.id ?? crypto.randomUUID(), employeeId, from, to, kind: kind as Absence["kind"], reason: String(f.get("reason") || "") }] }, editing ? "Izmenjeno odsustvo ili želja" : "Unet zahtev ili odsustvo");
     }
+    setEditing(null); event.currentTarget.reset();
   };
   return <section className="panel basic-panel"><h2>Odsustva, želje i delimična dostupnost</h2><p className="muted">Odobreno odsustvo i nedostupnost su zabrane. Želja za slobodnim danom je preferencija. Dostupnost za datum zamenjuje nedeljni obrazac, ali ne poništava odsustvo.</p>
-    {!w.employees.some(e => e.active) ? <p>Prvo dodajte zaposlene.</p> : <form className="settings-form" onSubmit={submit}>
-      <div className="form-columns"><label>Zaposleni<select name="employee" required>{w.employees.filter(e => e.active).map(e => <option key={e.id} value={e.id}>{e.name}</option>)}</select></label><label>Vrsta<select value={kind} onChange={e => setKind(e.target.value)}><option value="absence">Odobreno odsustvo</option><option value="unavailable">Nedostupnost</option><option value="wish">Želja za slobodnim danom</option><option value="available">Dostupnost za datum</option><option value="recurring">Nedeljna dostupnost u delu dana</option></select></label></div>
-      {kind === "recurring" ? <label>Dan<select name="day">{DAY_NAMES.map((d, i) => <option key={d} value={i}>{d}</option>)}</select></label> : <div className="form-columns"><label>{kind === "available" ? "Datum" : "Od"}<input type="date" name="from" required /></label>{kind !== "available" && <label>Do<input type="date" name="to" required /></label>}</div>}
-      {kind === "available" || kind === "recurring" ? <div className="form-columns"><label>Od<input type="time" name="start" required defaultValue="08:00" /></label><label>Do<input type="time" name="end" required defaultValue="16:00" /></label></div> : <label>Interni razlog / napomena<input name="reason" maxLength={300} /></label>}
-      {error && <p role="alert" className="form-error">{error}</p>}<Button type="submit">Dodaj uslov</Button>
+    {!w.employees.some(e => e.active) ? <p>Prvo dodajte zaposlene.</p> : <form key={editing?.id ?? "new"} className="settings-form" onSubmit={submit}>
+      <div className="form-columns"><label>Zaposleni<select name="employee" required defaultValue={editing?.employeeId}>{w.employees.filter(e => e.active || e.id === editing?.employeeId).map(e => <option key={e.id} value={e.id}>{e.name}</option>)}</select></label><label>Vrsta<select value={kind} onChange={e => { const next = e.target.value; setKind(next); if (next === "available" || next === "recurring") setEditing(null); }}><option value="absence">Odobreno odsustvo</option><option value="unavailable">Nedostupnost</option><option value="wish">Želja za slobodnim danom</option><option value="available">Dostupnost za datum</option><option value="recurring">Nedeljna dostupnost u delu dana</option></select></label></div>
+      {kind === "recurring" ? <label>Dan<select name="day">{DAY_NAMES.map((d, i) => <option key={d} value={i}>{d}</option>)}</select></label> : <div className="form-columns"><label>{kind === "available" ? "Datum" : "Od"}<input type="date" name="from" required defaultValue={editing?.from} /></label>{kind !== "available" && <label>Do<input type="date" name="to" required defaultValue={editing?.to} /></label>}</div>}
+      {kind === "available" || kind === "recurring" ? <div className="form-columns"><label>Od<input type="time" name="start" required defaultValue="08:00" /></label><label>Do<input type="time" name="end" required defaultValue="16:00" /></label></div> : <label>Interni razlog / napomena<input name="reason" maxLength={300} defaultValue={editing?.reason} /></label>}
+      {error && <p role="alert" className="form-error">{error}</p>}<Button type="submit">{editing ? "Sačuvaj izmenu" : "Dodaj uslov"}</Button>{editing && <Button type="button" variant="outline" onClick={() => setEditing(null)}>Otkaži izmenu</Button>}
     </form>}
-    <div className="basic-rows">{(w.absences ?? []).map(a => <div key={a.id}><span><strong>{w.employees.find(e => e.id === a.employeeId)?.name}</strong><small>{a.from}–{a.to} · {a.kind === "wish" ? "Želja" : a.kind === "absence" ? "Odobreno odsustvo" : "Nedostupnost"}{a.reason && ` · ${a.reason}`}</small></span><Button variant="ghost" size="sm" onClick={() => commit({ ...w, absences: w.absences?.filter(v => v.id !== a.id) }, "Uklonjeno odsustvo ili želja")}>Ukloni</Button></div>)}
+    <div className="basic-rows">{(w.absences ?? []).map(a => <div key={a.id}><span><strong>{w.employees.find(e => e.id === a.employeeId)?.name}</strong><small>{a.from}–{a.to} · {a.kind === "wish" ? "Želja" : a.kind === "absence" ? "Odobreno odsustvo" : "Nedostupnost"}{a.reason && ` · ${a.reason}`}</small></span><Button variant="ghost" size="sm" onClick={() => { setEditing(a); setKind(a.kind); setError(""); }}>Uredi</Button><Button variant="ghost" size="sm" onClick={() => commit({ ...w, absences: w.absences?.filter(v => v.id !== a.id) }, "Uklonjeno odsustvo ili želja")}>Ukloni</Button></div>)}
       {(w.dateAvailability ?? []).map(a => <div key={a.id}><span><strong>{w.employees.find(e => e.id === a.employeeId)?.name}</strong><small>{a.date} · dostupan {a.start}–{a.end}</small></span><Button variant="ghost" size="sm" onClick={() => commit({ ...w, dateAvailability: w.dateAvailability?.filter(v => v.id !== a.id) }, "Uklonjen datumski interval")}>Ukloni</Button></div>)}
       {w.employees.flatMap(e => (e.availability ?? []).map(a => <div key={`${e.id}-${a.day}`}><span><strong>{e.name}</strong><small>Svaki {DAY_NAMES[a.day].toLowerCase()} · {a.start}–{a.end}</small></span><Button variant="ghost" size="sm" onClick={() => commit({ ...w, employees: w.employees.map(p => p.id === e.id ? { ...p, availability: p.availability?.filter(v => v.day !== a.day) } : p) }, "Uklonjen nedeljni interval")}>Ukloni</Button></div>))}
     </div>
@@ -57,7 +59,7 @@ export function BasicSettings({ workspace: w, commit, week }: Props & { week: st
 export function BasicAccess({ companyId, role, flush, reconnect }: { companyId: string; role: string | null; flush: () => Promise<boolean>; reconnect: (companyId?: string) => Promise<void> }) {
   const [members, setMembers] = useState<{ user_id: string; email: string; role: string }[]>([]);
   const [companies, setCompanies] = useState<{ id: string; name: string }[]>([]);
-  const [url, setUrl] = useState(""); const [error, setError] = useState("");
+  const [url, setUrl] = useState(""); const [plannerUrl, setPlannerUrl] = useState(""); const [error, setError] = useState("");
   const refresh = async () => {
     const db = getSupabase()!;
     const [{ data: ms }, { data: cs }] = await Promise.all([db.rpc("get_basic_members", { p_company: companyId }), db.from("companies").select("id,name").order("created_at")]);
@@ -65,6 +67,7 @@ export function BasicAccess({ companyId, role, flush, reconnect }: { companyId: 
   };
   useEffect(() => { void refresh(); }, [companyId]); // Re-read role changes when the object changes.
   return <section className="panel basic-panel"><h2>Pristup i objekti</h2><p className="muted">Vaša korisnička uloga: {role === "owner" ? "vlasnik" : "menadžer"}. Zaposlenima nisu potrebni nalozi.</p>
+    <div className="settings-form"><h3>Radnik koji pravi raspored</h3><p className="muted">Jedan aktivan link po objektu. Novi link odmah opoziva prethodni; radnik dobija samo raspored, dostupnost i odsustva.</p><Button type="button" onClick={async () => { try { if (!(await flush())) throw new Error("Sačekajte da se izmene sačuvaju."); setPlannerUrl(await rotatePlannerLink(companyId)); setError(""); } catch (e) { setError(message(e)); } }}>{plannerUrl ? "Zameni radnički link" : "Napravi radnički link"}</Button><Button type="button" variant="outline" onClick={async () => { try { await revokePlannerLink(companyId); setPlannerUrl(""); setError(""); } catch (e) { setError(message(e)); } }}>Opozovi radnički link</Button>{plannerUrl && <label>Link za radnika<input readOnly value={plannerUrl} onFocus={e => e.currentTarget.select()} /><Button type="button" variant="outline" onClick={() => void navigator.clipboard.writeText(plannerUrl).catch(e => setError(message(e)))}>Kopiraj link</Button></label>}<p className="muted">Sačuvajte link posle pravljenja; zbog zaštite se više ne prikazuje u podešavanjima.</p></div>
     {companies.length > 1 && <label className="settings-form">Aktivan objekat<select value={companyId} onChange={async e => { const id = e.target.value; if (await flush()) await reconnect(id); else setError("Prvo sačuvajte izmene trenutnog objekta."); }}>{companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>}
     {role === "owner" && <form className="settings-form" onSubmit={async e => { e.preventDefault(); const f = new FormData(e.currentTarget); try { const { data, error } = await getSupabase()!.rpc("create_manager_invitation", { p_company: companyId, p_email: String(f.get("email")) }); if (error) throw error; setUrl(`${location.origin}/?invite=${data}`); setError(""); } catch (e) { setError(message(e)); } }}><label>Email menadžera<input type="email" name="email" required /></label><Button type="submit">Napravi pozivni link</Button>{url && <label>Poziv važi sedam dana<input readOnly value={url} onFocus={e => e.currentTarget.select()} /><Button type="button" variant="outline" onClick={() => void navigator.clipboard.writeText(url).catch(e => setError(message(e)))}>Kopiraj poziv</Button></label>}</form>}
     <div className="basic-rows">{members.map(m => <div key={m.user_id}><span><strong>{m.role === "owner" ? "Vlasnik" : "Menadžer"}</strong><small>{m.email}</small></span>{role === "owner" && m.role === "manager" && <Button variant="ghost" size="sm" onClick={async () => { const { error } = await getSupabase()!.rpc("remove_manager", { p_company: companyId, p_user: m.user_id }); if (error) setError(error.message); else void refresh(); }}>Ukloni pristup</Button>}</div>)}</div>{error && <p className="form-error" role="alert">{error}</p>}

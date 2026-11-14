@@ -3,6 +3,7 @@ import { createWorkspace } from "./demo";
 import { cloudState, migrateState, type StoredState } from "./storage";
 
 let client: SupabaseClient | null = null;
+let plannerClient: SupabaseClient | null = null;
 export function getSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -11,7 +12,41 @@ export function getSupabase() {
   return client;
 }
 function database() { const db = getSupabase(); if (!db) throw new Error("Supabase projekat još nije povezan."); return db; }
+function plannerDatabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) throw new Error("Supabase projekat još nije povezan.");
+  plannerClient ??= createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
+  return plannerClient;
+}
 export interface CloudWorkspace { company_id: string; version: number; state: StoredState; user_id: string; role: "owner" | "manager"; access_status: string; trial_ends_at: string | null }
+export interface PlannerWorkspace { company_id: string; version: number; state: StoredState; access_status: string; trial_ends_at: string | null }
+export async function loadPlanner(token: string): Promise<PlannerWorkspace> {
+  const { data, error } = await plannerDatabase().rpc("read_planner_workspace", { p_token: token });
+  if (error || !data) throw new Error("Radnički link je opozvan ili nije dostupan.");
+  return { ...data, state: migrateState(data.state) } as PlannerWorkspace;
+}
+export async function savePlanner(token: string, state: StoredState, version: number, operationId: string): Promise<number> {
+  const { data, error } = await plannerDatabase().rpc("save_planner_workspace", {
+    p_token: token, p_state: cloudState(state), p_expected_version: version, p_operation: operationId
+  });
+  if (error) {
+    if (error.message.includes("VERSION_CONFLICT")) throw new Error("VERSION_CONFLICT");
+    const failure = new Error("Čuvanje radničkih izmena nije uspelo: " + error.message) as Error & { retryable: boolean };
+    failure.retryable = !error.code || error.code.startsWith("PGRST") || error.code === "57014";
+    throw failure;
+  }
+  return data as number;
+}
+export async function rotatePlannerLink(companyId: string) {
+  const { data, error } = await database().rpc("rotate_planner_link", { p_company: companyId });
+  if (error) throw error;
+  return `${location.origin}/?planner=${data}`;
+}
+export async function revokePlannerLink(companyId: string) {
+  const { error } = await database().rpc("revoke_planner_link", { p_company: companyId });
+  if (error) throw error;
+}
 export async function loadCloud(companyId?: string): Promise<CloudWorkspace> {
   const db = database();
   const { data: { user }, error: authError } = await db.auth.getUser();

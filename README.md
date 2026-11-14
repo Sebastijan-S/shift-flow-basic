@@ -30,6 +30,7 @@ Za objavljivanje preko GitHub-a i Cloudflare Pages pogledati [CLOUDFLARE.md](CLO
 - Privatni tokeni važe 60 dana, mogu se rotirati i opozvati. Otvoren javni prikaz proverava izmene na 30 sekundi i pri fokusu.
 - Poseban PNG/PDF prikaz tima bez internih napomena, odsustava, dostupnosti i ciljnog fonda. PDF koristi dijalog štampe pregledača.
 - Vlasnik upravlja pristupom i nazivom firme; menadžer zaposlenima, pozicijama, pravilima i rasporedom. Korisnik može pripadati više objekata. Pozivni link je vezan za potvrđenu email adresu i važi 7 dana; email se ne šalje automatski.
+- Vlasnik ili menadžer može da izda jedan radnički link po objektu za rad na rasporedu, generatoru, dostupnosti i odsustvima. Zamena odmah opoziva prethodni link, a link se može i zasebno opozvati. Radnički prikaz nema administrativne stranice ni dugme za objavljivanje. U bazi anonimna uloga nema direktan pristup tabelama; poseban RPC proverava hash linka pri svakom čitanju i upisu i odbija izmene drugih polja i novo objavljivanje.
 - Vođena priprema objekta i eksplicitan početak 21 dana probe. Cena i limit zaposlenih nisu hardkodovani. Plaćeni nastavak zahteva pouzdanu administrativnu potvrdu prema dogovoru o pilotu.
 - Serverska obaveštenja i korisničko stanje pročitano.
 
@@ -38,6 +39,8 @@ Za objavljivanje preko GitHub-a i Cloudflare Pages pogledati [CLOUDFLARE.md](CLO
 Povezan projekat: https://sbvicmcgghoshrghbybq.supabase.co. Migracije su primenjene kroz Supabase MCP. Baza ima 21 tabelu sa RLS-om. Privilegovana implementacija je u private šemi; javni RPC-jevi su SECURITY INVOKER wrapperi sa tačno određenim dozvolama. Direktno pisanje tabela iz klijenta je zabranjeno. save_workspace_v2 atomski ažurira normalizovane podatke, dokument, audit i potvrdu operacije. Svaki upis proverava aktuelno članstvo.
 
 Za praznu dodatnu bazu primeniti SQL fajlove iz supabase/migrations redom. Ne primenjivati ih ponovo na već podešen projekat. Imena lokalnih migracija usklađena su sa verzijama u povezanom projektu.
+
+Migracija `20261114224339_planner_access.sql` je primenjena na povezani projekat. Za pregled interfejsa bez upisa u bazu, tokom `pnpm dev` otvoriti `http://127.0.0.1:3000/?planner-preview=1`. To koristi zaseban lokalni demo. Stvarne dozvole i opoziv pokriva izolovani PostgreSQL test `tests/planner-access.test.ts`.
 
 U Supabase Auth podesiti Site URL i dozvoljene redirect adrese za produkcioni domen i lokalni razvoj. Email potvrda se poštuje. Vlasnik se registruje u aplikaciji; Supabase platform nalog nije isti nalog kao korisnik ShiftFlow-a.
 
