@@ -21,7 +21,7 @@ Svaki push na `main` pokreće novu produkcionu verziju. Cloudflare dodeljuje bes
 
 ## Supabase Auth
 
-Po zahtevu vlasnika projekta, Supabase Auth Site URL ostaje `http://localhost:3000`; ovaj postupak ne menja dozvoljena odredišta prijave. Email potvrde i reset lozinke zato i dalje mogu voditi na lokalnu adresu. Ako ti tokovi treba da rade direktno na produkcionom domenu, vlasnik mora zasebno odobriti promenu Auth podešavanja.
+Pre javnog testiranja u Supabase Auth podesiti Site URL na adresu objavljenog sajta i dodati dozvoljena redirect odredišta za taj domen i lokalni razvoj. U suprotnom potvrda email adrese može voditi na `localhost`.
 
 ## Provera pre objavljivanja
 

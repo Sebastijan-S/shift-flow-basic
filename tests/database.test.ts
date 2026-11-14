@@ -13,7 +13,7 @@ test("PostgreSQL: migration, tenant isolation, role checks, atomic versions and 
       create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
       grant usage on schema public,auth to anon,authenticated;
       grant execute on function auth.uid() to anon,authenticated;`);
-    await db.exec(await readFile("supabase/migrations/202611030001_shiftflow.sql", "utf8"));
+    await db.exec(await readFile("supabase/migrations/20261114213420_shiftflow_initial.sql", "utf8"));
     const ownerA = "00000000-0000-0000-0000-000000000001";
     const ownerB = "00000000-0000-0000-0000-000000000002";
     const manager = "00000000-0000-0000-0000-000000000003";

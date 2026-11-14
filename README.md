@@ -35,9 +35,9 @@ Za objavljivanje preko GitHub-a i Cloudflare Pages pogledati [CLOUDFLARE.md](CLO
 
 ## Supabase
 
-Povezan projekat: https://enwllpwemymmeyycbwie.supabase.co. Migracije su primenjene kroz Supabase MCP. Baza ima 21 tabelu sa RLS-om. Privilegovana implementacija je u private šemi; javni RPC-jevi su SECURITY INVOKER wrapperi sa tačno određenim dozvolama. Direktno pisanje tabela iz klijenta je zabranjeno. save_workspace_v2 atomski ažurira normalizovane podatke, dokument, audit i potvrdu operacije. Svaki upis proverava aktuelno članstvo.
+Povezan projekat: https://sbvicmcgghoshrghbybq.supabase.co. Migracije su primenjene kroz Supabase MCP. Baza ima 21 tabelu sa RLS-om. Privilegovana implementacija je u private šemi; javni RPC-jevi su SECURITY INVOKER wrapperi sa tačno određenim dozvolama. Direktno pisanje tabela iz klijenta je zabranjeno. save_workspace_v2 atomski ažurira normalizovane podatke, dokument, audit i potvrdu operacije. Svaki upis proverava aktuelno članstvo.
 
-Za praznu dodatnu bazu primeniti SQL fajlove iz supabase/migrations redom. Ne primenjivati ih ponovo na već podešen projekat. MCP vodi sopstvene serverom generisane verzije migracija; pre eventualnog prelaska na CLI db push uskladiti istoriju sa listom primenjenih migracija.
+Za praznu dodatnu bazu primeniti SQL fajlove iz supabase/migrations redom. Ne primenjivati ih ponovo na već podešen projekat. Imena lokalnih migracija usklađena su sa verzijama u povezanom projektu.
 
 U Supabase Auth podesiti Site URL i dozvoljene redirect adrese za produkcioni domen i lokalni razvoj. Email potvrda se poštuje. Vlasnik se registruje u aplikaciji; Supabase platform nalog nije isti nalog kao korisnik ShiftFlow-a.
 

@@ -13,7 +13,7 @@ test("Basic database: four tenants, idempotent saves, history, absences, publish
       create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,raw_user_meta_data jsonb not null default '{}');
       create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
       grant usage on schema public,auth to anon,authenticated; grant execute on function auth.uid() to anon,authenticated;`);
-    for (const name of ["202611030001_shiftflow.sql", "20261114180614_shiftflow_basic.sql", "20261114182256_shiftflow_access_hardening.sql", "20261114183109_shiftflow_notification_events.sql"]) await db.exec(await readFile(`supabase/migrations/${name}`, "utf8"));
+    for (const name of ["20261114213420_shiftflow_initial.sql", "20261114213536_shiftflow_basic.sql", "20261114213542_shiftflow_access_hardening.sql", "20261114213547_shiftflow_notification_events.sql"]) await db.exec(await readFile(`supabase/migrations/${name}`, "utf8"));
     const users = [1, 2, 3, 4].map(n => `00000000-0000-0000-0000-${String(n).padStart(12, "0")}`);
     for (const id of users) await db.query("insert into auth.users(id,email,email_confirmed_at,raw_user_meta_data) values($1,$2,now(),$3)", [id, `${id}@example.test`, JSON.stringify({ company_name: "Pilot" })]);
     const memberships = (await db.query<{ user_id: string; company_id: string }>("select user_id,company_id from memberships")).rows;
