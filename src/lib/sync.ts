@@ -1,12 +1,13 @@
 import { cloudState, type StoredState } from "./storage";
 import { mergeWorkspace } from "./workspace-merge";
 
-export interface PendingSave { id: string; base: StoredState; state: StoredState; version: number }
+export interface PendingSave { id: string; base: StoredState; state: StoredState; version: number; uiBase?: StoredState; createdAt?: number }
 interface SyncOptions {
   version: number; state: StoredState;
   save: (state: StoredState, version: number, id: string) => Promise<number>;
   load: () => Promise<{ state: StoredState; version: number }>;
   pending: (saves: PendingSave[]) => void;
+  acknowledged?: (id: string) => void;
   acknowledge: (saved: StoredState, previous: StoredState, version: number) => void;
   status: (status: string, error?: Error) => void;
 }
@@ -17,18 +18,17 @@ export class WorkspaceSync {
   private version: number;
   private queue: PendingSave[] = [];
   private attempted = new Set<string>();
-  private rejected = new Set<string>();
   private running: Promise<void> | null = null;
   private stopped = false;
   constructor(private options: SyncOptions) { this.base = cloudState(options.state); this.version = options.version; }
   enqueue(state: StoredState) {
     if (this.stopped || (!this.queue.length && JSON.stringify(state.current) === JSON.stringify(this.base.current))) return;
-    const job = { id: crypto.randomUUID(), base: this.base, state: cloudState(state), version: this.version };
-    const last = this.queue.at(-1);
-    if (last && (!this.attempted.has(last.id) || this.rejected.has(last.id))) { this.rejected.delete(last.id); this.attempted.delete(last.id); this.queue[this.queue.length - 1] = job; } else this.queue.push(job);
+    const job: PendingSave = { id: crypto.randomUUID(), base: this.base, uiBase: this.base, state: cloudState(state), version: this.version, createdAt: Date.now() };
+    this.queue.push(job);
     this.options.pending([...this.queue]); this.options.status("Čeka slanje");
   }
-  restore(pending: PendingSave[]) { this.queue = pending; pending.forEach(p => this.attempted.add(p.id)); }
+  restore(pending: PendingSave[]) { this.queue = pending; this.attempted = new Set(pending.map(p => p.id)); }
+  pendingJobs() { return [...this.queue]; }
   flush(): Promise<void> {
     if (this.running) return this.running;
     this.running = this.drain().finally(() => { this.running = null; });
@@ -53,7 +53,6 @@ export class WorkspaceSync {
         }
         if (version === undefined) throw new Error("Nije potvrđena verzija upisa.");
         if (this.stopped) return;
-        const previous = this.base;
         this.base = job.state; this.version = version;
         this.queue.shift(); this.attempted.delete(job.id);
         for (const queued of this.queue) {
@@ -61,13 +60,10 @@ export class WorkspaceSync {
           queued.base = this.base; queued.version = version;
         }
         this.options.pending([...this.queue]);
-        this.options.acknowledge(job.state, previous, version);
+        this.options.acknowledged?.(job.id);
+        this.options.acknowledge(job.state, job.uiBase ?? job.base, version);
         this.options.status(this.queue.length ? "Čeka slanje" : "Sinhronizovano");
       } catch (error) {
-        if ((error as { retryable?: boolean })?.retryable === false) {
-          this.rejected.add(job.id);
-          if (this.queue.length > 1) { this.queue.shift(); this.attempted.delete(job.id); continue; }
-        }
         // The attempted request stays first with its exact ID/payload, even if newer edits exist.
         this.options.pending([...this.queue]);
         this.options.status("Pokušaj ponovo", error instanceof Error ? error : new Error(String(error)));

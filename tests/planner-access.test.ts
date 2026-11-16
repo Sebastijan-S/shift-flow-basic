@@ -12,7 +12,7 @@ test("planner link allows only scheduling and availability, with immediate rotat
       create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,raw_user_meta_data jsonb not null default '{}');
       create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
       grant usage on schema public,auth to anon,authenticated; grant execute on function auth.uid() to anon,authenticated;`);
-    for (const name of ["20261114213420_shiftflow_initial.sql", "20261114213536_shiftflow_basic.sql", "20261114213542_shiftflow_access_hardening.sql", "20261114213547_shiftflow_notification_events.sql", "20261114224339_planner_access.sql"]) {
+    for (const name of ["20261114213420_shiftflow_initial.sql", "20261114213536_shiftflow_basic.sql", "20261114213542_shiftflow_access_hardening.sql", "20261114213547_shiftflow_notification_events.sql", "20261114224339_planner_access.sql", "20261117000000_planner_private_notes.sql"]) {
       await db.exec(await readFile(`supabase/migrations/${name}`, "utf8"));
     }
     const owner = "00000000-0000-0000-0000-000000000011";
@@ -21,6 +21,8 @@ test("planner link allows only scheduling and availability, with immediate rotat
     await db.exec("set role authenticated");
     await db.query("select set_config('request.jwt.claim.sub',$1,false)", [owner]);
     const current = createDemo();
+    const scheduledWeek = Object.keys(current.schedules)[0];
+    current.schedules[scheduledWeek].assignments[0].note = "Manager secret";
     const initial = cloudState(migrateState({ schema: 2, revision: 1, current, past: [], future: [] }));
     await db.query("select save_workspace_v2($1,$2::jsonb,0,$3)", [company, JSON.stringify(initial), crypto.randomUUID()]);
     await db.exec("reset role");
@@ -32,12 +34,14 @@ test("planner link allows only scheduling and availability, with immediate rotat
     await db.query("select set_config('request.jwt.claim.sub','',false)");
     const firstRead = (await db.query<{ result: { company_id: string; state: { current: typeof current } } }>("select read_planner_workspace($1) result", [token])).rows[0].result;
     assert.equal(firstRead.company_id, company);
+    assert.equal(firstRead.state.current.schedules[scheduledWeek].assignments[0].note, undefined, "planner projection hides private notes");
+    assert.ok(!JSON.stringify(firstRead).includes("Manager secret"));
     assert.ok(!JSON.stringify(firstRead).includes("billing"), "future administrative fields stay private");
     await assert.rejects(db.query("select * from companies"), /permission denied/);
     await assert.rejects(db.query("select * from memberships"), /permission denied/);
     await assert.rejects(db.query("select * from workspace_documents"), /permission denied/);
     await assert.rejects(db.query("select save_workspace_v2($1,$2::jsonb,1,$3)", [company, JSON.stringify(initial), crypto.randomUUID()]), /permission denied/);
-    const allowed = structuredClone(initial);
+    const allowed = structuredClone(firstRead.state) as unknown as typeof initial;
     allowed.revision++;
     allowed.current.employees[0].daysOff = [2];
     allowed.current.absences = [{ id: crypto.randomUUID(), employeeId: allowed.current.employees[0].id, from: "2027-01-04", to: "2027-01-05", kind: "absence", reason: "Odmor" }];
@@ -68,15 +72,26 @@ test("planner link allows only scheduling and availability, with immediate rotat
     publication.current.schedules["2027-01-04"].publishedAt = new Date().toISOString();
     await assert.rejects(db.query("select save_planner_workspace($1,$2::jsonb,2,$3)", [token, JSON.stringify(publication), crypto.randomUUID()]), /PLANNER_SCOPE_VIOLATION/);
     const edited = structuredClone(allowed);
-    const scheduledWeek = Object.keys(current.schedules)[0];
-    edited.current.schedules[scheduledWeek].assignments[0].note = "Radnički unos";
+    edited.current.schedules[scheduledWeek].assignments[0].locked = !edited.current.schedules[scheduledWeek].assignments[0].locked;
     await db.query("select save_planner_workspace($1,$2::jsonb,2,$3)", [token, JSON.stringify(edited), crypto.randomUUID()]);
     const afterEdit = (await db.query<{ result: { state: { current: typeof current } } }>("select read_planner_workspace($1) result", [token])).rows[0].result;
-    assert.equal(afterEdit.state.current.schedules[scheduledWeek].assignments[0].note, "Radnički unos");
+    assert.equal(afterEdit.state.current.schedules[scheduledWeek].assignments[0].note, undefined);
+    await db.exec("reset role");
+    assert.equal((await db.query<{ note: string }>("select state#>>'{current,schedules," + scheduledWeek + ",assignments,0,note}' note from workspace_documents where company_id=$1", [company])).rows[0].note, "Manager secret", "normal planner edit retains the private note");
+    await db.exec("set role anon");
+    await db.query("select set_config('request.jwt.claim.sub','',false)");
     const weakened = structuredClone(edited);
-    weakened.current.schedules[scheduledWeek].assignments[0].note = "Novi unos";
+    weakened.current.schedules[scheduledWeek].assignments[0].note = "Crafted secret";
+    await assert.rejects(db.query("select save_planner_workspace($1,$2::jsonb,3,$3)", [token, JSON.stringify(weakened), crypto.randomUUID()]), /PLANNER_SCOPE_VIOLATION/);
+    weakened.current.schedules[scheduledWeek].assignments[0].note = "";
+    weakened.current.schedules[scheduledWeek].assignments = weakened.current.schedules[scheduledWeek].assignments.slice(1);
+    await assert.rejects(db.query("select save_planner_workspace($1,$2::jsonb,3,$3)", [token, JSON.stringify(weakened), crypto.randomUUID()]), /PLANNER_SCOPE_VIOLATION/);
+    weakened.current.schedules[scheduledWeek].assignments = edited.current.schedules[scheduledWeek].assignments;
     weakened.current.schedules[scheduledWeek].rules = { ...weakened.current.rules, minRestHours: 0 };
     await assert.rejects(db.query("select save_planner_workspace($1,$2::jsonb,3,$3)", [token, JSON.stringify(weakened), crypto.randomUUID()]), /PLANNER_SCOPE_VIOLATION/);
+    await db.exec("set role authenticated");
+    await db.query("select set_config('request.jwt.claim.sub',$1,false)", [owner]);
+    assert.equal((await db.query<{ note: string }>("select state#>>'{current,schedules," + scheduledWeek + ",assignments,0,note}' note from workspace_documents where company_id=$1", [company])).rows[0].note, "Manager secret", "manager retains note access");
     await db.exec("set role authenticated");
     await db.query("select set_config('request.jwt.claim.sub',$1,false)", [owner]);
     const replacement = (await db.query<{ token: string }>("select rotate_planner_link($1) token", [company])).rows[0].token;

@@ -6,6 +6,7 @@ function identity(v: unknown): string | null {
   if (!record(v)) return null;
   if (typeof v.id === "string") return v.id;
   if (v.day !== undefined && v.templateId && v.position) return `${v.day}|${v.templateId}|${v.position}`;
+  if (typeof v.day === "number" && typeof v.start === "string" && typeof v.end === "string") return `availability:${v.day}`;
   return null;
 }
 
@@ -20,11 +21,13 @@ export function mergeWorkspace(base: Workspace, local: Workspace, remote: Worksp
       return [...new Set([...r.filter(v => !removed.has(v)), ...l.filter(v => !b.includes(v))])];
     }
     if (Array.isArray(b) && Array.isArray(l) && Array.isArray(r) && [...b, ...l, ...r].every(v => identity(v) !== null)) {
+      const availability = [...b, ...l, ...r].every(v => record(v) && typeof v.day === "number" && typeof v.start === "string" && typeof v.end === "string" && !v.id);
       const bm = new Map(b.map(v => [identity(v)!, v])), lm = new Map(l.map(v => [identity(v)!, v])), rm = new Map(r.map(v => [identity(v)!, v]));
       const result: unknown[] = [];
       for (const key of new Set([...rm.keys(), ...lm.keys(), ...bm.keys()])) {
         if (bm.has(key) && !lm.has(key)) { if (rm.has(key) && !equal(bm.get(key), rm.get(key))) throw new Error("Zapis je u međuvremenu izmenjen. Pregledajte noviju verziju pre brisanja."); continue; }
         if (bm.has(key) && !rm.has(key) && lm.has(key)) { if (!equal(bm.get(key), lm.get(key))) throw new Error("Zapis je u međuvremenu obrisan. Izmena je ostala lokalno."); continue; }
+        if (availability && bm.has(key) && lm.has(key) && rm.has(key) && !equal(bm.get(key), lm.get(key)) && !equal(bm.get(key), rm.get(key)) && !equal(lm.get(key), rm.get(key))) throw new Error("Istu nedeljnu dostupnost je izmenio drugi korisnik. Pregledajte noviju verziju.");
         result.push(merge(bm.get(key), lm.has(key) ? lm.get(key) : bm.get(key), rm.get(key)));
       }
       return result.filter(v => v !== undefined);
