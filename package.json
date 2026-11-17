@@ -17,14 +17,12 @@
     "@remixicon/react": "^4.6.0",
     "@supabase/supabase-js": "^2.90.0",
     "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
     "cn": "^0.5.2",
     "html-to-image": "^1.11.13",
     "next": "16.4.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "shadcn": "^4.23.0",
-    "tailwind-merge": "^3.4.0"
+    "shadcn": "^4.23.0"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.14",

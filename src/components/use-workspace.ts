@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createDemo } from "@/lib/demo";
 import { getSupabase, loadCloud, loadPlanner, saveCloud, savePlanner, type CloudWorkspace, type PlannerWorkspace } from "@/lib/supabase";
 import { companyStorageKey, migrateState, readState, STORAGE_KEY, writeState, type StoredState } from "@/lib/storage";
-import { WorkspaceSync, type PendingSave } from "@/lib/sync";
+import { WorkspaceSync } from "@/lib/sync";
 import { mergeWorkspace } from "@/lib/workspace-merge";
 import { WorkspaceOutbox } from "@/lib/outbox";
 

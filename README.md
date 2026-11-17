@@ -4,7 +4,7 @@ Next.js, TypeScript, Supabase PostgreSQL/Auth/RLS i postojeći Tailwind/UI siste
 
 ## Pokretanje
 
-Node.js 22+ i pnpm. Kopirati .env.example u .env.local i uneti NEXT_PUBLIC_SUPABASE_URL i NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY. Javne vrednosti se ugrađuju tokom statičkog builda; tajni administrativni ključ nije deo klijenta.
+Node.js 24.22.1 (`.node-version`) i pnpm 11.25.0 (`packageManager`). Posle preuzimanja pokrenuti `pnpm install --frozen-lockfile`. Kopirati .env.example u .env.local i uneti NEXT_PUBLIC_SUPABASE_URL i NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY. Javne vrednosti se ugrađuju tokom statičkog builda; tajni administrativni ključ nije deo klijenta.
 
 - pnpm dev — lokalna aplikacija na http://127.0.0.1:3000
 - pnpm exec tsc --noEmit --incremental false — TypeScript
@@ -36,9 +36,9 @@ Za objavljivanje preko GitHub-a i Cloudflare Pages pogledati [CLOUDFLARE.md](CLO
 
 ## Supabase
 
-Povezan projekat: https://sbvicmcgghoshrghbybq.supabase.co. Migracije su primenjene kroz Supabase MCP. Baza ima 21 tabelu sa RLS-om. Privilegovana implementacija je u private šemi; javni RPC-jevi su SECURITY INVOKER wrapperi sa tačno određenim dozvolama. Direktno pisanje tabela iz klijenta je zabranjeno. save_workspace_v2 atomski ažurira normalizovane podatke, dokument, audit i potvrdu operacije. Svaki upis proverava aktuelno članstvo.
+Povezan projekat: https://sbvicmcgghoshrghbybq.supabase.co. Migracije do `20261114224339_planner_access.sql` primenjene su kroz Supabase MCP; `20261117000000_planner_private_notes.sql` još nije primenjena na povezani projekat. Baza ima 21 tabelu sa RLS-om. Privilegovana implementacija je u private šemi; javni RPC-jevi su SECURITY INVOKER wrapperi sa tačno određenim dozvolama. Direktno pisanje tabela iz klijenta je zabranjeno. save_workspace_v2 atomski ažurira normalizovane podatke, dokument, audit i potvrdu operacije. Svaki upis proverava aktuelno članstvo.
 
-Za praznu dodatnu bazu primeniti SQL fajlove iz supabase/migrations redom. Ne primenjivati ih ponovo na već podešen projekat. Imena lokalnih migracija usklađena su sa verzijama u povezanom projektu.
+Za praznu dodatnu bazu primeniti SQL fajlove iz supabase/migrations redom. Ne primenjivati ih ponovo na već podešen projekat. Imena ranijih lokalnih migracija usklađena su sa verzijama u povezanom projektu.
 
 Migracija `20261114224339_planner_access.sql` je primenjena na povezani projekat. Za pregled interfejsa bez upisa u bazu, tokom `pnpm dev` otvoriti `http://127.0.0.1:3000/?planner-preview=1`. To koristi zaseban lokalni demo. Stvarne dozvole i opoziv pokriva izolovani PostgreSQL test `tests/planner-access.test.ts`.
 
