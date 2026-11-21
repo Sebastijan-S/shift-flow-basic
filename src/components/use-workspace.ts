@@ -7,6 +7,7 @@ import { companyStorageKey, migrateState, readState, STORAGE_KEY, writeState, ty
 import { WorkspaceSync } from "@/lib/sync";
 import { mergeWorkspace } from "@/lib/workspace-merge";
 import { WorkspaceOutbox } from "@/lib/outbox";
+import { accessReadOnly } from "@/lib/access";
 
 export function useWorkspace() {
   const [state, setState] = useState<StoredState | null>(null);
@@ -132,6 +133,7 @@ export function useWorkspace() {
         if (!alive.current) return;
         if (sync.current?.isPending()) { retry(); return; }
         if (JSON.stringify(cloud.state.current) !== JSON.stringify(latest.current?.current)) await connect(cloud.company_id);
+        else setConnection(cloud); // Access changes must refresh even if the schedule is unchanged.
       } catch (e) { if (plannerToken.current) { sync.current?.dispose(); sync.current = null; latest.current = null; setState(null); setConnection(null); setConnectionError((e as Error).message); } else setError((e as Error).message); }
     };
     window.addEventListener("storage", onStorage); window.addEventListener("online", retry); window.addEventListener("focus", refresh);
@@ -159,6 +161,6 @@ export function useWorkspace() {
     localStorage.removeItem(key.current);
     sync.current?.dispose(); sync.current = null; await connect();
   }, [connect, flush, plannerMode]);
-  const readOnly = connection?.access_status === "expired" || (connection?.access_status === "trial" && !!connection.trial_ends_at && Date.parse(connection.trial_ends_at) <= Date.now());
+  const readOnly = accessReadOnly(connection, Date.now());
   return { state, setState: change, getLatest: () => latest.current, cloudId: connection?.company_id ?? null, role: plannerMode ? "planner" as const : connection && "role" in connection ? connection.role : null, plannerMode, authUser: email, saveStatus: error || status, saveError: !!error, connectionError, connect, flush, signOut, readOnly };
 }

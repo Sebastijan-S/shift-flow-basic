@@ -1,6 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createWorkspace } from "./demo";
 import { cloudState, migrateState, type StoredState } from "./storage";
+import { parseModules, type ModuleId, type ModuleSettings } from "./modules";
 
 let client: SupabaseClient | null = null;
 let plannerClient: SupabaseClient | null = null;
@@ -12,6 +13,15 @@ export function getSupabase() {
   return client;
 }
 function database() { const db = getSupabase(); if (!db) throw new Error("Supabase projekat još nije povezan."); return db; }
+export async function loadCompanyModules(companyId: string): Promise<ModuleSettings> {
+  const { data, error } = await database().from("company_modules").select("module_id,enabled").eq("company_id", companyId);
+  if (error) throw error;
+  return parseModules(Object.fromEntries((data ?? []).map(row => [row.module_id, row.enabled])));
+}
+export async function saveCompanyModule(companyId: string, module: ModuleId, enabled: boolean): Promise<void> {
+  const { error } = await database().rpc("set_company_module", { p_company: companyId, p_module: module, p_enabled: enabled });
+  if (error) throw error;
+}
 function plannerDatabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
