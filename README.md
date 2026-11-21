@@ -156,3 +156,37 @@ Ručna checklista za pregled:
 Nema otvorenih poslovnih pitanja za Fazu 3. Pregled trenutno učitava sve zapise jednog lokala; paginacija je tehnička nadogradnja kada obim to zahteva, uz očuvanje tačnosti ukupnog zbira. Nisu uvedeni PDF pazara, brisanje, zaključavanje dana, automatske nule, POS, porezi, troškovi, dobit, nove uloge ili Faze 4–7. Nema commit/push akcije; faza čeka pregled vlasnika.
 
 Naknadni pregled Faze 3: vlasnik je odobrio commit/push sa porukom `pazar`. Ispravljeno je mobilno prelivanje zajedničkih formi: kolone i njihove labele mogu da se suze, polja ostaju unutar roditelja, a ispod 480 px forma prelazi u jednu kolonu. Uklonjena je minimalna širina koja je mogla širiti podešavanja cena rada; uski redovi i akcije mogu da se prelome. Chrome vizuelno provereni Pazar, podešavanja smena/cena rada, pravila rada i dostupnost/odsustva na 392 px, kao i dostupnost na 320 px i običan prikaz. Tabele zadržavaju sopstveni horizontalni skrol. Poslovna logika i podaci nisu menjani ovim CSS popravkama. Faza 4 nije pokrenuta.
+
+### Faza 4 — Notes i podsetnici (21.11.2026, prihvaćena za commit/push)
+
+Postojeći modul `notes` je dostupan kroz registar, meni i Podešavanja → Moduli lokala. Jedan ekran podržava slobodan tekst do 10.000 znakova, kreiranje, pregled, izmenu, brisanje uz potvrdu, završavanje i vraćanje u aktivne. Bez datuma je beleška; datum pravi podsetnik, a vreme ostaje opciono. Aktivni podsetnici, beleške i završeni zapisi prikazani su zasebno. Isključivanje skriva ekran i podešavanja, odbija RPC pristup i čuva podatke. Ograničeni planerski link nema pristup ovom modulu.
+
+Rokovi se tumače u Europe/Belgrade, nezavisno od zone browsera. Datum bez vremena važi do kraja lokalnog dana; vremenski rok je prošao kada je njegov trenutak u prošlosti. Prošli rok dobija tekst „Prošao rok“ i vizuelnu oznaku, bez automatskog završavanja. Nepostojeće vreme u prolećnom DST prelazu se odbija. Ponovljeno jesenje vreme znači drugo pojavljivanje (zimsko vreme), dosledno PostgreSQL-u. Pravila su prikazana i u podešavanjima.
+
+Deterministički redosled: aktivni pre završenih; podsetnici po datumu pa vremenu rastuće, bez vremena na kraju istog dana; isti rok razrešavaju vreme kreiranja rastuće i ID. Beleške su od najnovije kreirane ka najstarijoj, sa ID-jem kao poslednjim kriterijumom. Izmena ne menja vreme kreiranja. Završeni zapisi prate ista pravila u zasebnoj grupi.
+
+Migracija **`20261121225201_shiftflow_notes.sql` je primenjena** na povezani projekat `sbvicmcgghoshrghbybq`; lokalno ime usklađeno je sa stvarnom Supabase istorijom. Pre primene provereni su istorija i postojeći pristupni model. Nova migracija kreira zasebne `notes_entries` i `notes_changes`, javne SECURITY INVOKER wrappere `read_notes`/`notes_command` i privilegovanu implementaciju u private šemi sa praznim search_path. Nema zavisnosti od `20261117000000_planner_private_notes.sql`; ona ostaje neprimenjena i predstavlja ranije planerske napomene. Ne primenjivati nekritički sve pending migracije.
+
+Svaki RPC proverava aktuelno članstvo i uključen modul; upis proverava i status probe. Tabele imaju RLS i nemaju direktne klijentske dozvole. Upisi koriste verziju zapisa protiv konkurentnog prepisivanja i request UUID za ponavljanje kreiranja, izmene, završavanja ili brisanja bez duplog audita. Isti request sa drugim sadržajem/autorem se odbija. Brisanje zadržava interni trag i ID, pa kasni ponovljeni create ne vraća obrisani zapis. Sve je odvojeno od dokumenta rasporeda. Demo koristi `shiftflow:demo:notes:v1`, zasebne potvrde zahteva i lokalno čuvanje; nema cloud upisa demo podataka.
+
+Promenjeni fajlovi: `src/lib/notes.ts`, `src/components/notes-panel.tsx`, `src/lib/modules.ts`, `src/components/shiftflow.tsx`, `src/app/shiftflow.css`, `tests/notes.test.ts`, `tests/notes-database.test.ts`, nova migracija i ovaj README. Nema novih aplikativnih zavisnosti ili env promena. Automatska izmena `next-env.d.ts` odnosila se samo na razvojne putanje; produkcioni build vratio je prvobitne putanje i fajl nema sadržajni diff. Nije uveden implementacioni log.
+
+Završne provere:
+
+- `node node_modules/typescript/bin/tsc --noEmit --incremental false` — prolazi.
+- `node node_modules/tsx/dist/cli.mjs --test tests/*.test.ts` — **36/36 prolazi**, uključujući svih 31 prethodnih testova.
+- `node scripts/next.mjs build --webpack` — uspešan statički produkcioni build; `git diff --check` — prolazi.
+- Testovi pokrivaju belešku, datum bez vremena, datum/vreme, prazne i pogrešne ulaze, prošli rok, završavanje, izmene, brisanje, sortiranje, ponoć i oba DST prelaza, trajnost, ponavljanje zahteva, konflikt verzije, audit, izolaciju lokala, menadžera, opozvano članstvo, planerski link, zabranu direktnog/anonimnog pristupa, isključivanje/uključivanje, istek probe i pilot. SQL testovi rade sa i bez stare migracije privatnih napomena. Auth je simuliran u izolovanom PGlite PostgreSQL-u.
+- Na povezanoj bazi provereni su istorija primene, RLS, zabrana direktnog pristupa tabelama, zabrana anonimnog izvršavanja i odbijanje RPC čitanja bez članstva. Nisu dodavane testne beleške stvarnih lokala niti menjani njihovi pilot statusi. Advisor za nove tabele daje samo INFO „RLS Enabled No Policy“ (namerno: pristup samo preko RPC-ja); ranija auth upozorenja ostaju. Objašnjenje: https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy.
+
+Vlasnik je ručno proverio ekran i potvrdio da radi, zatim odobrio završetak i commit/push. Automatska browser provera nije završena: integrated browser nije imao dostupan host, a Windows Computer Use prekinuo je Chrome pristup jer nije mogao pouzdano utvrditi URL. Novi ekran na 320/392 px, stvarni nalozi u UI i stvarni mrežni prekid nisu zasebno automatski provereni. Zajedničke mobilne forme iz Faze 3 ostaju neizmenjene; nove kartice prelamaju dugačak tekst i akcije. Razvojni server je zaustavljen pre završnog builda.
+
+Ručna checklista za dodatnu proveru:
+
+1. Uključiti Notes; sačuvati belešku bez datuma, podsetnik samo sa datumom i podsetnik sa vremenom. Osvežiti: sva tri zapisa ostaju, vreme nije obavezno.
+2. Uneti prazan tekst, neispravan datum i nepostojeći prolećni sat: unos je odbijen. Prošli rok ostaje aktivan i jasno označen. Završiti, vratiti u aktivne, izmeniti i obrisati zapis uz potvrdu.
+3. Proveriti redosled pri istim rokovima, ponoć i jesenski ponovljeni sat. U dva prozora izmeniti isti zapis: zastarela verzija se odbija. Ponoviti zahtev nakon izgubljenog odgovora: nema duplikata.
+4. Isključiti i uključiti modul: zapisi ostaju. Proveriti vlasnika/menadžera, drugi lokal i opozvano članstvo; planerski link ne prikazuje Notes.
+5. Na 320 i 392 px proveriti dugačak tekst, datum/vreme, dugmad i potvrdu brisanja; raspored, dostupnost, podešavanja, sati i pazar zadržavaju ponašanje iz prethodnih faza.
+
+Nema otvorenih poslovnih pitanja za Fazu 4. Pregled učitava sve neobrisane zapise lokala, bez paginacije. Neuspešan upis zadržava obrazac i ID operacije dok je ekran otvoren; nepotvrđen obrazac nije offline red koji preživljava zatvaranje/refreš. Postojeći audit i interni obrisani zapisi se ne brišu automatski. Povratak frontenda ne zahteva uklanjanje tabela. Nisu uvedeni push/SMS/email obaveštenja, checkliste, dnevnik smene, nove uloge, knjiga šanka, izveštaji ili dashboard. Faza 5 se pokreće zasebno.

@@ -4,7 +4,7 @@ export const MODULES = [
   { id: "overview", name: "Pregled", description: "Postojeći pregled tima na smeni i planiranih sati.", available: true, required: false, defaultEnabled: true },
   { id: "hours", name: "Radni sati i obračun", description: "Evidencija sati, obračuni i PDF za potpis.", available: true, required: false, defaultEnabled: false },
   { id: "revenue", name: "Pazar", description: "Gotovina, kartice i pregled evidentiranog pazara.", available: true, required: false, defaultEnabled: false },
-  { id: "notes", name: "Notes i podsetnici", description: "Beleške i podsetnici unutar aplikacije.", available: false, required: false, defaultEnabled: false },
+  { id: "notes", name: "Notes i podsetnici", description: "Beleške i podsetnici unutar aplikacije.", available: true, required: false, defaultEnabled: false },
   { id: "bar", name: "Knjiga šanka i inventar", description: "Popis, prenos stanja i potrošnja artikala.", available: false, required: false, defaultEnabled: false },
   { id: "reports", name: "Izveštaji", description: "Nedeljni i mesečni pregledi sačuvanih podataka.", available: false, required: false, defaultEnabled: false },
 ] as const;
