@@ -448,3 +448,25 @@ textarea { resize: vertical; }
 .note-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .note-overdue { border-color: #d97706; }
 .note-deadline { color: #d97706; }
+
+/* Each wide table owns its scroll; forms remain within the mobile panel. */
+.bar-panel, .bar-editor, .bar-item-form { min-width: 0; max-width: 100%; }
+.bar-panel { overflow-wrap: anywhere; }
+.bar-panel h3 { margin: 24px 0 12px; }
+.bar-panel fieldset { min-width: 0; border: 0; padding: 0; margin: 12px 0; }
+.bar-panel legend { margin-bottom: 12px; }
+.bar-panel .panel-heading { flex-wrap: wrap; gap: 12px; }
+.bar-panel .panel-heading h2 { min-width: 0; }
+.bar-panel .form-columns { min-width: 0; }
+.bar-item-form { margin: 24px 0; }
+.bar-item-form fieldset { display: grid; gap: 14px; }
+.bar-table-scroll { min-width: 0; width: 100%; max-width: 100%; overflow-x: auto; margin: 16px 0; }
+.bar-table { min-width: 1150px; }
+.bar-table th:first-child { min-width: 180px; max-width: 230px; white-space: normal; }
+.bar-table input { width: 120px; min-width: 0; }
+.bar-table select { width: 140px; }
+.bar-table small { display: block; font-size: 11px; margin-top: 6px; white-space: normal; }
+.bar-table input[aria-invalid="true"] { border-color: #dc7070; }
+.bar-editor { margin: 24px 0; padding-top: 12px; border-top: 1px solid var(--border); }
+.bar-panel [data-slot="button"] { max-width: 100%; white-space: normal; height: auto; min-height: 35px; }
+@media(max-width:480px) { .bar-panel .form-columns { grid-template-columns: minmax(0,1fr); } }
