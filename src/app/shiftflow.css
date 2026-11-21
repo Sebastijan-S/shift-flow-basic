@@ -267,7 +267,11 @@ textarea { resize: vertical; }
 .check-row span { flex: 1; }
 .check-row small { display: block; font: 12px var(--font-mono); line-height: 1.8; color: var(--muted-foreground); margin-top: 5px; }
 .check-row > svg { color: var(--muted-foreground); }
-.form-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.form-columns > label { min-width: 0; }
+.settings-form, .dialog-form { min-width: 0; }
+.settings-form input:not([type="checkbox"]), .settings-form select, .settings-form textarea,
+.dialog-form input:not([type="checkbox"]), .dialog-form select, .dialog-form textarea { width: 100%; max-width: 100%; }
 .requirements-editor details { border-bottom: 1px solid var(--border); }
 .requirements-editor summary { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; cursor: pointer; font-family: var(--font-sans); }
 .requirement-row { display: flex; align-items: center; gap: 12px; margin: 9px 0 18px; }
@@ -313,7 +317,7 @@ textarea { resize: vertical; }
 .modal-heading > .icon-button { margin-top: -5px; margin-right: -9px; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 19px; border-top: 1px solid var(--border); margin-top: 20px; }
 .dialog-form .modal-actions { margin-top: 0; }
-.dialog-form fieldset { border: 0; padding: 0; }
+.dialog-form fieldset { border: 0; padding: 0; min-width: 0; }
 .dialog-form legend { font-family: var(--font-sans); font-size: 12px; margin-bottom: 9px; }
 .position-options { display: flex; flex-wrap: wrap; gap: 9px; }
 .position-options label { padding: 9px 11px; border: 1px solid var(--border); display: flex; gap: 7px; align-items: center; border-radius: 5px; font-size: 12px; }
@@ -411,9 +415,27 @@ textarea { resize: vertical; }
 .hours-controls { display: flex; gap: 12px; align-items: end; flex-wrap: wrap; margin: 14px 0; }
 .hours-controls label { display: grid; gap: 8px; }
 .hours-controls input { max-width: 200px; }
-.hours-settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px; }
+.hours-settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); gap: 24px; }
 .hours-rate { padding: 12px; border: 1px solid var(--border); border-radius: 10px; }
 .hours-confirm { padding: 20px; margin-top: 20px; border: 1px solid var(--border); border-radius: 10px; }
 .hours-confirm button { margin: 8px 10px 0 0; }
 .hours-panel td small { display: block; white-space: nowrap; }
 .hours-panel td .settings-form { min-width: 190px; gap: 10px; }
+.revenue-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; margin:24px 0; }
+.revenue-summary > div { padding:20px; border:1px solid var(--border); border-radius:12px; }
+.revenue-summary strong { font-size:24px; font-variant-numeric:tabular-nums; }
+.revenue-form { max-width:760px; margin-bottom:32px; }
+.revenue-form fieldset { min-width:0; border:0; padding:0; margin:0; }
+.revenue-form legend { margin-bottom:12px; }
+.revenue-panel .data-table td { font-variant-numeric:tabular-nums; }
+@media(max-width:700px) { .revenue-summary { grid-template-columns:1fr; } }
+
+@media (max-width: 480px) {
+  .form-columns { grid-template-columns: minmax(0, 1fr); }
+  .rule-field { grid-template-columns: minmax(0, 1fr); }
+  .modal-actions { flex-wrap: wrap; }
+  .hours-controls > label { min-width: 0; max-width: 100%; }
+  .hours-controls > [data-slot="button"], .hours-confirm > [data-slot="button"] { height: auto; min-height: 35px; max-width: 100%; white-space: normal; }
+  .basic-rows > div { flex-wrap: wrap; }
+  .basic-rows > div > span:first-child { min-width: 0; flex-basis: 100%; }
+}
