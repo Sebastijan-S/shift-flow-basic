@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type MouseEvent as ReactMouseEvent, type ReactNode } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { RiArrowLeftSLine, RiArrowRightSLine, RiArrowDownSLine, RiArrowRightUpLine, RiCalendar2Line, RiDashboardLine, RiGroupLine, RiTimeLine, RiSettings3Line, RiNotification3Line, RiSearchLine, RiAddLine, RiCheckLine, RiCloseLine, RiSparkling2Line, RiShareForwardLine, RiDownloadLine, RiMoreLine, RiArrowGoBackLine, RiArrowGoForwardLine, RiLockLine, RiSunLine, RiMoonLine, RiCheckboxCircleLine, RiErrorWarningLine, RiHistoryLine, RiMenuLine, RiLogoutBoxRLine, RiCupLine, RiFileCopyLine, RiDeleteBinLine, RiRefreshLine, RiInformationLine, RiLayoutGridLine, RiListCheck } from "@remixicon/react";
 import { Button } from "@/components/ui/button";
@@ -71,6 +71,13 @@ export default function ShiftFlow() {
   const exportRef = useRef<HTMLDivElement>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const notify = (message: string) => { setToast(message); if (toastTimer.current) clearTimeout(toastTimer.current); toastTimer.current = setTimeout(() => setToast(""), 4500); };
+  const jumpToSettings = (event: ReactMouseEvent<HTMLAnchorElement>) => {
+    const target = document.getElementById(event.currentTarget.hash.slice(1));
+    if (!target) return;
+    event.preventDefault();
+    target.scrollIntoView({ block: "start" });
+    target.focus({ preventScroll: true });
+  };
 
   useEffect(() => {
     try {
@@ -183,9 +190,42 @@ export default function ShiftFlow() {
 
       {page === "Istorija izmena" && <section className="panel"><div className="panel-heading"><h2>Sačuvane promene <span className="tag">{state.past.length}</span></h2><div className="heading-actions"><Button variant="outline" disabled={!state.past.length} onClick={undo}><RiArrowGoBackLine size={16} />Poništi</Button><Button variant="outline" disabled={!state.future.length} onClick={redo}><RiArrowGoForwardLine size={16} />Ponovi</Button></div></div>{!state.past.length ? <Empty>Vaše izmene će se pojaviti ovde. Istorija ostaje sačuvana i posle zatvaranja pregledača.</Empty> : <div className="history-list">{[...state.past].reverse().map((entry, i) => <div key={i}><span className="history-icon"><RiHistoryLine size={17} /></span><span><strong>{entry.label}</strong><small>{new Date(entry.time).toLocaleString("sr-Latn-RS", { timeZone: "Europe/Belgrade", dateStyle: "medium", timeStyle: "short" })}</small></span>{i === 0 && <span className="tag">Poslednja izmena</span>}</div>)}</div>}</section>}
 
-      {page === "Podešavanja" && <div className="settings-grid"><section className="panel"><h2>Vaš kafić</h2><form className="settings-form" onSubmit={e => { e.preventDefault(); const f = new FormData(e.currentTarget); commit({ ...w, name: String(f.get("name")).trim() }, "Promenjen naziv kafića"); notify("Podešavanja su sačuvana."); }}><label>Naziv kafića<input name="name" required maxLength={80} defaultValue={w.name} disabled={role === "manager"} /></label><label>Vremenska zona<input value="Europe/Belgrade" readOnly /></label><label>Izgled<select value={theme} onChange={e => { setTheme(e.target.value); localStorage.setItem("shiftflow:theme", e.target.value); }}><option value="dark">Tamna tema</option><option value="light">Svetla tema</option></select></label><Button type="submit" disabled={role === "manager"}>Sačuvaj podešavanja</Button></form></section><section className="panel"><h2>Vremena smena</h2><p className="muted">Kraj pre početka označava smenu koja prelazi ponoć.</p><form className="settings-form" onSubmit={e => { e.preventDefault(); const f = new FormData(e.currentTarget); const templates = w.templates.map(t => ({ ...t, name: String(f.get(`${t.id}-name`)), start: String(f.get(`${t.id}-start`)), end: String(f.get(`${t.id}-end`)), days: f.getAll(`${t.id}-days`).map(Number) })); if (templates.some(t => t.start === t.end)) { notify("Početak i kraj smene moraju da se razlikuju."); return; } commit({ ...w, templates }, "Promenjena vremena smena"); notify("Vremena smena su sačuvana."); }}>{w.templates.map(t => <div className="template-editor" key={t.id}><label>Naziv<input name={`${t.id}-name`} defaultValue={t.name} required /></label><div className="form-columns"><label>Početak<input name={`${t.id}-start`} type="time" defaultValue={t.start} required /></label><label>Kraj<input name={`${t.id}-end`} type="time" defaultValue={t.end} required /></label></div><div className="position-options">{DAY_NAMES.map((d, i) => <label key={d}><input type="checkbox" name={`${t.id}-days`} value={i} defaultChecked={!t.days || t.days.includes(i)} />{d.slice(0, 3)}</label>)}</div></div>)}<Button type="submit">Sačuvaj smene</Button></form></section><section className="panel connection-panel"><span className="connection-icon"><RiLockLine size={24} /></span><div><h2>{cloudId ? "Nalog je povezan" : "Radite sa timom"}</h2><p className="muted">{cloudId ? "Rasporedi su sačuvani i dostupni vašem timu." : "Prijavite se za zajednički rad i deljenje rasporeda."}</p></div><Button variant="outline" onClick={() => { setModal("auth"); setFormError(""); }}>{cloudId ? "Moj nalog" : "Prijava i registracija"}<RiArrowRightSLine size={16} /></Button></section></div>}
-
-      {page === "Podešavanja" && !plannerMode && <><ModuleSettingsPanel {...modules} readOnly={readOnly} />{showBar && <BarPanel key={`${authUser}:${cloudId}:bar-settings`} companyId={cloudId} companyName={w.name} readOnly={readOnly} settingsOnly />}{showNotes && <NotesSettings />}{showRevenue && <RevenueSettings />}{showHours && <HoursPanel key={`${authUser}:${cloudId}:hours-settings`} companyId={cloudId} workspace={w} readOnly={readOnly} flush={flush} settingsOnly />}<BasicSettings workspace={w} commit={commit} week={week} />{cloudId && <BasicAccess key={`${authUser}:${cloudId}:access`} companyId={cloudId} role={role} flush={flush} reconnect={connect} />}</>}
+      {page === "Podešavanja" && <>
+        <nav className="panel settings-index" aria-label="Indeks podešavanja">
+          <span className="settings-index-title">Na ovoj strani</span>
+          <div className="settings-index-links">
+            <a href="#settings-venue" onClick={jumpToSettings}>Lokal</a>
+            {!plannerMode && <a href="#settings-modules" onClick={jumpToSettings}>Izbor modula</a>}
+            {!plannerMode && <div className="settings-index-group"><a href="#settings-configuration" onClick={jumpToSettings}>Podešavanja modula</a><div className="settings-index-sub">
+              <a href="#settings-schedule" onClick={jumpToSettings}>Raspored</a>
+              {showBar && <a href="#bar-item-settings" onClick={jumpToSettings}>Knjiga šanka</a>}
+              {showNotes && <a href="#settings-notes" onClick={jumpToSettings}>Notes</a>}
+              {showRevenue && <a href="#settings-revenue" onClick={jumpToSettings}>Pazar</a>}
+              {showHours && <a href="#settings-hours" onClick={jumpToSettings}>Radni sati</a>}
+            </div></div>}
+            <a href="#settings-access" onClick={jumpToSettings}>Pristup</a>
+          </div>
+        </nav>
+        <section id="settings-venue" className="settings-section" tabIndex={-1} aria-labelledby="settings-venue-title">
+          <div className="settings-section-heading"><h2 id="settings-venue-title">Lokal</h2><span>Sačuvaj u obrascu</span></div>
+          <div className="settings-grid"><section className="panel"><h2>Vaš kafić</h2><form className="settings-form" onSubmit={e => { e.preventDefault(); const f = new FormData(e.currentTarget); commit({ ...w, name: String(f.get("name")).trim() }, "Promenjen naziv kafića"); notify("Naziv lokala je sačuvan."); }}><label>Naziv kafića<input name="name" required maxLength={80} defaultValue={w.name} disabled={role === "manager"} /></label><label>Vremenska zona<input value="Europe/Belgrade" readOnly /></label><label>Izgled <small className="settings-auto-label">Čuva se odmah</small><select value={theme} onChange={e => { setTheme(e.target.value); localStorage.setItem("shiftflow:theme", e.target.value); }}><option value="dark">Tamna tema</option><option value="light">Svetla tema</option></select></label><Button type="submit" disabled={role === "manager"}>Sačuvaj naziv</Button></form></section><section className="panel"><h2>Vremena smena</h2><p className="muted">Kraj pre početka označava smenu koja prelazi ponoć.</p><form className="settings-form" onSubmit={e => { e.preventDefault(); const f = new FormData(e.currentTarget); const templates = w.templates.map(t => ({ ...t, name: String(f.get(`${t.id}-name`)), start: String(f.get(`${t.id}-start`)), end: String(f.get(`${t.id}-end`)), days: f.getAll(`${t.id}-days`).map(Number) })); if (templates.some(t => t.start === t.end)) { notify("Početak i kraj smene moraju da se razlikuju."); return; } commit({ ...w, templates }, "Promenjena vremena smena"); notify("Vremena smena su sačuvana."); }}>{w.templates.map(t => <div className="template-editor" key={t.id}><label>Naziv<input name={`${t.id}-name`} defaultValue={t.name} required /></label><div className="form-columns"><label>Početak<input name={`${t.id}-start`} type="time" defaultValue={t.start} required /></label><label>Kraj<input name={`${t.id}-end`} type="time" defaultValue={t.end} required /></label></div><div className="position-options">{DAY_NAMES.map((d, i) => <label key={d}><input type="checkbox" name={`${t.id}-days`} value={i} defaultChecked={!t.days || t.days.includes(i)} />{d.slice(0, 3)}</label>)}</div></div>)}<Button type="submit">Sačuvaj smene</Button></form></section></div>
+        </section>
+        {!plannerMode && <>
+          <ModuleSettingsPanel {...modules} readOnly={readOnly} />
+          <section id="settings-configuration" className="settings-section" tabIndex={-1} aria-labelledby="settings-configuration-title">
+            <div className="settings-section-heading"><h2 id="settings-configuration-title">Podešavanja modula</h2></div>
+            <div id="settings-schedule" className="settings-index-target" tabIndex={-1}><h3 className="settings-module-heading">Raspored</h3><BasicSettings workspace={w} commit={commit} week={week} /></div>
+            {showBar && <BarPanel key={`${authUser}:${cloudId}:bar-settings`} companyId={cloudId} companyName={w.name} readOnly={readOnly} settingsOnly />}
+            {showNotes && <div id="settings-notes" className="settings-index-target" tabIndex={-1}><NotesSettings /></div>}
+            {showRevenue && <div id="settings-revenue" className="settings-index-target" tabIndex={-1}><RevenueSettings /></div>}
+            {showHours && <div id="settings-hours" className="settings-index-target" tabIndex={-1}><HoursPanel key={`${authUser}:${cloudId}:hours-settings`} companyId={cloudId} workspace={w} readOnly={readOnly} flush={flush} settingsOnly /></div>}
+          </section>
+        </>}
+        <section id="settings-access" className="settings-section" tabIndex={-1} aria-labelledby="settings-access-title">
+          <div className="settings-section-heading"><h2 id="settings-access-title">Pristup</h2></div>
+          <div className="settings-access"><section className="panel connection-panel"><span className="connection-icon"><RiLockLine size={24} /></span><div><h2>{cloudId ? "Nalog je povezan" : "Radite sa timom"}</h2><p className="muted">{cloudId ? "Rasporedi su sačuvani i dostupni vašem timu." : "Prijavite se za zajednički rad i deljenje rasporeda."}</p></div><Button variant="outline" onClick={() => { setModal("auth"); setFormError(""); }}>{cloudId ? "Moj nalog" : "Prijava i registracija"}<RiArrowRightSLine size={16} /></Button></section>{cloudId && <BasicAccess key={`${authUser}:${cloudId}:access`} companyId={cloudId} role={role} flush={flush} reconnect={connect} />}</div>
+        </section>
+      </>}
 
       </main></div>
 

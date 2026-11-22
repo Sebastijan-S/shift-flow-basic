@@ -122,7 +122,7 @@ export function BarPanel({ companyId, companyName, readOnly, settingsOnly = fals
     else setEditing(old => old ? { ...old, version: next.version } : null);
     return true;
   };
-  return <section id={settingsOnly ? "bar-item-settings" : undefined} className="panel basic-panel bar-panel" aria-busy={busy}>
+  return <section id={settingsOnly ? "bar-item-settings" : undefined} className="panel basic-panel bar-panel" tabIndex={settingsOnly ? -1 : undefined} aria-busy={busy}>
     <div className="panel-heading"><h2>{settingsOnly ? "Artikli knjige šanka" : "Stanje i knjige"}</h2><Button variant="outline" disabled={busy} onClick={() => void load()}>Osveži pregled</Button></div>
     {error && <p className="form-error" role="alert">{error}</p>}{error && data && operation.current && <Button disabled={busy || readOnly} variant="outline" onClick={async () => { const command = operation.current!.command; const next = await execute(command); if (next) { setEditing(null); setItem(null); setItemVersion(null); newItemId.current = null; newBookId.current = null; setItemKey(k => k + 1); } }}>Ponovi isti zahtev</Button>}<p role="status">{status}</p>
     {!data ? <p>{error ? "Podaci nisu dostupni. Pokušajte osvežavanje." : "Učitavanje knjige…"}</p> : settingsOnly ? <>
