@@ -489,3 +489,17 @@ textarea { resize: vertical; }
   .dashboard-reminders li { align-items: flex-start; flex-direction: column; gap: 10px; }
 }
 @media print { .operational-dashboard { display: none !important; } }
+
+/* Small screens keep forms within their panels; wide tables alone scroll. */
+.schedule-section, .calendar-card, .calendar-scroll, .data-table-scroll { min-width: 0; max-width: 100%; }
+.panel, .stat-card { overflow-wrap: anywhere; }
+.settings-form input:not([type="checkbox"]), .settings-form select, .settings-form textarea { min-width: 0; }
+@media(max-width: 480px) {
+  .stats-grid { grid-template-columns: minmax(0, 1fr); }
+  .filter-group, .calendar-tools, .heading-actions { flex-wrap: wrap; }
+  .filter-group > .search-field { flex-basis: 100%; }
+  .filter-group > .filter-divider { display: none; }
+  .position-select { max-width: 100%; }
+  .schedule-bottom { flex-wrap: wrap; gap: 12px; }
+  .settings-form > [data-slot="button"], .panel-heading > [data-slot="button"] { max-width: 100%; height: auto; min-height: 35px; white-space: normal; }
+}

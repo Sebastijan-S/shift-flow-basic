@@ -22,3 +22,16 @@ test("sync: lost response retries the exact operation before newer edits", async
   assert.equal(calls[0].id, calls[1].id); assert.equal(calls[0].name, calls[1].name);
   assert.equal(calls[2].name, "Second"); assert.equal(sync.isPending(), false);
 });
+
+test("sync: disposing a workspace during a delayed conflict stops reads and callbacks", async () => {
+  let reject!: (error: Error) => void, loads = 0, callbacks = 0;
+  const sync = new WorkspaceSync({ state: state("Base"), version: 0,
+    save: () => new Promise<number>((_, fail) => { reject = fail; }),
+    load: async () => { loads++; return { state: state("Remote"), version: 1 }; },
+    pending: () => { callbacks++; }, acknowledge: () => { callbacks++; }, status: () => { callbacks++; },
+  });
+  sync.enqueue(state("Old tenant edit", 1)); const running = sync.flush();
+  sync.dispose(); const before = callbacks; reject(new Error("VERSION_CONFLICT")); await running;
+  assert.equal(loads, 0); assert.equal(callbacks, before);
+  assert.equal(sync.pendingJobs().length, 1, "the original operation remains available for tenant-scoped recovery");
+});

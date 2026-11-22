@@ -60,11 +60,12 @@ export async function revokePlannerLink(companyId: string) {
 export async function loadCloud(companyId?: string): Promise<CloudWorkspace> {
   const db = database();
   const { data: { user }, error: authError } = await db.auth.getUser();
-  if (authError || !user) throw new Error("Prijavite se da otvorite poslovni prostor.");
+  if (authError) throw authError;
+  if (!user) throw Object.assign(new Error("Prijavite se da otvorite poslovni prostor."), { code: "ACCESS_DENIED" });
   const { data: memberships, error: memberError } = await db.from("memberships").select("company_id,role").eq("user_id", user.id).order("created_at");
   if (memberError) throw new Error("Nije moguće učitati poslovni prostor: " + memberError.message);
   const selected = companyId ?? localStorage.getItem(`shiftflow:active:${user.id}`);
-  if (companyId && !memberships?.some(m => m.company_id === companyId)) throw new Error("Pristup ovom objektu je uklonjen.");
+  if (companyId && !memberships?.some(m => m.company_id === companyId)) throw Object.assign(new Error("Pristup ovom objektu je uklonjen."), { code: "ACCESS_DENIED" });
   const membership = memberships?.find(m => m.company_id === selected) ?? memberships?.[0];
   if (!membership) throw new Error("Još nemate poslovni prostor. Kreirajte objekat ili prihvatite poziv vlasnika.");
   localStorage.setItem(`shiftflow:active:${user.id}`, membership.company_id);

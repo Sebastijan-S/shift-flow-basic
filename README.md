@@ -240,7 +240,7 @@ Provere posle povlačenja: **42/42 testa prolazi**, TypeScript i produkcioni sta
 
 Sledeća faza je **Faza 7 — jednostavan operativni dashboard**, bez vraćanja izveštaja. Po završetku ostaviti rezultat za vlasnikov lični pregled, bez automatskog commit/push-a ili početka stabilizacije. Tek posle pregleda i posebnog zahteva ide završni GitHub push pre **Faze 8 — stabilizacija, ispravke i pilot-provera**.
 
-### Faza 7 — jednostavan operativni dashboard (na pregledu)
+### Faza 7 — jednostavan operativni dashboard
 
 Stavka **Pregled** sada prikazuje, redom: kratke operativne kartice, brze akcije, do tri aktivna podsetnika i postojeći raspored. Prethodni pregled tima i grafikon planiranih sati zamenjeni su ovim prikazom. Početna stranica ostaje Raspored; uključivanje Pregleda ostaje postojeći izbor lokala.
 
@@ -265,3 +265,18 @@ Dodati fajlovi: `src/components/dashboard-panel.tsx`, `src/lib/dashboard.ts`, `s
 5. Na 320 i 392 px proveriti jednu kolonu novih kartica/akcija, dug tekst podsetnika, polja i dugmad unutar panela i horizontalni skrol samo u tabelama.
 
 Faza 7 je ostavljena za vlasnikov pregled. Preostaje navedena ručna browser provera i eventualne ispravke po pregledu; završni commit/push zahteva poseban zahtev. Faza 8 nije započeta.
+
+### Faza 8 — stabilizacija i priprema pilota
+
+Posle posebnog zahteva Faza 7 i povlačenje izveštaja pushovani su kao `7ae55b8`. Vlasnik je zatim odobrio Fazu 8 i njen push. Stabilizacija čuva postojeće funkcije i format podataka:
+
+- Osvežavanje ostaje na izabranom lokalu i proverava članstvo i kada postoje nepotvrđene izmene. Promena naloga/lokala odbacuje zakašnjele odgovore prethodnog konteksta; callbacks sinhronizacije koriste originalni lokalni red upisa. Stari UI callback i storage događaj ne mogu ponovo otvoriti opozvan cloud prostor ili pisati u drugi lokal. Osvežavanje istog lokala čuva montirane forme i koristi već učitan serverski odgovor.
+- Prekid mreže čuva oporavljive izmene, a opozvan pristup/sesija skriva radni prostor. Greška čitanja/oštećen JSON reda vraća neuspeh sa porukom umesto neobrađenog Promise odbijanja. Prekinuta sinhronizacija ne nastavlja konfliktno čitanje prethodnog lokala. Odjava uklanja keš tačno onog lokala iz kog je pokrenuta.
+- Obračun sati ponovo čita na fokus, uklanja prethodne zarade/istoriju posle neuspelog čitanja i ignoriše odgovore nakon izlaska iz panela. Pristup, pilot status i obaveštenja dobijaju odvojen React ključ po nalogu/lokalu, pa njihovo interno stanje ne prelazi između lokala.
+- Ispod 480 px kartice ostaju u jednoj koloni, filteri/akcije se prelamaju, polja ostaju u panelu, a široke tabele imaju svoj skrol. Nema novih ekrana, uloga, zavisnosti, pricing-a ili izveštaja.
+
+Provere: **60/60 testova prolazi**, uključujući svih 49 prethodnih, TypeScript i produkcioni statički build prolaze; `git diff --check` prolazi. Novi testovi proveravaju asinhroni životni ciklus stvarnog hook koda sa simuliranim I/O, statički smoke svih navigacionih odredišta i praznih modula, ograničenu navigaciju planera, uklanjanje osetljivih podataka posle odbijenog osvežavanja i pun izolovani PGlite backup/restore. Vraćeni su arhiva/reset sati, nacrt/završena knjiga/inventar, pazar, Notes, auditi, članstva, moduli i linkovi; potvrđena je jednakost tabela, RLS i rollback neuspešne probne DDL transakcije.
+
+**Migracije i ograničenja:** nema novih migracija, env promena ili produkcionih upisa. Udaljena istorija i SECURITY INVOKER/private dozvole ponovo su proverene; stara planerska migracija ostaje neprimenjena, a povlačenje izveštaja primenjeno. Advisor zadržava ranija Auth upozorenja i namerno odsustvo RLS politika za tabele kojima se pristupa samo kroz RPC. Integrated browser i Google Chrome alat i dalje nisu dostupni. Stvarni prijavljeni tokovi, 320/392 px, fokus/tastatura, paginacija PDF-a, višekorisnički mrežni prekidi i hosted backup/restore zahtevaju ličnu proveru. Automatski test izolovane baze ne znači da je produkcioni backup potvrđen.
+
+Operativno uputstvo, prioriteti pre pilota, checklista za četiri lokala, ručni onboarding i postupak oporavka/povratka nalaze se u [docs/PILOT_READINESS.md](docs/PILOT_READINESS.md). Nije napravljen novi implementacioni log. Izmenjeni aplikativni fajlovi: `use-workspace.ts`, `hours-panel.tsx`, `shiftflow.tsx`, `access.ts`, `supabase.ts`, `sync.ts` i `shiftflow.css`; dodati su test helper, `workspace-lifecycle.test.ts`, `recovery-database.test.ts` i proširen `sync.test.ts`.

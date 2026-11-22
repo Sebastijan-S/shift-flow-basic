@@ -44,8 +44,10 @@ export class WorkspaceSync {
         for (let attempt = 0; attempt < 3; attempt++) {
           try { version = await this.options.save(job.state, job.version, job.id); break; }
           catch (error) {
+            if (this.stopped) return;
             if (!(error instanceof Error) || !error.message.includes("VERSION_CONFLICT") || attempt === 2) throw error;
             const remote = await this.options.load();
+            if (this.stopped) return;
             job.state = { ...job.state, current: mergeWorkspace(job.base.current, job.state.current, remote.state.current) };
             job.base = remote.state; job.version = remote.version;
             this.options.pending([...this.queue]);
@@ -64,6 +66,7 @@ export class WorkspaceSync {
         this.options.acknowledge(job.state, job.uiBase ?? job.base, version);
         this.options.status(this.queue.length ? "Čeka slanje" : "Sinhronizovano");
       } catch (error) {
+        if (this.stopped) return;
         // The attempted request stays first with its exact ID/payload, even if newer edits exist.
         this.options.pending([...this.queue]);
         this.options.status("Pokušaj ponovo", error instanceof Error ? error : new Error(String(error)));

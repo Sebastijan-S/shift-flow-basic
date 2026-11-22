@@ -1,6 +1,6 @@
 "use client";
 
-import { readHours } from "@/lib/module-data";
+import { DEMO_HOURS_KEY as DEMO_KEY, readHours } from "@/lib/module-data";
 
 import { useEffect, useRef, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
@@ -8,7 +8,6 @@ import { EMPTY_HOURS, defaultRate, demoHoursCommand, money, parseMoney, payLabel
 import type { Workspace } from "@/lib/scheduler";
 import { Button } from "./ui/button";
 
-const DEMO_KEY = "shiftflow:demo:hours:v1";
 const errorText = (e: unknown) => {
   const message = (e as Error).message ?? String(e);
   if (message.includes("VERSION_CONFLICT")) return "Podaci su u međuvremenu promenjeni. Osvežite obračun i ponovite izmenu.";
@@ -53,6 +52,7 @@ export function HoursPanel({ companyId, workspace, readOnly, flush, settingsOnly
   const [data, setData] = useState<HoursData | null>(null), [error, setError] = useState(""), [busy, setBusy] = useState(false);
   const [end, setEnd] = useState(todayBelgrade()), [start, setStart] = useState(todayBelgrade().slice(0, 8) + "01"), [confirm, setConfirm] = useState(false);
   const pending = useRef(false), scope = useRef(companyId);
+  const alive = useRef(false);
   const request = useRef(0);
   scope.current = companyId;
   const load = async () => {
@@ -61,10 +61,15 @@ export function HoursPanel({ companyId, workspace, readOnly, flush, settingsOnly
     const selected = companyId;
     try {
       const next = await readHours(companyId);
-      if (scope.current === selected && revision === request.current && !pending.current) { setData(next); setError(""); }
-    } catch (e) { if (scope.current === selected && revision === request.current) setError(errorText(e)); }
+      if (alive.current && scope.current === selected && revision === request.current && !pending.current) { setData(next); setError(""); }
+    } catch (e) { if (alive.current && scope.current === selected && revision === request.current) { setData(null); setError(errorText(e)); } }
   };
-  useEffect(() => { setData(null); void load(); return () => { ++request.current; }; }, [companyId]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    alive.current = true; setData(null); void load();
+    const refresh = () => { if (document.visibilityState !== "hidden") void load(); };
+    window.addEventListener("focus", refresh);
+    return () => { alive.current = false; ++request.current; window.removeEventListener("focus", refresh); };
+  }, [companyId]); // eslint-disable-line react-hooks/exhaustive-deps
   const command = async (action: HoursAction, payload: Record<string, unknown>) => {
     if (pending.current || readOnly || !data) return;
     pending.current = true; ++request.current; setBusy(true); setError(""); const selected = companyId;
@@ -82,9 +87,9 @@ export function HoursPanel({ companyId, workspace, readOnly, flush, settingsOnly
         };
         next = navigator.locks ? await navigator.locks.request(DEMO_KEY, writeDemo) : await writeDemo();
       }
-      if (scope.current === selected) { setData(next); setConfirm(false); }
-    } catch (e) { if (scope.current === selected) setError(errorText(e)); }
-    finally { pending.current = false; if (scope.current === selected) setBusy(false); }
+      if (alive.current && scope.current === selected) { setData(next); setConfirm(false); }
+    } catch (e) { if (alive.current && scope.current === selected) setError(errorText(e)); }
+    finally { pending.current = false; if (alive.current && scope.current === selected) setBusy(false); }
   };
   const submit = (action: HoursAction, values: () => Record<string, unknown>) => { try { void command(action, values()); } catch (e) { setError(errorText(e)); } };
   const p = data?.open;
@@ -97,7 +102,7 @@ export function HoursPanel({ companyId, workspace, readOnly, flush, settingsOnly
     <div className="panel-heading"><h2>{settingsOnly ? "Podešavanja radnih sati i obračuna" : "Otvoreni period i obračun"}</h2><Button variant="outline" disabled={busy} onClick={() => void load()}>Osveži obračun</Button></div>
     <p className="muted">RSD · Zbir sati zaposlenog zaokružuje se na ceo sat, od 30 minuta naviše. Dodatak za prekovremeni rad unosi se kao iznos.</p>
     {error && <p className="form-error" role="alert">{error}</p>}
-    {!data ? <p>Učitavanje obračuna…</p> : !p ? <form className="settings-form" onSubmit={e => { e.preventDefault(); void command("start", { start }); }}><label>Početak prvog perioda<input type="date" required max={todayBelgrade()} value={start} onChange={e => setStart(e.target.value)} /></label><Button type="submit" disabled={busy || readOnly}>Otvori prvi period</Button></form> : <>
+    {!data ? <p>{error ? "Podaci nisu dostupni. Osvežite obračun." : "Učitavanje obračuna…"}</p> : !p ? <form className="settings-form" onSubmit={e => { e.preventDefault(); void command("start", { start }); }}><label>Početak prvog perioda<input type="date" required max={todayBelgrade()} value={start} onChange={e => setStart(e.target.value)} /></label><Button type="submit" disabled={busy || readOnly}>Otvori prvi period</Button></form> : <>
       <p>Početak perioda: <strong>{p.start}</strong> · {p.entries.length} evidentiranih smena</p>
       {settingsOnly ? <div className="hours-settings">{employees.map(e => { const rate = data.rates[e.id] ?? defaultRate; return <form className="settings-form hours-rate" key={`${p.version}:${e.id}`} onSubmit={event => { event.preventDefault(); const f = new FormData(event.currentTarget); submit("rate", () => ({ employee: e.id, method: f.get("method"), cents: parseMoney(String(f.get("amount"))) })); }}><h3>{e.name}</h3><label>Metod<select name="method" defaultValue={rate.method}>{Object.entries(payLabels).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></label><label>Iznos (RSD)<input name="amount" inputMode="decimal" required defaultValue={(rate.cents / 100).toFixed(2)} /></label><Button type="submit" disabled={busy || readOnly}>Sačuvaj cenu rada</Button></form>; })}</div> : <>
         <div className="hours-controls"><label>Kraj perioda / uvoz do datuma<input type="date" required min={p.start} max={todayBelgrade()} value={end} onChange={e => { setEnd(e.target.value); setConfirm(false); }} /></label><Button variant="outline" disabled={busy || readOnly || end < p.start} onClick={() => void command("import", { end })}>Preuzmi / osveži iz rasporeda</Button></div>
