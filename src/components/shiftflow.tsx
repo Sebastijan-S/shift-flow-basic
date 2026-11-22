@@ -168,7 +168,7 @@ export default function ShiftFlow() {
       <div className="calendar-footer"><div className="shift-legend">{w.templates.map(t => <span key={t.id}><i className={t.color} />{t.name}</span>)}<span><i className="off" />Slobodan dan</span></div><span className="save-status"><RiCheckboxCircleLine size={14} />{saveError ? <button onClick={() => void flush()}>{saveStatus} · Pokušaj ponovo</button> : saveStatus}</span></div></div><div className="schedule-bottom"><span><RiInformationLine size={15} />Kliknite smenu da je uredite ili je prevucite na drugo mesto.</span>{!plannerMode && <Button size="sm" onClick={() => setModal("publish")}><RiCheckLine size={16} />{schedule.status === "published" ? "Raspored je objavljen" : "Objavi raspored"}</Button>}</div></section>}
 
 
-      {page === "Knjiga šanka i inventar" && showBar && <BarPanel key={`${authUser}:${cloudId}:bar`} companyId={cloudId} companyName={w.name} readOnly={readOnly} />}
+      {page === "Knjiga šanka i inventar" && showBar && <BarPanel key={`${authUser}:${cloudId}:bar`} companyId={cloudId} companyName={w.name} readOnly={readOnly} openItemSettings={() => { setPageAndClose("Podešavanja"); requestAnimationFrame(() => requestAnimationFrame(() => document.getElementById("bar-item-settings")?.scrollIntoView({ block: "start" }))); }} />}
       {page === "Notes i podsetnici" && showNotes && <NotesPanel key={`${authUser}:${cloudId}:notes`} companyId={cloudId} readOnly={readOnly} />}
       {page === "Pazar" && showRevenue && <RevenuePanel key={`${authUser}:${cloudId}:revenue`} companyId={cloudId} readOnly={readOnly} />}
       {page === "Radni sati i obračun" && showHours && <HoursPanel key={`${authUser}:${cloudId}:hours`} companyId={cloudId} workspace={w} readOnly={readOnly} flush={flush} />}
