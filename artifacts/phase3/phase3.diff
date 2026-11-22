@@ -1,0 +1,139 @@
+diff --git a/src/app/shiftflow.css b/src/app/shiftflow.css
+index f5e6619..5c6a504 100644
+--- a/src/app/shiftflow.css
++++ b/src/app/shiftflow.css
+@@ -541,21 +541,50 @@ textarea { resize: vertical; }
+ @media(max-width:480px) { .bar-panel .form-columns { grid-template-columns: minmax(0,1fr); } }
+ 
+ .operational-dashboard { min-width: 0; margin-bottom: 24px; }
+-.operational-cards { grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); }
+-.operational-cards .stat-card { min-width: 0; overflow-wrap: anywhere; }
+-.operational-cards .stat-card strong { font-size: 23px; line-height: 1.35; }
+-.dashboard-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
+-.operational-dashboard [data-slot="button"] { max-width: 100%; white-space: normal; height: auto; min-height: 35px; }
+-.dashboard-reminders { min-width: 0; }
+-.dashboard-reminders .panel-heading { flex-wrap: wrap; gap: 12px; }
++.dashboard-overview-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
++.dashboard-overview-heading .eyebrow { margin: 0; color: var(--muted-foreground); }
++.operational-dashboard [data-slot="button"] { max-width: 100%; white-space: normal; height: auto; min-height: 44px; }
++.dashboard-today-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-bottom: 15px; }
++.dashboard-today-grid.has-reminders { grid-template-columns: repeat(2, minmax(0, 1fr)); }
++.dashboard-today-card { border-color: var(--mint-border); background: linear-gradient(130deg, var(--mint-bg), var(--card) 65%); }
++.dashboard-due-card { border-color: var(--blue-border); background: linear-gradient(130deg, var(--blue-bg), var(--card) 65%); }
++.dashboard-today-card h2 { margin-bottom: 15px; font-size: 15px; }
++.dashboard-today-values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
++.dashboard-today-values > div + div { border-left: 1px solid var(--border); padding-left: 14px; }
++.dashboard-today-values span, .dashboard-today-values small { display: block; color: var(--muted-foreground); font-size: 11px; }
++.dashboard-today-values strong { display: block; margin: 3px 0; color: var(--foreground); font: 600 24px/1.25 var(--font-mono); letter-spacing: -.7px; overflow-wrap: anywhere; }
++.dashboard-today-values small { line-height: 1.5; }
++.dashboard-reminders { min-width: 0; margin-bottom: 19px; }
++.dashboard-reminders .panel-heading { flex-wrap: wrap; gap: 12px; margin-bottom: 10px; }
++.dashboard-reminders .panel-heading p { margin: 4px 0 0; font-size: 12px; }
+ .dashboard-reminders ul { list-style: none; padding: 0; margin: 0; }
+-.dashboard-reminders li { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; border-top: 1px solid var(--border); }
++.dashboard-reminders li { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 11px 0; border-top: 1px solid var(--border); }
+ .dashboard-reminders li > div { min-width: 0; flex: 1; }
+ .dashboard-note-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; white-space: pre-wrap; margin: 0 0 6px; }
+-@media(max-width: 480px) {
++[data-theme="light"] .dashboard-reminders .note-deadline { color: #80471a; }
++.dashboard-reminders [role="status"]:empty { display: none; }
++.dashboard-metrics { margin: 18px 0; }
++.dashboard-metrics h2, .dashboard-action-group h2 { font-size: 13px; margin-bottom: 10px; }
++.operational-cards { grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); margin-bottom: 0; }
++.operational-cards .stat-card { min-width: 0; overflow-wrap: anywhere; }
++.operational-cards .stat-card strong { font-size: 21px; line-height: 1.35; }
++.dashboard-actions { display: flex; flex-wrap: wrap; gap: 14px 24px; padding-top: 16px; border-top: 1px solid var(--border); margin: 18px 0; }
++.dashboard-action-group > div { display: flex; flex-wrap: wrap; gap: 8px; }
++.dashboard-module-link[data-slot="button"] { color: var(--blue-fg); border-color: var(--blue-border); background: var(--blue-bg); }
++.dashboard-module-link[data-slot="button"]:hover { color: var(--foreground); border-color: var(--blue-fg); }
++.dashboard-schedule-heading { display: flex; align-items: baseline; gap: 12px; margin: 0 0 12px; }
++.dashboard-schedule-heading h2, .dashboard-schedule-heading p { margin: 0; }
++.dashboard-schedule-heading p { color: var(--muted-foreground); font-size: 12px; }
++@media (max-width: 900px) { .dashboard-today-grid.has-reminders { grid-template-columns: minmax(0, 1fr); } }
++@media (max-width: 480px) {
++  .dashboard-overview-heading { align-items: flex-start; }
++  .dashboard-today-values strong { font-size: 21px; }
+   .operational-cards { grid-template-columns: minmax(0, 1fr); }
+-  .dashboard-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
+   .dashboard-reminders li { align-items: flex-start; flex-direction: column; gap: 10px; }
++  .dashboard-reminders li [data-slot="button"], .dashboard-reminders .dashboard-module-link { width: 100%; }
++  .dashboard-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
++  .dashboard-action-group > div, .dashboard-action-group [data-slot="button"] { width: 100%; }
++  .dashboard-schedule-heading { display: block; }
+ }
+ @media print { .operational-dashboard { display: none !important; } }
+ 
+diff --git a/src/components/dashboard-panel.tsx b/src/components/dashboard-panel.tsx
+index 44d4fd7..ce30e0d 100644
+--- a/src/components/dashboard-panel.tsx
++++ b/src/components/dashboard-panel.tsx
+@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
+ import { dashboardActions, dashboardSources, dashboardValues, loadDashboard, scheduledToday, todayInBelgrade, type DashboardResults, type DashboardSource } from "@/lib/dashboard";
+ import { readBar, readHours, readNotes, readRevenue, saveNoteCommand } from "@/lib/module-data";
+ import type { ModuleSettings } from "@/lib/modules";
+-import type { Workspace } from "@/lib/scheduler";
++import { addDays, missingRequirements, monday, scheduleRequirements, type Workspace } from "@/lib/scheduler";
+ import { money } from "@/lib/hours";
+ import { noteOverdue, type NoteEntry } from "@/lib/notes";
+ import { Button } from "./ui/button";
+@@ -52,18 +52,34 @@ export function DashboardPanel({ companyId, workspace, settings, readOnly, go }:
+   };
+   const values = dashboardValues(data);
+   const value = (id: DashboardSource, content: string) => data[id]?.error ? "Nedostupno" : !data[id]?.data ? "Učitavanje…" : content;
++  const today = todayInBelgrade(now);
++  const week = monday(now);
++  const day = Array.from({ length: 7 }, (_, index) => index).find(index => addDays(week, index) === today) ?? 0;
++  const schedule = workspace.schedules[week];
++  const requirements = scheduleRequirements(workspace, schedule ?? { week, status: "draft", assignments: [] }).filter(item => item.day === day);
++  const required = requirements.reduce((sum, item) => sum + item.count, 0);
++  const missing = missingRequirements(schedule?.assignments ?? [], requirements).reduce((sum, item) => sum + item.missing, 0);
++  const due = values.reminders.filter(note => note.date! <= today);
++  const actions = dashboardActions(settings);
+   const cards = [
+-    { id: "schedule", title: "Danas na rasporedu", value: String(scheduledToday(workspace, now)), detail: dateLabel(todayInBelgrade(now)) },
+     ...(settings.hours ? [{ id: "hours", title: "Evidentirani sati", value: value("hours", values.minutes === null ? "Period nije otvoren" : `${Math.floor(values.minutes / 60)} h ${values.minutes % 60} min`), detail: "Otvoreni period" }] : []),
+     ...(settings.revenue ? [{ id: "revenue", title: "Poslednji unos pazara", value: value("revenue", values.revenue ? money(values.revenue.total) : "Nema unosa"), detail: values.revenue ? `Datum prometa: ${dateLabel(values.revenue.date)}` : "Pojedinačni unos" }] : []),
+     ...(settings.bar ? [{ id: "bar", title: "Poslednja završena knjiga", value: value("bar", values.bookDate ? dateLabel(values.bookDate) : "Nema završene knjige"), detail: "Knjiga šanka" }] : []),
+   ];
+   return <div className="operational-dashboard">
+-    <div className="stats-grid operational-cards">{cards.map(card => <div className="stat-card" key={card.id}><div><span>{card.title}</span></div><strong>{card.value}</strong><p>{card.detail}</p></div>)}</div>
+-    <section className="dashboard-actions" aria-label="Brze akcije">{dashboardActions(settings).map(action => <Button variant="outline" key={action.module} onClick={() => go(action.page)}>{action.label}</Button>)}<Button variant="ghost" disabled={busy} onClick={() => void load()}>Osveži pregled</Button></section>
+-    {sources.some(id => data[id]?.error) && <p className="form-error" role="alert">Deo podataka nije dostupan. Osvežite pregled.</p>}
++    <div className="dashboard-overview-heading"><p className="eyebrow">DANAS · {dateLabel(today)}</p><Button variant="outline" disabled={busy} onClick={() => void load()}>Osveži pregled</Button></div>
++    <div className={`dashboard-today-grid ${settings.notes ? "has-reminders" : ""}`}>
++      <section className="stat-card dashboard-today-card" aria-label="Popunjenost smena danas">
++        <h2>Popunjenost smena danas</h2>
++        <div className="dashboard-today-values"><div><span>Danas na rasporedu</span><strong>{scheduledToday(workspace, now)}</strong><small>zaposlenih</small></div><div><span>Popunjena mesta</span><strong>{schedule ? `${required - missing}/${required}` : "Nema rasporeda"}</strong><small>{schedule ? required ? missing ? `Nedostaje ${missing} ${missing === 1 ? "mesto" : "mesta"}` : "Sva mesta su popunjena" : "Nema planiranih mesta" : "Za današnji dan nema sačuvanog rasporeda"}</small></div></div>
++      </section>
++      {settings.notes && <section className="stat-card dashboard-today-card dashboard-due-card" aria-label="Podsetnici za danas">
++        <h2>Podsetnici za danas</h2>
++        <div className="dashboard-today-values"><div><span>Danas ili ranije</span><strong>{value("notes", String(due.length))}</strong><small>{data.notes?.data ? due.length ? "aktivnih podsetnika" : "Nema dospelih podsetnika" : data.notes?.error ? "Pokušajte osvežavanje" : "Učitavanje podsetnika"}</small></div><div><span>Svi aktivni</span><strong>{value("notes", String(values.reminders.length))}</strong><small>sa rokom</small></div></div>
++      </section>}
++    </div>
+     {settings.notes && <section className="panel dashboard-reminders" aria-label="Aktivni podsetnici" aria-busy={busy}>
+-      <div className="panel-heading"><h2>Aktivni podsetnici</h2><Button variant="ghost" onClick={() => go("Notes i podsetnici")}>Sve beleške i podsetnici</Button></div>
++      <div className="panel-heading"><div><h2>Aktivni podsetnici</h2><p className="muted">Najbliži rokovi na jednom mestu</p></div><Button variant="outline" className="dashboard-module-link" onClick={() => go("Notes i podsetnici")}>Sve beleške i podsetnici →</Button></div>
+       {!data.notes?.data ? <p className="muted">{data.notes?.error ?? "Učitavanje podsetnika…"}</p> : !values.reminders.length ? <p className="muted">Nema aktivnih podsetnika.</p> : <ul>{values.reminders.slice(0, 3).map(note => <li key={note.id}>
+         <div><p className="dashboard-note-text">{note.text}</p><small className={noteOverdue(note, now) ? "note-deadline" : "muted"}>{dateLabel(note.date!)}{note.time ? ` · ${note.time}` : " · do kraja dana"}{noteOverdue(note, now) ? " · Rok je prošao" : ""}</small></div>
+         <Button size="sm" variant="outline" disabled={busy || readOnly} aria-label={`Završi podsetnik: ${note.text.slice(0, 80)}`} onClick={() => void finish(note)}>Završi</Button>
+@@ -71,5 +87,8 @@ export function DashboardPanel({ companyId, workspace, settings, readOnly, go }:
+       {values.reminders.length > 3 && <p className="muted">Još {values.reminders.length - 3} u Notes modulu.</p>}
+       <p role="status">{status}</p>
+     </section>}
++    {cards.length > 0 && <section className="dashboard-metrics" aria-label="Evidencija i stanje"><h2>Evidencija i stanje</h2><div className="stats-grid operational-cards">{cards.map(card => <div className="stat-card" key={card.id}><div><span>{card.title}</span></div><strong>{card.value}</strong><p>{card.detail}</p></div>)}</div></section>}
++    <section className="dashboard-actions" aria-label="Brze akcije"><div className="dashboard-action-group"><h2>Planiranje</h2>{actions.filter(action => action.module === "schedule").map(action => <Button variant="outline" className="dashboard-module-link" key={action.module} onClick={() => go(action.page)}>{action.label} →</Button>)}</div>{actions.some(action => action.module !== "schedule") && <div className="dashboard-action-group"><h2>Brzi unos i evidencija</h2><div>{actions.filter(action => action.module !== "schedule").map(action => <Button variant="outline" className="dashboard-module-link" key={action.module} onClick={() => go(action.page)}>{action.label} →</Button>)}</div></div>}</section>
++    {sources.some(id => data[id]?.error) && <p className="form-error" role="alert">Deo podataka nije dostupan. Ostali moduli su prikazani; pokušajte osvežavanje.</p>}
+   </div>;
+ }
+diff --git a/src/components/shiftflow.tsx b/src/components/shiftflow.tsx
+index 2486c19..fa5fffb 100644
+--- a/src/components/shiftflow.tsx
++++ b/src/components/shiftflow.tsx
+@@ -161,6 +161,7 @@ export default function ShiftFlow() {
+       {page === "Raspored" && <><div className="stats-grid"><div className="stat-card"><div><span>Aktivni zaposleni</span><RiGroupLine size={17} /></div><strong>{active.length}</strong></div><div className="stat-card"><div><span>Planirani sati</span><RiTimeLine size={17} /></div><strong>{totalHours} h</strong><p>{schedule.assignments.length} raspoređenih smena</p></div><div className="stat-card"><div><span>Pokrivenost smena</span><RiCheckboxCircleLine size={17} /></div><strong>{coverage}%</strong><p><span className="coverage-track"><i style={{ width: `${coverage}%` }} /></span><span>{required - missingCount}/{required}</span></p></div><button className={`stat-card attention-card ${missingCount + conflicts.length ? "has-issues" : ""}`} onClick={() => setShowProblems(v => !v)}><div><span>Potrebna pažnja</span>{missingCount + conflicts.length ? <RiErrorWarningLine size={17} /> : <RiCheckLine size={17} />}</div><strong>{missingCount + conflicts.length}</strong><p>{missingCount + conflicts.length ? "Pregledaj upozorenja" : "Nema upozorenja"}<RiArrowRightUpLine size={14} /></p></button></div></>}
+       {(page === "Raspored" || (page === "Pregled" && showOverview)) && showProblems && <div className="problems-panel"><h3>Provera rasporeda</h3>{!missing.length && !conflicts.length ? <p className="success-text"><RiCheckLine size={16} />Sve smene su popunjene i pravila su ispoštovana.</p> : <><ul>{explainMissing(schedule, w).map((r, i) => <li key={i}><strong>{DAY_NAMES[r.day]}, {w.templates.find(t => t.id === r.templateId)?.name}: nedostaje {r.missing} × {r.position}.</strong><small className="conflict-reasons">{r.reasons.length ? r.reasons.slice(0, 3).join(" ") : "Generator nije pronašao potpun raspored uz ove uslove. Pregledajte dostupne kandidate."}</small></li>)}{conflicts.map(c => <li key={c.id}>{c.message} <span className="tag">{c.severity === "block" ? "Zabrana" : "Upozorenje"}</span></li>)}</ul></>}</div>}
+ 
++      {page === "Pregled" && showOverview && <div className="dashboard-schedule-heading"><h2>Raspored smena</h2><p>Pregledajte i uredite izabranu nedelju.</p></div>}
+       {(page === "Raspored" || (page === "Pregled" && showOverview)) && <section className="schedule-section"><div className="schedule-toolbar"><div className="week-controls"><div className="week-arrows"><button className="icon-button" aria-label="Prethodna nedelja" onClick={() => setWeek(addDays(week, -7))}><RiArrowLeftSLine size={20} /></button><button className="icon-button" aria-label="Sledeća nedelja" onClick={() => setWeek(addDays(week, 7))}><RiArrowRightSLine size={20} /></button></div><h2>{dates[0].getUTCDate()}–{dates[6].getUTCDate()}. {dateLabel(dates[6], { month: "long" })} <span>{dates[6].getUTCFullYear()}.</span></h2><button className="today-button" onClick={() => setWeek(monday())}>Danas</button><span className={`status-badge ${schedule.status === "published" ? "published" : ""}`}><i />{schedule.status === "draft" ? "Nacrt" : "Objavljeno"}</span></div><div className="view-switch" aria-label="Prikaz rasporeda">{[{ id: "week", label: "Nedelja", icon: RiCalendar2Line }, { id: "day", label: "Dan", icon: RiLayoutGridLine }, { id: "list", label: "Lista", icon: RiListCheck }].map(v => <button key={v.id} className={view === v.id ? "selected" : ""} onClick={() => { setView(v.id); localStorage.setItem("shiftflow:view", v.id); }}><v.icon size={14} />{v.label}</button>)}</div></div>
+       <div className="calendar-card"><div className="calendar-filters"><div className="filter-group"><label className="search-field"><RiSearchLine size={16} /><input placeholder="Pronađi zaposlenog…" value={query} onChange={e => setQuery(e.target.value)} aria-label="Pronađi zaposlenog" /><kbd>⌕</kbd></label><div className="filter-divider" /><select className="position-select" value={position} onChange={e => setPosition(e.target.value)} aria-label="Filtriraj po poziciji"><option value="all">Sve pozicije</option>{positions.map(p => <option key={p}>{p}</option>)}</select></div><div className="calendar-tools"><button className="icon-button" title="Poništi (Ctrl+Z)" aria-label="Poništi izmenu" onClick={undo} disabled={!state.past.length}><RiArrowGoBackLine size={iconSize} /></button><button className="icon-button" title="Ponovi (Ctrl+Shift+Z)" aria-label="Ponovi izmenu" onClick={redo} disabled={!state.future.length}><RiArrowGoForwardLine size={iconSize} /></button><span className="filter-divider" />{!plannerMode && <button className="icon-button" aria-label="Preuzmi raspored" onClick={() => setModal("export")}><RiDownloadLine size={iconSize} /></button>}<div className="more-wrapper"><button className="icon-button" aria-label="Više opcija" aria-expanded={more} onClick={() => setMore(v => !v)}><RiMoreLine size={18} /></button>{more && <div className="dropdown-menu"><button onClick={duplicateWeek}><RiFileCopyLine size={16} />Kopiraj u sledeću nedelju</button><button onClick={() => { updateSchedule({ ...schedule, assignments: schedule.assignments.map(a => ({ ...a, locked: true })) }, "Zaključane sve smene"); setMore(false); }}><RiLockLine size={16} />Zaključaj sve smene</button><button onClick={() => { updateSchedule({ ...schedule, assignments: schedule.assignments.map(a => ({ ...a, locked: false })) }, "Otključane sve smene"); setMore(false); }}><RiRefreshLine size={16} />Otključaj sve smene</button></div>}</div><Button size="sm" variant="outline" onClick={() => openShift()}><RiAddLine size={15} />Dodaj smenu</Button></div></div>
+       {view === "week" ? <Calendar /> : <div className="alternative-view">{view === "day" && <div className="day-tabs">{DAY_NAMES.map((name, i) => <button className={day === i ? "selected" : ""} key={name} onClick={() => setDay(i)}>{name.slice(0, 3)} {dates[i].getUTCDate()}.</button>)}</div>}{(view === "day" ? [day] : [0, 1, 2, 3, 4, 5, 6]).map(i => <section className="day-section" key={i}><h3>{DAY_NAMES[i]} <span>{dateLabel(dates[i], { day: "numeric", month: "long" })}</span></h3>{w.templates.map(t => <div className="day-shift-group" key={t.id}><div className={`shift-group-label ${t.color}`}>{t.id === "morning" ? <RiSunLine size={18} /> : <RiMoonLine size={18} />}<strong>{t.name}</strong><span>{t.start}–{t.end}</span></div><div>{schedule.assignments.filter(a => a.day === i && a.templateId === t.id && filtered.some(e => e.id === a.employeeId)).map(a => { const e = w.employees.find(e => e.id === a.employeeId)!; return <button key={a.id} className="day-employee" onClick={() => openShift(e.id, i, a)}><Avatar small employee={e} /><strong>{e.name}</strong><span>{a.position} · {a.start ?? t.start}–{a.end ?? t.end}</span>{a.locked && <RiLockLine size={13} />}</button>; })}<button className="day-add" onClick={() => openShift(undefined, i)}><RiAddLine size={15} />Dodaj</button></div></div>)}</section>)}</div>}
