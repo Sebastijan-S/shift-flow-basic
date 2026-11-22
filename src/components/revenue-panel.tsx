@@ -1,5 +1,7 @@
 "use client";
 
+import { readRevenue } from "@/lib/module-data";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { money, todayBelgrade } from "@/lib/hours";
@@ -30,12 +32,7 @@ export function RevenuePanel({ companyId, readOnly }: { companyId: string | null
     if (pending.current) return;
     const request = ++revision.current;
     try {
-      let next: RevenueData;
-      if (companyId) {
-        const result = await getSupabase()!.rpc("read_revenue", { p_company: companyId });
-        if (result.error) throw result.error;
-        next = result.data;
-      } else next = JSON.parse(localStorage.getItem(DEMO_REVENUE_KEY) ?? JSON.stringify(EMPTY_REVENUE));
+      const next = await readRevenue(companyId);
       if (alive.current && revision.current === request && !pending.current) { setData(next); setError(""); }
     } catch (e) {
       if (alive.current && revision.current === request) { setData(null); setError(errorText(e)); }

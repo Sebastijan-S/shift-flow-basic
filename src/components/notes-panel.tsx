@@ -1,8 +1,9 @@
 "use client";
 
+import { readNotes, saveNoteCommand } from "@/lib/module-data";
+
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getSupabase } from "@/lib/supabase";
-import { DEMO_NOTES_KEY, EMPTY_NOTES, demoNotesCommand, noteOverdue, notesOrder, noteValues, type NoteCommand, type NoteEntry, type NotesData } from "@/lib/notes";
+import { DEMO_NOTES_KEY, noteOverdue, notesOrder, noteValues, type NoteCommand, type NoteEntry, type NotesData } from "@/lib/notes";
 import { Button } from "./ui/button";
 
 function errorText(error: unknown) {
@@ -15,7 +16,7 @@ function errorText(error: unknown) {
   return message;
 }
 export function NotesSettings() {
-  return <section className="panel basic-panel"><h2>Podešavanja Notes i podsetnika</h2><p>Vremenska zona: Europe/Belgrade. Obaveštenja se prikazuju samo u ovom modulu.</p><p className="muted">Datum bez vremena važi do kraja izabranog dana. Nepostojeće vreme pri prolećnoj promeni sata se odbija; ponovljeni jesenji sat znači drugo pojavljivanje (zimsko vreme). Isključivanje modula čuva podatke.</p></section>;
+  return <section className="panel basic-panel"><h2>Podešavanja Notes i podsetnika</h2><p>Vremenska zona: Europe/Belgrade. Aktivni podsetnici se prikazuju u ovom modulu i operativnom pregledu.</p><p className="muted">Datum bez vremena važi do kraja izabranog dana. Nepostojeće vreme pri prolećnoj promeni sata se odbija; ponovljeni jesenji sat znači drugo pojavljivanje (zimsko vreme). Isključivanje modula čuva podatke.</p></section>;
 }
 export function NotesPanel({ companyId, readOnly }: { companyId: string | null; readOnly: boolean }) {
   const [data, setData] = useState<NotesData | null>(null), [error, setError] = useState(""), [status, setStatus] = useState(""), [busy, setBusy] = useState(false);
@@ -28,11 +29,7 @@ export function NotesPanel({ companyId, readOnly }: { companyId: string | null; 
     if (pending.current) return;
     const request = ++revision.current;
     try {
-      let next: NotesData;
-      if (companyId) {
-        const result = await getSupabase()!.rpc("read_notes", { p_company: companyId });
-        if (result.error) throw result.error; next = result.data;
-      } else next = JSON.parse(localStorage.getItem(DEMO_NOTES_KEY) ?? JSON.stringify(EMPTY_NOTES));
+      const next = await readNotes(companyId);
       if (alive.current && revision.current === request && !pending.current) { setData(next); setError(""); }
     } catch (e) { if (alive.current && revision.current === request) { setData(null); setError(errorText(e)); } }
   }, [companyId]);
@@ -51,17 +48,7 @@ export function NotesPanel({ companyId, readOnly }: { companyId: string | null; 
     const request = operation.current.id;
     pending.current = true; ++revision.current; setBusy(true); setError(""); setStatus("");
     try {
-      let next: NotesData;
-      if (companyId) {
-        const result = await getSupabase()!.rpc("notes_command", { p_company: companyId, p_request: request, p_command: command });
-        if (result.error) throw result.error; next = result.data;
-      } else {
-        const write = async () => {
-          const saved = JSON.parse(localStorage.getItem(DEMO_NOTES_KEY) ?? JSON.stringify(EMPTY_NOTES));
-          const result = demoNotesCommand(saved, request, command); localStorage.setItem(DEMO_NOTES_KEY, JSON.stringify(result)); return result;
-        };
-        next = navigator.locks ? await navigator.locks.request(DEMO_NOTES_KEY, write) : await write();
-      }
+      const next = await saveNoteCommand(companyId, request, command);
       if (alive.current) {
         setData(next); setNow(new Date()); setDeleting(null);
         if (resetForm || (command.action === "delete" && editing?.id === command.id)) reset();

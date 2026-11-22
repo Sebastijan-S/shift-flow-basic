@@ -9,7 +9,6 @@ export function ModuleSettingsPanel({ settings, loading, saving, error, readOnly
   return <section className="panel basic-panel module-settings" aria-labelledby="module-settings-title" aria-busy={loading || saving}>
     <h2 id="module-settings-title">Moduli lokala</h2>
     <p className="muted">Izaberite module za ovaj lokal. Isključivanje skriva modul i čuva njegove podatke.</p>
-    <p className="muted">Za module u pripremi možete sačuvati izbor. Pojaviće se u meniju kada budu dostupni; svaki će imati svoja podešavanja.</p>
     <div className="module-list">{MODULES.map(module => <label className="module-option" key={module.id}>
       <span><strong>{module.name}</strong><span className="module-description">{module.description}</span>
         <span className="module-status">{module.required ? "Osnovni modul · uvek uključen" : !module.available ? "U pripremi" : settings[module.id] ? "Uključen" : "Isključen"}</span></span>

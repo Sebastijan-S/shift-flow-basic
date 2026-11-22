@@ -1,5 +1,7 @@
 "use client";
 
+import { readBar } from "@/lib/module-data";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { todayBelgrade } from "@/lib/hours";
@@ -84,9 +86,7 @@ export function BarPanel({ companyId, companyName, readOnly, settingsOnly = fals
   const load = useCallback(async () => {
     if (pending.current) return; const request = ++revision.current;
     try {
-      let next: BarData;
-      if (companyId) { const r = await getSupabase()!.rpc("read_bar", { p_company: companyId }); if (r.error) throw r.error; next = r.data; }
-      else next = readDemoBar(JSON.parse(localStorage.getItem(DEMO_BAR_KEY) ?? JSON.stringify(EMPTY_BAR)));
+      const next = await readBar(companyId);
       if (alive.current && revision.current === request && !pending.current) setData(next);
     } catch (e) { if (alive.current && revision.current === request) { if (/ACCESS_DENIED|MODULE_DISABLED|JWT|session|token/i.test((e as Error).message ?? "")) setData(null); setError(errorText(e)); } }
   }, [companyId]);

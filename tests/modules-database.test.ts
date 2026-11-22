@@ -36,7 +36,9 @@ test("modules and pilot: tenant isolation, audit, preserved data and restricted 
     assert.equal((await modules()).rows.find(m => m.module_id === "hours")!.enabled, false);
     await db.query("select save_workspace_v2($1,$2::jsonb,1,$3)", [companies[0], JSON.stringify(state), crypto.randomUUID()]);
     assert.equal((await modules()).rows.find(m => m.module_id === "overview")!.enabled, false, "workspace saves do not overwrite settings");
-    for (const [id, value] of [["unknown", true], [null, true], ["hours", null]] as const) await assert.rejects(setModule(companies[0], id, value), /INVALID_MODULE/);
+    for (const [id, value] of [["unknown", true], ["reports", true], [null, true], ["hours", null]] as const) await assert.rejects(setModule(companies[0], id, value), /INVALID_MODULE/);
+    const retired = (await db.query<{ absent: boolean }>("select to_regprocedure('public.read_reports(uuid,text,text)') is null and to_regprocedure('private.read_reports(uuid,text,text)') is null and to_regprocedure('private.report_window(uuid,date,date,boolean,boolean,boolean)') is null and to_regclass('public.revenue_entries_company_date') is null and to_regclass('public.hours_snapshots_company_start') is null and to_regclass('public.bar_books_company_date') is null absent")).rows[0];
+    assert.equal(retired.absent, true, "all reports runtime functions and dedicated indexes were removed");
     await assert.rejects(setModule(companies[0], "schedule", false), /SCHEDULE_REQUIRED/);
     await assert.rejects(db.query("update company_modules set enabled=true"), /permission denied/);
     await assert.rejects(db.query("update companies set access_status='pilot'"), /permission denied/);

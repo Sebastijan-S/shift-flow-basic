@@ -1,12 +1,11 @@
 /** Only shipped modules may create navigation or dashboard entries. */
 export const MODULES = [
   { id: "schedule", name: "Raspored", description: "Zaposleni, smene, dostupnost, odsustva i pravila rada.", available: true, required: true, defaultEnabled: true },
-  { id: "overview", name: "Pregled", description: "Postojeći pregled tima na smeni i planiranih sati.", available: true, required: false, defaultEnabled: true },
+  { id: "overview", name: "Pregled", description: "Kratak operativni dashboard i postojeći raspored.", available: true, required: false, defaultEnabled: true },
   { id: "hours", name: "Radni sati i obračun", description: "Evidencija sati, obračuni i PDF za potpis.", available: true, required: false, defaultEnabled: false },
   { id: "revenue", name: "Pazar", description: "Gotovina, kartice i pregled evidentiranog pazara.", available: true, required: false, defaultEnabled: false },
   { id: "notes", name: "Notes i podsetnici", description: "Beleške i podsetnici unutar aplikacije.", available: true, required: false, defaultEnabled: false },
   { id: "bar", name: "Knjiga šanka i inventar", description: "Popis, prenos stanja i potrošnja artikala.", available: true, required: false, defaultEnabled: false },
-  { id: "reports", name: "Izveštaji", description: "Nedeljni i mesečni pregledi sačuvanih podataka.", available: false, required: false, defaultEnabled: false },
 ] as const;
 
 export type ModuleId = typeof MODULES[number]["id"];
@@ -25,6 +24,8 @@ export function parseModules(value: unknown): ModuleSettings {
   const result = defaultModules();
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Podešavanja modula nisu u podržanom formatu.");
   for (const [id, enabled] of Object.entries(value)) {
+    // Discard the retired flag from previously saved cloud/demo settings.
+    if (id === "reports" && typeof enabled === "boolean") continue;
     if (!isModuleId(id) || typeof enabled !== "boolean" || (id === "schedule" && !enabled)) throw new Error("Neispravno podešavanje modula.");
     result[id] = enabled;
   }

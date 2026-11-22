@@ -1,5 +1,7 @@
 "use client";
 
+import { readHours } from "@/lib/module-data";
+
 import { useEffect, useRef, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { EMPTY_HOURS, defaultRate, demoHoursCommand, money, parseMoney, payLabels, payRows, todayBelgrade, fullMonth, type HoursAction, type HoursData, type HoursSnapshot } from "@/lib/hours";
@@ -58,9 +60,7 @@ export function HoursPanel({ companyId, workspace, readOnly, flush, settingsOnly
     const revision = ++request.current;
     const selected = companyId;
     try {
-      let next: HoursData;
-      if (companyId) { const result = await getSupabase()!.rpc("read_hours", { p_company: companyId }); if (result.error) throw result.error; next = result.data; }
-      else next = JSON.parse(localStorage.getItem(DEMO_KEY) ?? JSON.stringify(EMPTY_HOURS));
+      const next = await readHours(companyId);
       if (scope.current === selected && revision === request.current && !pending.current) { setData(next); setError(""); }
     } catch (e) { if (scope.current === selected && revision === request.current) setError(errorText(e)); }
   };

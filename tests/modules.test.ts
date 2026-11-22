@@ -14,6 +14,8 @@ test("modules: legacy defaults, persisted choices and unavailable modules never 
   assert.equal(moduleVisible("overview", enabled, true), false);
   assert.equal(moduleVisible("schedule", enabled, true), true);
   assert.deepEqual(defaultModules(), defaults, "settings are not shared mutable defaults");
+  assert.ok(!MODULES.some(m => String(m.id) === "reports"), "retired reports have no settings or navigation entry");
+  assert.deepEqual(parseModules({ ...defaults, reports: true }), defaults, "legacy flags do not break loading other modules");
   for (const invalid of [null, [], "", { schedule: false }, { overview: "false" }, { hours: null }, { unknown: true }]) {
     assert.throws(() => parseModules(invalid));
   }

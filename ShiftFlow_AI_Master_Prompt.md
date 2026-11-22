@@ -72,13 +72,9 @@
 - Lista aktivnih podsetnika, označavanje završenim, izmena i brisanje.
 - **Samo unutar aplikacije**; bez push, SMS ili e-mail notifikacija.
 
-### B5. Jednostavni izveštaji
+### B5. Izveštaji — PINNED IDEA (odloženo, van pilota)
 
-- Nedeljni i mesečni pregled ISKLJUČIVO podataka koji su već sačuvani.
-- Pazar (gotovina/kartice), potvrđeni sati i obračunati iznosi, evidentirana potrošnja iz knjige šanka gde podaci postoje, osnovno poređenje perioda.
-- Odnos obračunatih iznosa rada i pazara = indikativan procenat, ne kompletan računovodstveni trošak rada.
-- Nedostajući pazar ili drugi podaci moraju biti jasno naznačeni; nema izmišljanja nula ni prognoza.
-- Detaljnije finansije samo u sekciji Izveštaji, ne na dashboardu.
+Odluka vlasnika 22.11.2026: izveštaji su previše nepregledni za trenutni pilot. Implementacija Faze 6 je povučena iz aplikacije i baze; ostaje samo ideja za eventualnu kasniju, jednostavniju verziju. Ne vraćati ekran, podešavanja, agregacije, RPC-jeve ili pozadinski kod bez novog izričitog zahteva. Istorijske migracije i migracija povlačenja ostaju kao trag, bez aktivnih report funkcija. Faza 7 ne zavisi od izveštaja.
 
 ### B6. Dashboard
 
@@ -142,7 +138,7 @@ Commit/branch:
 - [ ] Faza 3: Pazar
 - [ ] Faza 4: Notes
 - [ ] Faza 5: Knjiga šanka
-- [ ] Faza 6: Izveštaji
+- [ ] Faza 6: Izveštaji — povučeno, pinned idea, van pilota
 - [ ] Faza 7: Dashboard
 - [ ] Faza 8: Stabilizacija
 ## Tekuća faza / testovi / nerešena pitanja
@@ -197,15 +193,13 @@ Commit/branch:
 
 **Testovi:** prvi unos, nepromenjen artikal sa 0 kroz 10 knjiga, nova nabavka, računanje iz utroška, računanje iz stanja, ručno menjanje prethodnog, decimalne jedinice, negativna/neispravna količina, više knjiga istog datuma prenosi stanje redom završavanja, pokušaj nove knjige za prethodnu sredu posle petka je odbijen, preuzimanje PDF-a, izmena poslednje i pete knjige, šesta/starija je samo u bazi, izmena stare ne menja novije, obrisan artikal ostaje u starim snimcima, restart/refresh bez gubitka.
 
-### FAZA 6 — IZVEŠTAJI
+### FAZA 6 — IZVEŠTAJI: POVUČENO / PINNED IDEA
 
-**Prompt:**
-
-> Implementiraj jednostavne nedeljne i mesečne izveštaje samo iz stvarnih podataka: pazar, gotovina/kartice, potvrđeni sati, obračunati iznosi, osnovna evidentirana potrošnja, odnos obračunatih iznosa rada i pazara. Ne dodaj nove unose, duboku analitiku ni kompleksne grafike. Jasno označi nepotpune periode i objasni kako računaš periode koji se ne poklapaju sa obračunom plate. Ne tretiraj nedostajući pazar kao 0. Finansijske brojke ostaju u Izveštajima, NE na dashboardu.
-
-**Testovi:** nepotpun pazar, odsutan obračun zarade, različiti datumi upisa i prometa, rubovi nedelje/meseca, poređenje bez prethodnog perioda, 0 kao stvarno upisan pazar nasuprot nepostojanju zapisa, agregacija više unosa dnevno.
+Van trenutnog pilota prema odluci vlasnika 22.11.2026. Implementacija je uklonjena; ne pokretati ovu fazu niti ponovo uvoditi njenu logiku u Fazi 7 ili stabilizaciji. Ponovno planiranje zahteva novu odluku vlasnika.
 
 ### FAZA 7 — MENADŽERSKI DASHBOARD
+
+**Aktuelna odluka vlasnika:** jednostavan operativni ekran, bez izveštaja. Po završetku ostaviti rezultat za lični pregled. Tek posle pregleda i posebnog zahteva ide završni commit/push pre Faze 8 (stabilizacija i ispravke). Ne raditi automatski push niti odmah prelaziti na stabilizaciju.
 
 **Prompt:**
 
