@@ -137,7 +137,7 @@ test("module panels: loaded empty states and settings render without errors", as
   const cases = [
     ["hours", "HoursPanel", {}, "Otvori prvi period"],
     ["revenue", "RevenuePanel", {}, "Još nema evidentiranog pazara."],
-    ["notes", "NotesPanel", {}, "Nema zapisa."],
+    ["notes", "NotesPanel", {}, "Nema aktivnih podsetnika."],
     ["bar", "BarPanel", {}, "Nema završenih knjiga."],
     ["bar", "BarPanel", { settingsOnly: true }, "Dodajte prvi artikal"],
   ] as const;

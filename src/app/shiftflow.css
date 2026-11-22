@@ -421,14 +421,51 @@ textarea { resize: vertical; }
 .hours-confirm button { margin: 8px 10px 0 0; }
 .hours-panel td small { display: block; white-space: nowrap; }
 .hours-panel td .settings-form { min-width: 190px; gap: 10px; }
-.revenue-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; margin:24px 0; }
-.revenue-summary > div { padding:20px; border:1px solid var(--border); border-radius:12px; }
-.revenue-summary strong { font-size:24px; font-variant-numeric:tabular-nums; }
-.revenue-form { max-width:760px; margin-bottom:32px; }
-.revenue-form fieldset { min-width:0; border:0; padding:0; margin:0; }
-.revenue-form legend { margin-bottom:12px; }
-.revenue-panel .data-table td { font-variant-numeric:tabular-nums; }
-@media(max-width:700px) { .revenue-summary { grid-template-columns:1fr; } }
+.revenue-panel { margin-top: 0; }
+.revenue-heading { margin-bottom: 8px; }
+.revenue-heading [data-slot="button"] { min-height: 44px; }
+.revenue-panel .revenue-form { margin: 0 0 22px; padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); scroll-margin-top: 82px; }
+.revenue-form fieldset { min-width: 0; border: 0; padding: 0; margin: 0; }
+.revenue-form legend { padding: 0; margin-bottom: 12px; font-weight: 600; font-size: 14px; }
+.revenue-fields { display: grid; grid-template-columns: minmax(150px,.9fr) repeat(2,minmax(135px,1fr)) minmax(180px,1.1fr); gap: 12px; }
+.revenue-fields label { display: flex; flex-direction: column; gap: 6px; min-width: 0; font-size: 12px; }
+.revenue-fields input { min-height: 44px; }
+.revenue-total { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--border); margin-top: 16px; padding-top: 12px; font-size: 12px; color: var(--muted-foreground); }
+.revenue-total output { color: var(--foreground); font: 600 14px var(--font-mono); text-align: right; }
+.revenue-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.revenue-actions [data-slot="button"] { min-height: 44px; }
+.revenue-summary { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: 0 0 24px; }
+.revenue-summary > div { padding: 16px; border: 1px solid var(--border); border-radius: 8px; min-width: 0; }
+.revenue-summary h3 { margin-bottom: 7px; }
+.revenue-summary strong { display: block; font: 600 22px var(--font-mono); letter-spacing: -.6px; font-variant-numeric: tabular-nums; }
+.revenue-summary .revenue-highlight-value { color: var(--green-text); }
+.revenue-summary p { margin: 6px 0 0; font-size: 12px; }
+.revenue-records-heading { align-items: end; margin-bottom: 8px; }
+.revenue-records-heading h3 { margin: 0; }
+.revenue-records-heading [data-slot="button"] { min-height: 44px; }
+.revenue-panel .data-table td { font-variant-numeric: tabular-nums; }
+.revenue-cell-label { display: none; }
+.revenue-unavailable p { margin-bottom: 10px; }
+@media (max-width: 1100px) { .revenue-fields { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 700px) { .revenue-summary { grid-template-columns: 1fr; } }
+@media (max-width: 480px) {
+  .revenue-panel .revenue-form { padding: 14px; }
+  .revenue-fields { gap: 12px 10px; }
+  .revenue-date, .revenue-shift { grid-column: 1 / -1; }
+  .revenue-cash { grid-row: 2; grid-column: 1; }
+  .revenue-cards { grid-row: 2; grid-column: 2; }
+  .revenue-shift { grid-row: 3; }
+  .revenue-panel .data-table-scroll { overflow: visible; }
+  .revenue-panel .data-table { display: block; min-width: 0; }
+  .revenue-panel .data-table thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  .revenue-panel .data-table tbody { display: grid; gap: 10px; }
+  .revenue-panel .data-table tr { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px 14px; padding: 13px; border: 1px solid var(--border); border-radius: 8px; }
+  .revenue-panel .data-table td { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; padding: 0; border: 0; overflow-wrap: anywhere; }
+  .revenue-panel .data-table td:last-child { grid-column: 1 / -1; width: 100%; text-align: left; }
+  .revenue-panel .data-table td:last-child [data-slot="button"] { width: 100%; min-height: 44px; }
+  .revenue-panel .data-table td:nth-child(5) { font-weight: 600; }
+  .revenue-cell-label { display: block; color: var(--muted-foreground); font: 11px var(--font-mono); }
+}
 
 @media (max-width: 480px) {
   .form-columns { grid-template-columns: minmax(0, 1fr); }
@@ -440,14 +477,46 @@ textarea { resize: vertical; }
   .basic-rows > div > span:first-child { min-width: 0; flex-basis: 100%; }
 }
 
-/* Notes uses the existing responsive settings form without widening its panel. */
-.notes-group { margin-top: 24px; min-width: 0; }
-.note-card { border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-top: 12px; min-width: 0; overflow-wrap: anywhere; }
-.note-card p { margin-bottom: 12px; }
-.note-text { white-space: pre-wrap; overflow-wrap: anywhere; }
-.note-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.note-overdue { border-color: #d97706; }
-.note-deadline { color: #d97706; }
+/* Notes keeps due work first and opens its editor only when requested. */
+.notes-panel { margin-top: 0; }
+.notes-heading { margin-bottom: 20px; }
+.notes-heading-actions, .notes-editor-actions, .note-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.notes-heading-actions [data-slot="button"], .notes-editor-actions [data-slot="button"], .note-actions [data-slot="button"] { min-height: 44px; height: auto; }
+.notes-panel .notes-editor { margin: 0 0 22px; padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); scroll-margin-top: 82px; }
+.notes-editor h2 { margin-bottom: 0; font-size: 15px; }
+.notes-editor fieldset { min-width: 0; border: 0; padding: 0; margin: 0; display: grid; gap: 14px; }
+.notes-editor .form-columns > label { display: flex; flex-direction: column; gap: 6px; min-width: 0; font-size: 12px; }
+.notes-editor-actions { margin-top: 2px; }
+.notes-group { min-width: 0; margin-top: 24px; }
+.notes-active { margin-top: 0; }
+.notes-group + .notes-group { padding-top: 22px; border-top: 1px solid var(--border); }
+.notes-group-heading { display: flex; align-items: baseline; gap: 9px; margin-bottom: 10px; }
+.notes-group-heading h2 { margin: 0; font-size: 15px; }
+.notes-group-heading span { font: 12px var(--font-mono); color: var(--muted-foreground); }
+.notes-empty { margin: 0; padding: 18px; border: 1px dashed var(--border); border-radius: 8px; color: var(--muted-foreground); font-size: 13px; }
+.note-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "text actions" "meta actions" "confirm confirm"; align-items: center; gap: 4px 16px; min-width: 0; margin-top: 9px; padding: 15px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow-wrap: anywhere; }
+.note-text { grid-area: text; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.55; }
+.note-meta { grid-area: meta; display: flex; align-items: center; flex-wrap: wrap; gap: 7px 10px; color: var(--muted-foreground); font: 11px var(--font-mono); }
+.note-actions { grid-area: actions; }
+.note-meta time { overflow-wrap: anywhere; }
+.note-deadline, .note-completed { display: inline-block; padding: 3px 6px; border-radius: 4px; font: 600 11px var(--font-sans); }
+.note-deadline { color: #e8ae65; background: #b8754524; }
+.note-completed { color: var(--mint-fg); background: var(--mint-bg); }
+.note-overdue { border-color: #b87545; }
+.note-complete-action[data-slot="button"] { color: var(--mint-fg); border-color: var(--mint-border); background: var(--mint-bg); }
+.note-reopen-action[data-slot="button"] { color: var(--blue-fg); border-color: var(--blue-border); background: var(--blue-bg); }
+.note-delete-action[data-slot="button"] { color: var(--destructive); }
+.note-delete-confirm { grid-area: confirm; margin-top: 9px; padding: 12px; border: 1px solid var(--border); border-radius: 6px; }
+.note-delete-confirm p { margin-bottom: 8px; font-size: 12px; }
+@media (max-width: 480px) {
+  .notes-heading-actions { width: 100%; }
+  .notes-heading-actions [data-slot="button"]:first-child { flex: 1; }
+  .notes-editor { padding: 14px; }
+  .note-card { display: block; }
+  .note-text { margin-bottom: 10px; }
+  .note-meta { margin-bottom: 13px; }
+  .note-actions [data-slot="button"] { flex: 1 1 auto; }
+}
 
 /* Each wide table owns its scroll; forms remain within the mobile panel. */
 .bar-panel, .bar-editor, .bar-item-form { min-width: 0; max-width: 100%; }
