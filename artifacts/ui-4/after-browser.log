@@ -1,0 +1,30 @@
+after desktop dark
+after desktop light
+after mobile dark
+after mobile light
+[
+  {
+    "device": "desktop",
+    "theme": "dark",
+    "checks": "fresh seed per click, exact seeded results, diversity, locked on/off, history, reload, undo/redo",
+    "errors": []
+  },
+  {
+    "device": "desktop",
+    "theme": "light",
+    "checks": "fresh seed per click, exact seeded results, diversity, locked on/off, history, reload, undo/redo",
+    "errors": []
+  },
+  {
+    "device": "mobile",
+    "theme": "dark",
+    "checks": "fresh seed per click, exact seeded results, diversity, locked on/off, history, reload, undo/redo",
+    "errors": []
+  },
+  {
+    "device": "mobile",
+    "theme": "light",
+    "checks": "fresh seed per click, exact seeded results, diversity, locked on/off, history, reload, undo/redo",
+    "errors": []
+  }
+]

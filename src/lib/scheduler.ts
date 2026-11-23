@@ -105,15 +105,28 @@ export function validateSchedule(schedule: Schedule, w: Workspace) {
   for (const a of schedule.assignments) { if (seen.has(a.id)) all.push({ id: `duplicate-${a.id}`, severity: "block", message: "Dve dodele imaju isti identifikator." }); seen.add(a.id); }
   return [...new Map(all.map(c => [c.id, c])).values()];
 }
+// Local, reproducible PRNG: randomness never affects constraint checks or global state.
+function seededRandom(seed: number) {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6D2B79F5) >>> 0;
+    let value = Math.imul(state ^ (state >>> 15), state | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 // Reproducible multi-pass greedy search. Locked assignments remain unchanged.
-// Each pass prioritizes constrained roles and scores fair hours/weekends/preferences.
-export function generateSchedule(w: Workspace, week: string, keepLocked = true): Schedule {
+// Seeded runs retain all legacy passes as a quality floor, then explore more ties.
+export function generateSchedule(w: Workspace, week: string, keepLocked = true, seed?: number): Schedule {
+  const random = seed === undefined ? undefined : seededRandom(seed);
   const locked = keepLocked ? (w.schedules[week]?.assignments ?? []).filter(a => a.locked) : [];
   const adjacent = neighborAssignments(w, week);
   const available = w.employees.filter(e => e.active);
   const requirements = effectiveRequirements(w, week);
   let best: Assignment[] = [...locked]; let bestScore: number[] | null = null;
-  for (let pass = 0; pass < 36; pass++) {
+  let equalBestCount = 0;
+  for (let pass = 0; pass < (random ? 72 : 36); pass++) {
     const result = locked.map(a => ({ ...a }));
     const slots = requirements.flatMap(r => Array.from({ length: Math.max(0, r.count - locked.filter(a => a.day === r.day && a.templateId === r.templateId && a.position === r.position).length) }, (_, i) => ({ ...r, slot: i })));
     slots.sort((a, b) => a.day - b.day || available.filter(e => e.positions.includes(a.position)).length - available.filter(e => e.positions.includes(b.position)).length || a.templateId.localeCompare(b.templateId));
@@ -126,7 +139,7 @@ export function generateSchedule(w: Workspace, week: string, keepLocked = true):
         const conflicts = assignmentConflicts(assignment, result, w, adjacent, week);
         const hours = hoursFor(result, e.id, w.templates);
         const weekend = result.filter(a => a.employeeId === e.id && a.day >= 5).length;
-        const tie = ((ei * 17 + pass * 13 + index * (pass + 3)) % 31) / 31;
+        const tie = pass >= 36 && random ? random() : ((ei * 17 + pass * 13 + index * (pass + 3)) % 31) / 31;
         const score = hours / Math.max(e.targetHours, 8) * 30 + weekend * 5 + (e.preferredShift && e.preferredShift !== slot.templateId ? 4 : 0) + conflicts.length * 12 + tie * 4;
         return { assignment, conflicts, score };
       }).filter(c => !c.conflicts.some(c => c.severity === "block")).sort((a, b) => a.score - b.score || a.assignment.employeeId.localeCompare(b.assignment.employeeId));
@@ -134,7 +147,13 @@ export function generateSchedule(w: Workspace, week: string, keepLocked = true):
     }
     const score = [missingRequirements(result, requirements).reduce((s, r) => s + r.missing, 0), result.reduce((s, a) => s + assignmentConflicts(a, result, w, adjacent, week).length, 0), available.reduce((s, e) => s + (hoursFor(result, e.id, w.templates) / Math.max(e.targetHours, 8)) ** 2, 0), result.filter(a => { const e = available.find(e => e.id === a.employeeId); return e?.preferredShift && e.preferredShift !== a.templateId; }).length];
     const different = bestScore ? score.findIndex((s, i) => s !== bestScore![i]) : 0;
-    if (!bestScore || (different >= 0 && score[different] < bestScore[different])) { best = result; bestScore = score; }
+    if (!bestScore || (different >= 0 && score[different] < bestScore[different])) {
+      best = result; bestScore = score; equalBestCount = 1;
+    } else if (different === -1 && random) {
+      // Reservoir sampling only among equally good results; quality wins first.
+      equalBestCount++;
+      if (random() < 1 / equalBestCount) best = result;
+    }
   }
   return { week, status: "draft", assignments: best, requirements: structuredClone(requirements), rules: { ...w.rules } };
 }

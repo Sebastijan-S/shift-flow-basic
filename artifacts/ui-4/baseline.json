@@ -1,0 +1,645 @@
+{
+  "week": "2026-11-23",
+  "status": "draft",
+  "assignments": [
+    {
+      "id": "2026-11-23-0-evening-Barista-0",
+      "employeeId": "employee-8",
+      "day": 0,
+      "templateId": "evening",
+      "position": "Barista",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-0-morning-Barista-0",
+      "employeeId": "employee-2",
+      "day": 0,
+      "templateId": "morning",
+      "position": "Barista",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-0-evening-Konobar-0",
+      "employeeId": "employee-3",
+      "day": 0,
+      "templateId": "evening",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-0-evening-Konobar-1",
+      "employeeId": "employee-6",
+      "day": 0,
+      "templateId": "evening",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-0-morning-Konobar-0",
+      "employeeId": "employee-4",
+      "day": 0,
+      "templateId": "morning",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-0-morning-Konobar-1",
+      "employeeId": "employee-7",
+      "day": 0,
+      "templateId": "morning",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-1-evening-Barista-0",
+      "employeeId": "employee-5",
+      "day": 1,
+      "templateId": "evening",
+      "position": "Barista",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-1-morning-Barista-0",
+      "employeeId": "employee-2",
+      "day": 1,
+      "templateId": "morning",
+      "position": "Barista",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-1-evening-Konobar-0",
+      "employeeId": "employee-9",
+      "day": 1,
+      "templateId": "evening",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-1-evening-Konobar-1",
+      "employeeId": "employee-3",
+      "day": 1,
+      "templateId": "evening",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-1-morning-Konobar-0",
+      "employeeId": "employee-10",
+      "day": 1,
+      "templateId": "morning",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-1-morning-Konobar-1",
+      "employeeId": "employee-7",
+      "day": 1,
+      "templateId": "morning",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-2-evening-Barista-0",
+      "employeeId": "employee-5",
+      "day": 2,
+      "templateId": "evening",
+      "position": "Barista",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-2-morning-Barista-0",
+      "employeeId": "employee-1",
+      "day": 2,
+      "templateId": "morning",
+      "position": "Barista",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-2-evening-Konobar-0",
+      "employeeId": "employee-6",
+      "day": 2,
+      "templateId": "evening",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-2-evening-Konobar-1",
+      "employeeId": "employee-9",
+      "day": 2,
+      "templateId": "evening",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-2-morning-Konobar-0",
+      "employeeId": "employee-4",
+      "day": 2,
+      "templateId": "morning",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-2-morning-Konobar-1",
+      "employeeId": "employee-10",
+      "day": 2,
+      "templateId": "morning",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-3-evening-Barista-0",
+      "employeeId": "employee-8",
+      "day": 3,
+      "templateId": "evening",
+      "position": "Barista",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-3-morning-Barista-0",
+      "employeeId": "employee-1",
+      "day": 3,
+      "templateId": "morning",
+      "position": "Barista",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-3-evening-Konobar-0",
+      "employeeId": "employee-2",
+      "day": 3,
+      "templateId": "evening",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-3-evening-Konobar-1",
+      "employeeId": "employee-6",
+      "day": 3,
+      "templateId": "evening",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-3-morning-Konobar-0",
+      "employeeId": "employee-4",
+      "day": 3,
+      "templateId": "morning",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-3-morning-Konobar-1",
+      "employeeId": "employee-7",
+      "day": 3,
+      "templateId": "morning",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-4-evening-Barista-0",
+      "employeeId": "employee-8",
+      "day": 4,
+      "templateId": "evening",
+      "position": "Barista",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-4-morning-Barista-0",
+      "employeeId": "employee-1",
+      "day": 4,
+      "templateId": "morning",
+      "position": "Barista",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-4-evening-Konobar-0",
+      "employeeId": "employee-3",
+      "day": 4,
+      "templateId": "evening",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-4-evening-Konobar-1",
+      "employeeId": "employee-9",
+      "day": 4,
+      "templateId": "evening",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-4-morning-Konobar-0",
+      "employeeId": "employee-10",
+      "day": 4,
+      "templateId": "morning",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-4-morning-Konobar-1",
+      "employeeId": "employee-4",
+      "day": 4,
+      "templateId": "morning",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-5-evening-Barista-0",
+      "employeeId": "employee-5",
+      "day": 5,
+      "templateId": "evening",
+      "position": "Barista",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-5-morning-Barista-0",
+      "employeeId": "employee-1",
+      "day": 5,
+      "templateId": "morning",
+      "position": "Barista",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-5-evening-Konobar-0",
+      "employeeId": "employee-3",
+      "day": 5,
+      "templateId": "evening",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-5-evening-Konobar-1",
+      "employeeId": "employee-6",
+      "day": 5,
+      "templateId": "evening",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-5-morning-Konobar-0",
+      "employeeId": "employee-7",
+      "day": 5,
+      "templateId": "morning",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-5-morning-Konobar-1",
+      "employeeId": "employee-10",
+      "day": 5,
+      "templateId": "morning",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-6-evening-Barista-0",
+      "employeeId": "employee-2",
+      "day": 6,
+      "templateId": "evening",
+      "position": "Barista",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-6-morning-Barista-0",
+      "employeeId": "employee-8",
+      "day": 6,
+      "templateId": "morning",
+      "position": "Barista",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-6-evening-Konobar-0",
+      "employeeId": "employee-9",
+      "day": 6,
+      "templateId": "evening",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-6-evening-Konobar-1",
+      "employeeId": "employee-3",
+      "day": 6,
+      "templateId": "evening",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "15:00",
+      "end": "23:00"
+    },
+    {
+      "id": "2026-11-23-6-morning-Konobar-0",
+      "employeeId": "employee-4",
+      "day": 6,
+      "templateId": "morning",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    },
+    {
+      "id": "2026-11-23-6-morning-Konobar-1",
+      "employeeId": "employee-10",
+      "day": 6,
+      "templateId": "morning",
+      "position": "Konobar",
+      "locked": false,
+      "note": "",
+      "start": "07:00",
+      "end": "15:00"
+    }
+  ],
+  "requirements": [
+    {
+      "day": 0,
+      "templateId": "morning",
+      "position": "Barista",
+      "count": 1
+    },
+    {
+      "day": 0,
+      "templateId": "morning",
+      "position": "Konobar",
+      "count": 2
+    },
+    {
+      "day": 0,
+      "templateId": "evening",
+      "position": "Barista",
+      "count": 1
+    },
+    {
+      "day": 0,
+      "templateId": "evening",
+      "position": "Konobar",
+      "count": 2
+    },
+    {
+      "day": 1,
+      "templateId": "morning",
+      "position": "Barista",
+      "count": 1
+    },
+    {
+      "day": 1,
+      "templateId": "morning",
+      "position": "Konobar",
+      "count": 2
+    },
+    {
+      "day": 1,
+      "templateId": "evening",
+      "position": "Barista",
+      "count": 1
+    },
+    {
+      "day": 1,
+      "templateId": "evening",
+      "position": "Konobar",
+      "count": 2
+    },
+    {
+      "day": 2,
+      "templateId": "morning",
+      "position": "Barista",
+      "count": 1
+    },
+    {
+      "day": 2,
+      "templateId": "morning",
+      "position": "Konobar",
+      "count": 2
+    },
+    {
+      "day": 2,
+      "templateId": "evening",
+      "position": "Barista",
+      "count": 1
+    },
+    {
+      "day": 2,
+      "templateId": "evening",
+      "position": "Konobar",
+      "count": 2
+    },
+    {
+      "day": 3,
+      "templateId": "morning",
+      "position": "Barista",
+      "count": 1
+    },
+    {
+      "day": 3,
+      "templateId": "morning",
+      "position": "Konobar",
+      "count": 2
+    },
+    {
+      "day": 3,
+      "templateId": "evening",
+      "position": "Barista",
+      "count": 1
+    },
+    {
+      "day": 3,
+      "templateId": "evening",
+      "position": "Konobar",
+      "count": 2
+    },
+    {
+      "day": 4,
+      "templateId": "morning",
+      "position": "Barista",
+      "count": 1
+    },
+    {
+      "day": 4,
+      "templateId": "morning",
+      "position": "Konobar",
+      "count": 2
+    },
+    {
+      "day": 4,
+      "templateId": "evening",
+      "position": "Barista",
+      "count": 1
+    },
+    {
+      "day": 4,
+      "templateId": "evening",
+      "position": "Konobar",
+      "count": 2
+    },
+    {
+      "day": 5,
+      "templateId": "morning",
+      "position": "Barista",
+      "count": 1
+    },
+    {
+      "day": 5,
+      "templateId": "morning",
+      "position": "Konobar",
+      "count": 2
+    },
+    {
+      "day": 5,
+      "templateId": "evening",
+      "position": "Barista",
+      "count": 1
+    },
+    {
+      "day": 5,
+      "templateId": "evening",
+      "position": "Konobar",
+      "count": 2
+    },
+    {
+      "day": 6,
+      "templateId": "morning",
+      "position": "Barista",
+      "count": 1
+    },
+    {
+      "day": 6,
+      "templateId": "morning",
+      "position": "Konobar",
+      "count": 2
+    },
+    {
+      "day": 6,
+      "templateId": "evening",
+      "position": "Barista",
+      "count": 1
+    },
+    {
+      "day": 6,
+      "templateId": "evening",
+      "position": "Konobar",
+      "count": 2
+    }
+  ],
+  "rules": {
+    "minRestHours": 12,
+    "maxWeeklyHours": 40,
+    "restSeverity": "block",
+    "hoursSeverity": "block",
+    "allowMultiple": false
+  }
+}

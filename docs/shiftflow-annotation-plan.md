@@ -2,7 +2,7 @@
 
 Dogovoreno: 23. novembra 2026.
 
-Status: celine 1 i 2 su završene i pushovane kao `UI - 1` (`cf46f28`) i `UI - 2` (`8fcaacd`). Celina 3 je implementirana i proverena, uz korisnikovo odobrenje za neposredni commit/push `UI - 3`. Celina 4 nije započeta.
+Status: celine 1–3 su završene i pushovane kao `UI - 1` (`cf46f28`), `UI - 2` (`8fcaacd`) i `UI - 3` (`83c4a66`). Celina 4 je implementirana i proverena; korisnik je odobrio commit/push `UI - 4`.
 
 ## Način rada i nastavak
 
@@ -138,9 +138,9 @@ Trenutni generator je namerno determinističan. Korisnik želi novu kombinaciju 
 - [x] Razjašnjene anotacije i sačuvan plan.
 - [x] Celina 1: UI i podešavanja — završeno, pregledano i odobreno; isporuka `UI - 1`.
 - [x] Celina 2: označavanje postojećeg unosa — završeno i pushovano kao `UI - 2` (`8fcaacd`).
-- [x] Celina 3: kopiranje potreba tima — implementirano i provereno; odobrena isporuka `UI - 3`.
-- [ ] Celina 4: raznovrsnije generisanje.
-- [ ] Završni pregled diffa, snimaka, testova, TypeScript-a i builda.
+- [x] Celina 3: kopiranje potreba tima — završeno i pushovano kao `UI - 3` (`83c4a66`).
+- [x] Celina 4: raznovrsnije generisanje — završeno i provereno; odobrena isporuka `UI - 4`.
+- [x] Završni pregled diffa, snimaka, testova, TypeScript-a i builda — poslednja celina: 70/70 testova, check/build i browser provere.
 
 Pri nastavku ažurirati ovaj spisak prema stvarno završenom radu i zabeležiti eventualne nove dogovore, bez pretpostavljanja da je neoznačena celina implementirana.
 
@@ -177,3 +177,15 @@ Pri nastavku ažurirati ovaj spisak prema stvarno završenom radu i zabeležiti 
 - Browser provere: Chrome 390 × 844 i 1440 × 900, obe teme; tastatura/Enter i emulirani dodir; oba editora, nula/20/prilagođena pozicija, ograničeni dani smene, jedna istorijska stavka, reload, undo/redo i naknadna nezavisna izmena jednog dana. Isključivo izolovani demo profili, bez produkcionih upisa.
 - Dokazi su u `artifacts/ui-3/`: skripta i demo primer, snimci pre/posle kopiranja, rezultati, logovi i pregledan diff. Nije testiran fizički telefon/Safari.
 - Preview na portu 3000 i dalje poslužuje uspešan produkcioni build; sad sadrži korak 3. Korisnik je izričito odobrio zaseban commit/push `UI - 3` odmah po implementaciji i proverama. Korak 4 ostaje za kasnije.
+
+## Pregled celine 4 — 23. novembar 2026.
+
+- Svako korisničko pokretanje generatora dobija novo 32-bitno seme preko `crypto.getRandomValues`. Nema novog dugmeta ili podešavanja.
+- `generateSchedule` prima opciono četvrto polje `seed`. Isti ulaz i seme daju isti rezultat; bez semena rezultat ostaje identičan prethodnom generatoru (potvrđen tačnim regresionim otiskom).
+- Zadržano je svih 36 dosadašnjih pokušaja i dodato 36 pokušaja sa semenom. Nasumičan izbor među jednakim ocenama koristi lokalni reproduktivan PRNG. Rezultat se bira istim redosledom merila: nepopunjena mesta, konflikti, raspodela fonda sati, željene smene; seme ne može da izabere lošiji rezultat od najbolje prethodne ocene.
+- Sve provere dozvoljenosti ostaju iste. Zaključane smene ostaju iste kada je opcija uključena; opcija isključena omogućava ponovno generisanje svega. Zaključavanje se ne prenosi u druge nedelje, a željena smena ostaje preferenca.
+- Poruka posle generisanja sada koristi potrebe novog rasporeda, uključujući nedeljne izuzetke i dane korišćenja smena, da broj preostalih mesta bude tačan.
+- Prošlo je 70/70 testova (pet novih za seme, raznovrsnost, kvalitet, zabrane i zaključavanje), `npm run check` i `npm run build`. Na izolovanom demo primeru 12 fiksnih semena daje 12 različitih potpuno popunjenih rasporeda, bez blokirajućih konflikata. Isti rezultat je očekivan kada postoji samo jedno dozvoljeno rešenje.
+- Chrome provere pre/posle: 390 × 844 i 1440 × 900, obe teme; tastatura i emulirani dodir, novo seme po pokretanju, tačni rezultati za kontrolisana semena, zaključavanje uključeno/isključeno, jedna istorijska stavka po generisanju, reload, undo/redo, dozvoljena objava kompletnog nacrta i blokirana objava nepopunjenog nedeljnog izuzetka uz tačan broj praznih mesta. Nema stvarnih naloga/upisa.
+- Dokazi i pregledan diff su u `artifacts/ui-4/`. Nije proveravan fizički telefon ili Safari. Generator ima dvostruko više pokušaja kada dobije seme; merenja demo primera su u `metrics.json`.
+- Preview ostaje na `http://localhost:3000` kao osvežen produkcioni build. Korisnik je naknadno izričito odobrio commit/push koraka 4 kao `UI - 4`.

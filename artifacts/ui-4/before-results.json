@@ -1,0 +1,26 @@
+[
+  {
+    "device": "desktop",
+    "theme": "dark",
+    "checks": "legacy repeat result and locked shift",
+    "errors": []
+  },
+  {
+    "device": "desktop",
+    "theme": "light",
+    "checks": "legacy repeat result and locked shift",
+    "errors": []
+  },
+  {
+    "device": "mobile",
+    "theme": "dark",
+    "checks": "legacy repeat result and locked shift",
+    "errors": []
+  },
+  {
+    "device": "mobile",
+    "theme": "light",
+    "checks": "legacy repeat result and locked shift",
+    "errors": []
+  }
+]

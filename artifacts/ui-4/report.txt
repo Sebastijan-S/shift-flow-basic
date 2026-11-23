@@ -1,0 +1,29 @@
+ShiftFlow — korak 4, raznovrsnije generisanje
+
+Promene:
+- Opciono seme kao četvrti argument generateSchedule; postojeći pozivi bez semena potpuno zadržavaju staro ponašanje.
+- Svako pokretanje preko postojećeg dugmeta uzima novo crypto.getRandomValues seme.
+- Zadržana stara pretraga (36 pokušaja) kao donja granica kvaliteta, plus 36 pokušaja sa semenom. Nasumičan izbor samo posle ocene kvaliteta i provere svih postojećih zabrana.
+- Ista pravila, istorija, objava i zaključavanje; željena smena ostaje preferenca i nema novih trajnih ograničenja.
+- Broj preostalih mesta u poruci računa se prema potrebama upravo generisanog rasporeda, uključujući nedeljni izuzetak.
+
+Provere:
+- npm test: 70/70 (pet novih testova). npm run check i npm run build: prolaze.
+- Tačan hash starog rezultata bez semena sačuvan i proveren. Isto seme, uključujući nulu, daje isti rezultat bez oslanjanja na globalni Math.random i bez promene ulaznih podataka.
+- Demo, 12 fiksnih semena: 12 različitih rasporeda, sva 42 mesta popunjena i nula blokirajućih konflikata. Rezultati nisu lošiji od dosadašnjeg generatora prema postojećem redosledu merila.
+- Odsustva, datumska i nedeljna dostupnost, pozicije, broj sati i lični limit, noćne smene, minimalni odmor, dani korišćenja smena, susedne nedelje, nedeljni izuzeci, zaključane smene i neostvarive potrebe pokriveni su testovima.
+- Chrome: četiri kombinacije dimenzija/tema, pre i posle promene. Tastatura i emulirani dodir; svaka akcija uzima novo seme (kontrolisan browser stub sa tačnim očekivanim rasporedima), čuvanje/reload, undo/redo, uključeno/isključeno čuvanje zaključanih smena, omogućena objava kompletnog nacrta, blokirana objava nepopunjenog nacrta i tačna poruka za nedeljni izuzetak.
+- Nema browser pageerror grešaka. Vizuelno pregledani mobile-light/generated i desktop-dark/unfilled.
+- Fizički telefon/Safari i produkcioni/cloud upisi nisu korišćeni. Dodatni pokušaji povećavaju vreme generisanja; merenja izolovanog demo primera nalaze se u metrics.json.
+- Pomoćnoj expected.ts skripti je tokom provere dodat eksplicitan Workspace tip; nakon toga TypeScript i završni build prolaze.
+
+Dokazi:
+- baseline.ts, baseline.json, fixture.json: stari generator i izolovani podaci.
+- expected.ts, expected.json, metrics.json: tačni rezultati i merenja za poznata semena.
+- verify.cjs, before/after-results.json, before/after-browser.log: ponovljive provere UI-ja.
+- before/after JPG snimci, tests.log, seed-tests.log, typecheck.log, build.log, ui-4.diff.
+
+Predaja:
+- Plan ažuriran; sve četiri celine su implementirane.
+- Korisnik je nakon pregleda izričito odobrio commit/push koraka 4 kao UI - 4.
+- Preview ostaje na http://localhost:3000 kao produkcioni build. Obrisani handoff nije vraćen; next-env.d.ts sačuvan sa postojećim .next/dev/types putanjama.

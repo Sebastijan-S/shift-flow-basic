@@ -1,0 +1,222 @@
+diff --git a/docs/shiftflow-annotation-plan.md b/docs/shiftflow-annotation-plan.md
+index 56eb381..6fb94a6 100644
+--- a/docs/shiftflow-annotation-plan.md
++++ b/docs/shiftflow-annotation-plan.md
+@@ -2,7 +2,7 @@
+ 
+ Dogovoreno: 23. novembra 2026.
+ 
+-Status: celine 1 i 2 su završene i pushovane kao `UI - 1` (`cf46f28`) i `UI - 2` (`8fcaacd`). Celina 3 je implementirana i proverena, uz korisnikovo odobrenje za neposredni commit/push `UI - 3`. Celina 4 nije započeta.
++Status: celine 1–3 su završene i pushovane kao `UI - 1` (`cf46f28`), `UI - 2` (`8fcaacd`) i `UI - 3` (`83c4a66`). Celina 4 je implementirana i proverena lokalno; novi commit/push nije zatražen.
+ 
+ ## Način rada i nastavak
+ 
+@@ -138,9 +138,9 @@ Trenutni generator je namerno determinističan. Korisnik želi novu kombinaciju
+ - [x] Razjašnjene anotacije i sačuvan plan.
+ - [x] Celina 1: UI i podešavanja — završeno, pregledano i odobreno; isporuka `UI - 1`.
+ - [x] Celina 2: označavanje postojećeg unosa — završeno i pushovano kao `UI - 2` (`8fcaacd`).
+-- [x] Celina 3: kopiranje potreba tima — implementirano i provereno; odobrena isporuka `UI - 3`.
+-- [ ] Celina 4: raznovrsnije generisanje.
+-- [ ] Završni pregled diffa, snimaka, testova, TypeScript-a i builda.
++- [x] Celina 3: kopiranje potreba tima — završeno i pushovano kao `UI - 3` (`83c4a66`).
++- [x] Celina 4: raznovrsnije generisanje — implementirano i provereno lokalno.
++- [x] Završni pregled diffa, snimaka, testova, TypeScript-a i builda — poslednja celina: 70/70 testova, check/build i browser provere.
+ 
+ Pri nastavku ažurirati ovaj spisak prema stvarno završenom radu i zabeležiti eventualne nove dogovore, bez pretpostavljanja da je neoznačena celina implementirana.
+ 
+@@ -177,3 +177,15 @@ Pri nastavku ažurirati ovaj spisak prema stvarno završenom radu i zabeležiti
+ - Browser provere: Chrome 390 × 844 i 1440 × 900, obe teme; tastatura/Enter i emulirani dodir; oba editora, nula/20/prilagođena pozicija, ograničeni dani smene, jedna istorijska stavka, reload, undo/redo i naknadna nezavisna izmena jednog dana. Isključivo izolovani demo profili, bez produkcionih upisa.
+ - Dokazi su u `artifacts/ui-3/`: skripta i demo primer, snimci pre/posle kopiranja, rezultati, logovi i pregledan diff. Nije testiran fizički telefon/Safari.
+ - Preview na portu 3000 i dalje poslužuje uspešan produkcioni build; sad sadrži korak 3. Korisnik je izričito odobrio zaseban commit/push `UI - 3` odmah po implementaciji i proverama. Korak 4 ostaje za kasnije.
++
++## Pregled celine 4 — 23. novembar 2026.
++
++- Svako korisničko pokretanje generatora dobija novo 32-bitno seme preko `crypto.getRandomValues`. Nema novog dugmeta ili podešavanja.
++- `generateSchedule` prima opciono četvrto polje `seed`. Isti ulaz i seme daju isti rezultat; bez semena rezultat ostaje identičan prethodnom generatoru (potvrđen tačnim regresionim otiskom).
++- Zadržano je svih 36 dosadašnjih pokušaja i dodato 36 pokušaja sa semenom. Nasumičan izbor među jednakim ocenama koristi lokalni reproduktivan PRNG. Rezultat se bira istim redosledom merila: nepopunjena mesta, konflikti, raspodela fonda sati, željene smene; seme ne može da izabere lošiji rezultat od najbolje prethodne ocene.
++- Sve provere dozvoljenosti ostaju iste. Zaključane smene ostaju iste kada je opcija uključena; opcija isključena omogućava ponovno generisanje svega. Zaključavanje se ne prenosi u druge nedelje, a željena smena ostaje preferenca.
++- Poruka posle generisanja sada koristi potrebe novog rasporeda, uključujući nedeljne izuzetke i dane korišćenja smena, da broj preostalih mesta bude tačan.
++- Prošlo je 70/70 testova (pet novih za seme, raznovrsnost, kvalitet, zabrane i zaključavanje), `npm run check` i `npm run build`. Na izolovanom demo primeru 12 fiksnih semena daje 12 različitih potpuno popunjenih rasporeda, bez blokirajućih konflikata. Isti rezultat je očekivan kada postoji samo jedno dozvoljeno rešenje.
++- Chrome provere pre/posle: 390 × 844 i 1440 × 900, obe teme; tastatura i emulirani dodir, novo seme po pokretanju, tačni rezultati za kontrolisana semena, zaključavanje uključeno/isključeno, jedna istorijska stavka po generisanju, reload, undo/redo, dozvoljena objava kompletnog nacrta i blokirana objava nepopunjenog nedeljnog izuzetka uz tačan broj praznih mesta. Nema stvarnih naloga/upisa.
++- Dokazi i pregledan diff su u `artifacts/ui-4/`. Nije proveravan fizički telefon ili Safari. Generator ima dvostruko više pokušaja kada dobije seme; merenja demo primera su u `metrics.json`.
++- Preview ostaje na `http://localhost:3000` kao osvežen produkcioni build. Izmene su lokalne, bez novog commita/push-a; prethodno odobrenje za neposredni push odnosilo se na korak 3.
+diff --git a/src/components/shiftflow.tsx b/src/components/shiftflow.tsx
+index 242aa7c..9796a00 100644
+--- a/src/components/shiftflow.tsx
++++ b/src/components/shiftflow.tsx
+@@ -260,7 +260,7 @@ export default function ShiftFlow() {
+ 
+       </main></div>
+ 
+-    {modal === "generate" && <ModalFrame title="Nova nedelja, dobar plan." description="ShiftFlow usklađuje potrebe kafića sa dostupnošću i pravilima vašeg tima." close={() => !busy && setModal(null)}><div className="generation-visual"><RiSparkling2Line size={29} /><span>Vaš tim. Pametno raspoređen.</span><div><span>{active.length} zaposlenih</span><span>7 dana</span><span>{required} mesta</span></div></div><div className="generation-checklist"><p><RiCheckLine size={16} />Dostupnost i pozicije zaposlenih</p><p><RiCheckLine size={16} />Fond sati i minimum {w.rules.minRestHours} h odmora</p><p><RiCheckLine size={16} />Ravnomernija raspodela sati i vikenda</p></div><label className="check-row"><input type="checkbox" checked={keepLocked} onChange={e => setKeepLocked(e.target.checked)} /><span>Zadrži zaključane smene<small>{schedule.assignments.filter(a => a.locked).length} zaključanih smena u ovom rasporedu</small></span><RiLockLine size={17} /></label>{schedule.assignments.length > 0 && <p className="muted text-small">Otključane smene biće zamenjene novim nacrtom. Promenu možete poništiti.</p>}<div className="modal-actions"><Button variant="outline" disabled={busy} onClick={() => setModal(null)}>Otkaži</Button><Button disabled={busy || !active.length || readOnly} onClick={() => { setBusy(true); setTimeout(() => { try { const generated = generateSchedule(w, week, keepLocked); updateSchedule(generated, "Automatski generisan raspored"); setModal(null); setPage("Raspored"); const gaps = missingRequirements(generated.assignments, w.requirements).reduce((n, r) => n + r.missing, 0); notify(gaps ? `Nacrt je spreman. Preostalo je ${gaps} nepopunjenih mesta.` : "Raspored je spreman. Sve smene su popunjene."); } finally { setBusy(false); } }, 100); }}><RiSparkling2Line size={16} />{busy ? "Pravimo vaš raspored…" : "Generiši raspored"}</Button></div></ModalFrame>}
++    {modal === "generate" && <ModalFrame title="Nova nedelja, dobar plan." description="ShiftFlow usklađuje potrebe kafića sa dostupnošću i pravilima vašeg tima." close={() => !busy && setModal(null)}><div className="generation-visual"><RiSparkling2Line size={29} /><span>Vaš tim. Pametno raspoređen.</span><div><span>{active.length} zaposlenih</span><span>7 dana</span><span>{required} mesta</span></div></div><div className="generation-checklist"><p><RiCheckLine size={16} />Dostupnost i pozicije zaposlenih</p><p><RiCheckLine size={16} />Fond sati i minimum {w.rules.minRestHours} h odmora</p><p><RiCheckLine size={16} />Ravnomernija raspodela sati i vikenda</p></div><label className="check-row"><input type="checkbox" checked={keepLocked} onChange={e => setKeepLocked(e.target.checked)} /><span>Zadrži zaključane smene<small>{schedule.assignments.filter(a => a.locked).length} zaključanih smena u ovom rasporedu</small></span><RiLockLine size={17} /></label>{schedule.assignments.length > 0 && <p className="muted text-small">Otključane smene biće zamenjene novim nacrtom. Promenu možete poništiti.</p>}<div className="modal-actions"><Button variant="outline" disabled={busy} onClick={() => setModal(null)}>Otkaži</Button><Button disabled={busy || !active.length || readOnly} onClick={() => { const seed = crypto.getRandomValues(new Uint32Array(1))[0]; setBusy(true); setTimeout(() => { try { const generated = generateSchedule(w, week, keepLocked, seed); updateSchedule(generated, "Automatski generisan raspored"); setModal(null); setPage("Raspored"); const gaps = missingRequirements(generated.assignments, scheduleRequirements(w, generated)).reduce((n, r) => n + r.missing, 0); notify(gaps ? `Nacrt je spreman. Preostalo je ${gaps} nepopunjenih mesta.` : "Raspored je spreman. Sve smene su popunjene."); } finally { setBusy(false); } }, 100); }}><RiSparkling2Line size={16} />{busy ? "Pravimo vaš raspored…" : "Generiši raspored"}</Button></div></ModalFrame>}
+ 
+     {modal === "employee" && !plannerMode && <ModalFrame title={editEmployee ? "Uredi zaposlenog" : "Novi član tima"} description="Dodajte osnovne podatke i pozicije za raspoređivanje." close={() => setModal(null)}><form className="dialog-form" onSubmit={saveEmployee}><label>Ime i prezime<input {...selectOnFocus} name="name" autoFocus required minLength={2} maxLength={80} defaultValue={editEmployee?.name} placeholder="npr. Ana Petrović" /></label><fieldset><legend>Pozicije</legend><div className="position-options">{positions.map(p => <label key={p}><input type="checkbox" name="positions" value={p} defaultChecked={editEmployee?.positions.includes(p)} />{p}</label>)}</div></fieldset><label>Maksimalno sati nedeljno (opciono)<input {...selectOnFocus} type="number" name="maximum" min="1" max="168" defaultValue={editEmployee?.maxHours} placeholder="Bez posebnog limita" /></label><div className="form-columns"><label>Ciljani nedeljni fond sati<input {...selectOnFocus} type="number" name="hours" min="8" max="80" step="1" defaultValue={editEmployee?.targetHours ?? 40} required /></label><label>Željena smena<select name="preferred" defaultValue={editEmployee?.preferredShift ?? ""}><option value="">Bez preference</option>{w.templates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}</select></label></div><label className="check-row"><input type="checkbox" name="active" defaultChecked={editEmployee?.active ?? true} /><span>Aktivan član tima<small>Neaktivni zaposleni ne ulaze u automatsko generisanje.</small></span></label>{formError && <p className="form-error" role="alert">{formError}</p>}<div className="modal-actions"><Button type="button" variant="outline" onClick={() => setModal(null)}>Otkaži</Button><Button type="submit">Sačuvaj zaposlenog</Button></div></form></ModalFrame>}
+ 
+diff --git a/src/lib/scheduler.ts b/src/lib/scheduler.ts
+index bc03720..133ac9d 100644
+--- a/src/lib/scheduler.ts
++++ b/src/lib/scheduler.ts
+@@ -105,15 +105,28 @@ export function validateSchedule(schedule: Schedule, w: Workspace) {
+   for (const a of schedule.assignments) { if (seen.has(a.id)) all.push({ id: `duplicate-${a.id}`, severity: "block", message: "Dve dodele imaju isti identifikator." }); seen.add(a.id); }
+   return [...new Map(all.map(c => [c.id, c])).values()];
+ }
++// Local, reproducible PRNG: randomness never affects constraint checks or global state.
++function seededRandom(seed: number) {
++  let state = seed >>> 0;
++  return () => {
++    state = (state + 0x6D2B79F5) >>> 0;
++    let value = Math.imul(state ^ (state >>> 15), state | 1);
++    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
++    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
++  };
++}
++
+ // Reproducible multi-pass greedy search. Locked assignments remain unchanged.
+-// Each pass prioritizes constrained roles and scores fair hours/weekends/preferences.
+-export function generateSchedule(w: Workspace, week: string, keepLocked = true): Schedule {
++// Seeded runs retain all legacy passes as a quality floor, then explore more ties.
++export function generateSchedule(w: Workspace, week: string, keepLocked = true, seed?: number): Schedule {
++  const random = seed === undefined ? undefined : seededRandom(seed);
+   const locked = keepLocked ? (w.schedules[week]?.assignments ?? []).filter(a => a.locked) : [];
+   const adjacent = neighborAssignments(w, week);
+   const available = w.employees.filter(e => e.active);
+   const requirements = effectiveRequirements(w, week);
+   let best: Assignment[] = [...locked]; let bestScore: number[] | null = null;
+-  for (let pass = 0; pass < 36; pass++) {
++  let equalBestCount = 0;
++  for (let pass = 0; pass < (random ? 72 : 36); pass++) {
+     const result = locked.map(a => ({ ...a }));
+     const slots = requirements.flatMap(r => Array.from({ length: Math.max(0, r.count - locked.filter(a => a.day === r.day && a.templateId === r.templateId && a.position === r.position).length) }, (_, i) => ({ ...r, slot: i })));
+     slots.sort((a, b) => a.day - b.day || available.filter(e => e.positions.includes(a.position)).length - available.filter(e => e.positions.includes(b.position)).length || a.templateId.localeCompare(b.templateId));
+@@ -126,7 +139,7 @@ export function generateSchedule(w: Workspace, week: string, keepLocked = true):
+         const conflicts = assignmentConflicts(assignment, result, w, adjacent, week);
+         const hours = hoursFor(result, e.id, w.templates);
+         const weekend = result.filter(a => a.employeeId === e.id && a.day >= 5).length;
+-        const tie = ((ei * 17 + pass * 13 + index * (pass + 3)) % 31) / 31;
++        const tie = pass >= 36 && random ? random() : ((ei * 17 + pass * 13 + index * (pass + 3)) % 31) / 31;
+         const score = hours / Math.max(e.targetHours, 8) * 30 + weekend * 5 + (e.preferredShift && e.preferredShift !== slot.templateId ? 4 : 0) + conflicts.length * 12 + tie * 4;
+         return { assignment, conflicts, score };
+       }).filter(c => !c.conflicts.some(c => c.severity === "block")).sort((a, b) => a.score - b.score || a.assignment.employeeId.localeCompare(b.assignment.employeeId));
+@@ -134,7 +147,13 @@ export function generateSchedule(w: Workspace, week: string, keepLocked = true):
+     }
+     const score = [missingRequirements(result, requirements).reduce((s, r) => s + r.missing, 0), result.reduce((s, a) => s + assignmentConflicts(a, result, w, adjacent, week).length, 0), available.reduce((s, e) => s + (hoursFor(result, e.id, w.templates) / Math.max(e.targetHours, 8)) ** 2, 0), result.filter(a => { const e = available.find(e => e.id === a.employeeId); return e?.preferredShift && e.preferredShift !== a.templateId; }).length];
+     const different = bestScore ? score.findIndex((s, i) => s !== bestScore![i]) : 0;
+-    if (!bestScore || (different >= 0 && score[different] < bestScore[different])) { best = result; bestScore = score; }
++    if (!bestScore || (different >= 0 && score[different] < bestScore[different])) {
++      best = result; bestScore = score; equalBestCount = 1;
++    } else if (different === -1 && random) {
++      // Reservoir sampling only among equally good results; quality wins first.
++      equalBestCount++;
++      if (random() < 1 / equalBestCount) best = result;
++    }
+   }
+   return { week, status: "draft", assignments: best, requirements: structuredClone(requirements), rules: { ...w.rules } };
+ }
+
+--- /dev/null
++++ b/tests/scheduler-seed.test.ts
+@@ -0,0 +1,103 @@
++import test from "node:test";
++import assert from "node:assert/strict";
++import { createHash } from "node:crypto";
++import { createDemo, createWorkspace } from "../src/lib/demo";
++import { addDays, effectiveRequirements, generateSchedule, hoursFor, missingRequirements, validateSchedule, type Assignment, type Schedule, type Workspace } from "../src/lib/scheduler";
++
++const week = "2026-11-23";
++function quality(s: Schedule, w: Workspace) {
++  return [
++    missingRequirements(s.assignments, effectiveRequirements(w, week)).reduce((n, r) => n + r.missing, 0),
++    validateSchedule(s, w).length,
++    w.employees.filter(e => e.active).reduce((n, e) => n + (hoursFor(s.assignments, e.id, w.templates) / Math.max(e.targetHours, 8)) ** 2, 0),
++    s.assignments.filter(a => { const e = w.employees.find(e => e.id === a.employeeId); return e?.preferredShift && e.preferredShift !== a.templateId; }).length,
++  ];
++}
++function atLeastAsGood(result: Schedule, baseline: Schedule, w: Workspace) {
++  const actual = quality(result, w), original = quality(baseline, w);
++  const firstDifference = actual.findIndex((v, i) => v !== original[i]);
++  assert.ok(firstDifference === -1 || actual[firstDifference] < original[firstDifference], `${actual} is worse than ${original}`);
++  assert.equal(validateSchedule(result, w).filter(c => c.severity === "block").length, 0);
++  assert.equal(new Set(result.assignments.map(a => a.id)).size, result.assignments.length);
++}
++
++test("seeded generator is repeatable (including zero); omitted seed retains the exact legacy result", t => {
++  const w = createDemo(); w.schedules = {};
++  const original = structuredClone(w);
++  t.mock.method(Math, "random", () => { throw new Error("Global randomness must not affect the generator"); });
++  const legacy = generateSchedule(w, week, false);
++  assert.equal(createHash("sha256").update(JSON.stringify(legacy)).digest("hex"), "19f26bd4d262b83553c85aee68dffcd94f043757c6afb81696a3cd502c9aacca");
++  assert.deepEqual(generateSchedule(w, week, false, undefined), legacy);
++  for (const seed of [0, 1, 101, 0xffffffff]) assert.deepEqual(generateSchedule(w, week, false, seed), generateSchedule(w, week, false, seed));
++  assert.deepEqual(w, original);
++});
++
++test("different fixed seeds produce multiple full, valid schedules without reducing quality", () => {
++  const w = createDemo(); w.schedules = {};
++  const baseline = generateSchedule(w, week, false), combinations = new Set<string>();
++  for (let seed = 0; seed < 12; seed++) {
++    const result = generateSchedule(w, week, false, seed);
++    assert.equal(result.assignments.length, 42);
++    atLeastAsGood(result, baseline, w);
++    for (const e of w.employees) assert.ok(hoursFor(result.assignments, e.id, w.templates) <= 40);
++    combinations.add(JSON.stringify(result.assignments.map(a => [a.day, a.templateId, a.position, a.employeeId]).sort()));
++  }
++  assert.ok(combinations.size > 1, "several equally eligible teams must not always receive the same schedule");
++});
++
++test("seeded runs preserve locks, availability, hours, overnight rest, shift days and neighboring weeks", () => {
++  const w = createDemo(); w.schedules = {};
++  w.employees[5].maxHours = 16;
++  w.employees[4].availability = [{ day: 0, start: "10:00", end: "18:00" }];
++  w.absences = [{ id: "absence", employeeId: "employee-1", from: addDays(week, 1), to: addDays(week, 4), kind: "absence", reason: "" }];
++  w.dateAvailability = [{ id: "dated", employeeId: "employee-4", date: week, start: "08:00", end: "16:00" }];
++  w.templates[1].days = [0, 1, 2, 3, 4];
++  w.templates.push({ id: "night", name: "Noćna", start: "22:00", end: "08:00", days: [5], color: "blue" });
++  w.requirementOverrides = { [week]: [...w.requirements, { day: 5, templateId: "night", position: "Barista", count: 1 }] };
++  const assignment: Assignment = { id: "locked", employeeId: "employee-2", day: 2, templateId: "morning", position: "Barista", locked: true, note: "Dogovor", start: "07:00", end: "15:00" };
++  w.schedules[week] = { week, status: "draft", assignments: [assignment] };
++  for (const [offset, day, templateId, employeeId] of [[-7, 6, "evening", "employee-2"], [7, 0, "morning", "employee-3"]] as const) {
++    const adjacentWeek = addDays(week, offset);
++    w.schedules[adjacentWeek] = { week: adjacentWeek, status: "published", assignments: [{ id: `neighbor-${offset}`, employeeId, day, templateId, position: "Barista", locked: false, note: "" }] };
++  }
++  const original = structuredClone(w), baseline = generateSchedule(w, week);
++  for (const seed of [0, 1, 2, 101, 202, 999]) {
++    const result = generateSchedule(w, week, true, seed);
++    atLeastAsGood(result, baseline, w);
++    assert.deepEqual(result.assignments.find(a => a.id === assignment.id), assignment);
++    assert.ok(!result.assignments.some(a => a.day === 0 && a.employeeId === "employee-2" && a.templateId === "morning"));
++    assert.ok(!result.assignments.some(a => a.day >= 5 && a.templateId === "evening"));
++    assert.ok(hoursFor(result.assignments, "employee-6", w.templates) <= 16);
++    assert.deepEqual(result.requirements, effectiveRequirements(w, week));
++    assert.equal(generateSchedule(w, week, false, seed).assignments.some(a => a.id === "locked" || a.locked), false);
++  }
++  assert.deepEqual(w, original);
++});
++
++test("a preferred shift remains a preference, and a lock does not become a future-week restriction", () => {
++  const w = createWorkspace();
++  w.employees = [{ id: "only", name: "Jedini", initials: "J", color: "mint", positions: ["Barista"], targetHours: 40, active: true, daysOff: [], preferredShift: "morning" }];
++  w.requirements = [{ day: 0, templateId: "evening", position: "Barista", count: 1 }];
++  w.schedules[week] = { week, status: "draft", assignments: [{ id: "manual", employeeId: "only", day: 2, templateId: "morning", position: "Barista", locked: true, note: "Only here" }] };
++  const nextWeek = addDays(week, 7);
++  const result = generateSchedule(w, nextWeek, true, 123);
++  assert.equal(result.assignments.length, 1);
++  assert.equal(result.assignments[0].templateId, "evening");
++  assert.equal(result.assignments[0].locked, false);
++  assert.equal(result.assignments.some(a => a.id === "manual"), false);
++});
++
++test("randomness cannot fill impossible demand by violating a ban or fabricate variety in a forced solution", () => {
++  const w = createWorkspace();
++  w.employees = [{ id: "only", name: "Jedini", initials: "J", color: "mint", positions: ["Barista"], targetHours: 40, active: true, daysOff: [1] }];
++  w.requirements = [{ day: 0, templateId: "morning", position: "Barista", count: 1 }, { day: 1, templateId: "morning", position: "Barista", count: 1 }, { day: 0, templateId: "morning", position: "Konobar", count: 1 }];
++  const baseline = generateSchedule(w, week), outputs: Schedule[] = [];
++  for (const seed of [0, 1, 2, 123, 999]) {
++    const result = generateSchedule(w, week, true, seed);
++    atLeastAsGood(result, baseline, w);
++    assert.equal(result.assignments.length, 1);
++    assert.equal(missingRequirements(result.assignments, w.requirements).reduce((n, r) => n + r.missing, 0), 2);
++    outputs.push(result);
++  }
++  outputs.forEach(result => assert.deepEqual(result, outputs[0]));
++});

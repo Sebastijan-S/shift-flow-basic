@@ -1,0 +1,10 @@
+import {writeFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {createDemo} from '../../src/lib/demo';
+import {generateSchedule} from '../../src/lib/scheduler';
+const current=createDemo(),week='2026-11-23';
+current.schedules={[week]:generateSchedule({...current,schedules:{}},week,false)};
+const schedule=generateSchedule(current,week,false);
+writeFileSync('artifacts/ui-4/fixture.json',JSON.stringify({schema:2,revision:0,current,past:[],future:[]},null,2));
+writeFileSync('artifacts/ui-4/baseline.json',JSON.stringify(schedule,null,2));
+console.log(createHash('sha256').update(JSON.stringify(schedule)).digest('hex'));

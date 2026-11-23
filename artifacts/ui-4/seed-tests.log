@@ -1,0 +1,13 @@
+✔ seeded generator is repeatable (including zero); omitted seed retains the exact legacy result (3555.9985ms)
+✔ different fixed seeds produce multiple full, valid schedules without reducing quality (4563.2916ms)
+✔ seeded runs preserve locks, availability, hours, overnight rest, shift days and neighboring weeks (4045.6849ms)
+✔ a preferred shift remains a preference, and a lock does not become a future-week restriction (3.5302ms)
+✔ randomness cannot fill impossible demand by violating a ban or fabricate variety in a forced solution (18.7955ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12464.9511
