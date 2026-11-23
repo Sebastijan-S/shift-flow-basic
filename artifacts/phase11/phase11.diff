@@ -1,0 +1,60 @@
+--- a/src/components/shiftflow.tsx
++++ b/src/components/shiftflow.tsx
+@@ -201,7 +201,24 @@
+ 
+       {page === "Pravila rada" && <div className="settings-grid work-rules"><section className="panel"><h2>Pravila raspoređivanja</h2><p className="muted">Izmene primenite dugmetom „Sačuvaj pravila“.</p><form className="settings-form" onSubmit={e => { e.preventDefault(); const f = new FormData(e.currentTarget); commit({ ...w, rules: { minRestHours: Number(f.get("rest")), maxWeeklyHours: Number(f.get("hours")), restSeverity: f.get("restSeverity") as "warning" | "block", hoursSeverity: f.get("hoursSeverity") as "warning" | "block", allowMultiple: f.get("multiple") === "on", restEnabled: f.get("restEnabled") === "on", hoursEnabled: f.get("hoursEnabled") === "on" } }, "Izmenjena pravila rada"); notify("Pravila su sačuvana. Proverite postojeći raspored ili generišite novi."); }}><fieldset className="work-rule-group"><legend>Odmor između smena</legend><label className="check-row"><input type="checkbox" name="restEnabled" defaultChecked={w.rules.restEnabled !== false} />Primeni pravilo odmora</label><div className="rule-field"><label>Minimalni odmor između smena<div className="input-unit"><input name="rest" type="number" min="0" max="48" defaultValue={w.rules.minRestHours} required /><span>sati</span></div></label><label>Primena pravila odmora<select aria-describedby="rest-severity-help" name="restSeverity" defaultValue={w.rules.restSeverity}><option value="block">Zabrana</option><option value="warning">Upozorenje</option></select></label></div><p id="rest-severity-help" className="work-rule-help">Zabrana blokira smenu bez dovoljnog odmora. Upozorenje dozvoljava izmenu i prikazuje upozorenje.</p></fieldset><fieldset className="work-rule-group"><legend>Nedeljni fond sati</legend><label className="check-row"><input type="checkbox" name="hoursEnabled" defaultChecked={w.rules.hoursEnabled !== false} />Primeni maksimum sati</label><div className="rule-field"><label>Maksimalni nedeljni fond<div className="input-unit"><input name="hours" type="number" min="8" max="168" step="1" defaultValue={w.rules.maxWeeklyHours} required /><span>sati</span></div></label><label>Primena maksimuma sati<select aria-describedby="hours-severity-help" name="hoursSeverity" defaultValue={w.rules.hoursSeverity}><option value="block">Zabrana</option><option value="warning">Upozorenje</option></select></label></div><p id="hours-severity-help" className="work-rule-help">Zabrana blokira prekoračenje fonda. Upozorenje dozvoljava izmenu i prikazuje upozorenje. Poseban maksimum zaposlenog ima prednost nad ovim fondom.</p></fieldset><fieldset className="work-rule-group"><legend>Smene u istom danu</legend><label className="check-row"><input type="checkbox" name="multiple" defaultChecked={w.rules.allowMultiple} /><span>Dozvoli više smena dnevno<small>Više smena istog dana prikazuje upozorenje. Preklapanje termina je uvek zabranjeno.</small></span></label></fieldset><Button type="submit">Sačuvaj pravila</Button></form></section><section className="panel"><h2>Potreban broj ljudi</h2><p className="muted">Podesite broj zaposlenih po danu, smeni i poziciji.</p><p className="settings-auto-label">Promene broja ljudi čuvaju se odmah.</p><div className="requirements-editor">{DAY_NAMES.map((name, dayIndex) => <details key={name} open={dayIndex === 0}><summary>{name}<RiArrowDownSLine size={16} /></summary>{w.templates.map(t => <div key={t.id} className="requirement-row"><strong>{t.name}<small>{t.start}–{t.end}</small></strong>{positions.map(p => <label key={p}>{p}<input type="number" min="0" max="20" aria-label={`${name}, ${t.name}, ${p}`} value={w.requirements.find(r => r.day === dayIndex && r.templateId === t.id && r.position === p)?.count ?? 0} onChange={e => { const count = Math.max(0, Math.min(20, Number(e.target.value))); const rest = w.requirements.filter(r => !(r.day === dayIndex && r.templateId === t.id && r.position === p)); commit({ ...w, requirements: [...rest, { day: dayIndex, templateId: t.id, position: p, count }] }, "Promenjene potrebe tima"); }} /></label>)}</div>)}</details>)}</div></section></div>}
+ 
+-      {page === "Istorija izmena" && <section className="panel"><div className="panel-heading"><h2>Sačuvane promene <span className="tag">{state.past.length}</span></h2><div className="heading-actions"><Button variant="outline" disabled={!state.past.length} onClick={undo}><RiArrowGoBackLine size={16} />Poništi</Button><Button variant="outline" disabled={!state.future.length} onClick={redo}><RiArrowGoForwardLine size={16} />Ponovi</Button></div></div>{!state.past.length ? <Empty>Vaše izmene će se pojaviti ovde. Istorija ostaje sačuvana i posle zatvaranja pregledača.</Empty> : <div className="history-list">{[...state.past].reverse().map((entry, i) => <div key={i}><span className="history-icon"><RiHistoryLine size={17} /></span><span><strong>{entry.label}</strong><small>{new Date(entry.time).toLocaleString("sr-Latn-RS", { timeZone: "Europe/Belgrade", dateStyle: "medium", timeStyle: "short" })}</small></span>{i === 0 && <span className="tag">Poslednja izmena</span>}</div>)}</div>}</section>}
++      {page === "Istorija izmena" && <section className="panel history-panel">
++        <div className="panel-heading">
++          <div><h2>Sačuvane promene <span className="tag">{state.past.length}</span></h2><p className="muted">Istorija ovog pregledača. Najnovije izmene su na vrhu.</p></div>
++          <div className="heading-actions">
++            <Button variant="outline" disabled={!state.past.length} onClick={undo} aria-describedby="history-undo"><RiArrowGoBackLine size={16} />Poništi izmenu</Button>
++            <Button variant="outline" disabled={!state.future.length} onClick={redo} aria-describedby="history-redo"><RiArrowGoForwardLine size={16} />Ponovi izmenu</Button>
++          </div>
++        </div>
++        <div className="history-actions-help" role="status" aria-atomic="true">
++          <p id="history-undo">{state.past.length ? <>Za poništavanje: <strong>{state.past.at(-1)?.label}</strong></> : "Nema izmena za poništavanje."}</p>
++          <p id="history-redo">{state.future.length ? <>Za ponavljanje: <strong>{state.future.at(-1)?.label}</strong></> : "Nema izmena za ponavljanje."}</p>
++        </div>
++        {!state.past.length ? <Empty>Vaše izmene će se pojaviti ovde. Istorija ostaje sačuvana i posle zatvaranja pregledača.</Empty> : <div className="history-list">{[...state.past].reverse().map((entry, i) => <div key={i}>
++          <span className="history-icon" aria-hidden="true"><RiHistoryLine size={17} /></span>
++          <span className="history-copy"><strong>{entry.label}</strong><small><time dateTime={entry.time}>{new Date(entry.time).toLocaleString("sr-Latn-RS", { timeZone: "Europe/Belgrade", dateStyle: "medium", timeStyle: "short" })}</time></small></span>
++          {i === 0 && <span className="tag">Poslednja izmena</span>}
++        </div>)}</div>}
++      </section>}
+ 
+       {page === "Podešavanja" && <>
+         <nav className="panel settings-index" aria-label="Indeks podešavanja">
+--- a/src/app/shiftflow.css
++++ b/src/app/shiftflow.css
+@@ -327,6 +327,15 @@
+ .history-list strong { font-size: 12px; font-weight: 500; display: block; }
+ .history-list small { font-size: 12px; margin-top: 5px; display: block; color: var(--muted-foreground); }
+ .history-list .tag { margin-left: auto; }
++.history-panel .panel-heading { align-items: flex-start; }
++.history-panel .panel-heading > div:first-child { min-width: 0; }
++.history-panel .history-actions-help { padding: 12px 14px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--muted-foreground); font: 12px/1.7 var(--font-sans); overflow-wrap: anywhere; }
++.history-panel .history-actions-help p { margin: 0; }
++.history-panel .history-actions-help strong { color: var(--foreground); font-weight: 500; }
++.history-panel .history-icon { flex-shrink: 0; }
++.history-panel .history-copy { min-width: 0; overflow-wrap: anywhere; }
++.history-panel .history-list .tag { flex-shrink: 0; }
++.history-panel [data-slot="button"]:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+ .empty { text-align: center; padding: 70px 25px; color: var(--muted-foreground); font-size: 12px; }
+ .empty > svg { margin: 0 auto 15px; opacity: .5; }
+ .loading { height: 100vh; display: flex; gap: 15px; align-items: center; justify-content: center; color: var(--muted-foreground); }
+@@ -835,3 +844,13 @@
+   .availability-button { min-height: 44px; }
+   .availability-heading-actions [data-slot="button"], .availability-conditions [data-slot="button"] { min-height: 44px; }
+ }
++
++/* Keep the latest history marker and recovery controls visible on phones. */
++@media (max-width: 760px) {
++  .history-panel .panel-heading .heading-actions { flex-wrap: wrap; }
++  .history-panel .heading-actions > [data-slot="button"] { min-height: 44px; white-space: normal; }
++  .history-panel .history-list > div { display: grid; grid-template-columns: 35px minmax(0, 1fr); gap: 8px 12px; align-items: start; }
++  .history-panel .history-icon { grid-column: 1; grid-row: 1 / 3; }
++  .history-panel .history-copy { grid-column: 2; }
++  .history-panel .history-list .tag { display: inline-flex; grid-column: 2; justify-self: start; margin-left: 0; }
++}

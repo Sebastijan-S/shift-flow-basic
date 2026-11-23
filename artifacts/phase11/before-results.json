@@ -1,0 +1,34 @@
+[
+  {
+    "device": "mobile",
+    "theme": "dark",
+    "overflow": false,
+    "latestVisible": false,
+    "persistence": true,
+    "errors": []
+  },
+  {
+    "device": "mobile",
+    "theme": "light",
+    "overflow": false,
+    "latestVisible": false,
+    "persistence": true,
+    "errors": []
+  },
+  {
+    "device": "desktop",
+    "theme": "dark",
+    "overflow": false,
+    "latestVisible": true,
+    "persistence": true,
+    "errors": []
+  },
+  {
+    "device": "desktop",
+    "theme": "light",
+    "overflow": false,
+    "latestVisible": true,
+    "persistence": true,
+    "errors": []
+  }
+]

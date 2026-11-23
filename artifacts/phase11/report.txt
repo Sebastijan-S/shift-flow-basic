@@ -1,0 +1,39 @@
+Faza 11 - Istorija izmena
+
+Scope and review
+- Changes only the history branch in src/components/shiftflow.tsx and adds .history-panel scoped CSS.
+- Before source snapshots and pre-existing.diff preserve the Phase 9/10 starting point.
+- Verified byte-equivalent source outside the history branch, reused onClick={undo}/onClick={redo}, original disabled predicates, reverse history ordering, timestamps/timezone and empty-state text.
+- Storage, merging, conflict safeguards, access checks, history boundaries and scheduler logic unchanged.
+- phase11.diff contains only this phase relative to its starting tree.
+
+Confirmed baseline issue
+- Poslednja izmena was hidden at 390x844 in both themes (before-results.json), while visible on desktop.
+- Recovery buttons did not identify the change they would undo/redo.
+
+Implemented
+- Explicit Poništi izmenu/Ponovi izmenu labels with associated descriptions naming the next operation or explaining its unavailable state.
+- Dynamic descriptions in a status region announce the current recovery context.
+- Local-browser history scope is explained; order remains newest first.
+- Latest marker remains visible on phones below action/time, with 44px mobile recovery buttons and a visible keyboard focus outline.
+- Semantic time elements preserve exact stored timestamps and existing Europe/Belgrade display.
+
+Verification
+- npm test: 60 passed, 0 failed/skipped (tests.log); includes scheduler, local history conflict/serialization and role visibility checks.
+- npm run check: passed (typecheck.log).
+- npm run build: passed; static production export (build.log).
+- git diff --check: passed.
+- Installed Google Chrome in fresh isolated contexts: 390x844 and 1440x900, dark/light.
+- Before and after tested empty history, disabled undo/redo, real demo rule change, undo, redo, persistence after reload and long labels; final production checks all passed, no page errors or horizontal page overflow.
+- Visible latest marker in all four final cases; keyboard focus active/visible with 2px outline. Full-page and viewport screenshots retained, with JSON results and repeatable verify.cjs.
+
+Limitations/environment
+- Simulated phone viewport, not physical phone hardware. No authenticated cloud owner/manager/read-only UI session was modified; existing access tests passed.
+- Initial dev reload probe stalled at workspace loading. The unchanged production baseline and final production export both passed the complete reload sequence; no authentication/lifecycle changes were made in this UI phase.
+- Local static-server startup needed cleanup of earlier server processes. All task servers were stopped and ports 3000/3001 checked before handoff.
+- npm executes the existing package scripts; sandbox exceptions were used for Node child processes, browser launch and Git/network operations.
+
+Delivery
+- User authorized commit UI finish and then explicitly requested push when complete.
+- Commit includes the pending Phase 9 and Phase 10 source changes, Phase 11, and existing/new UI review evidence in artifacts/phase7 through phase11.
+- Remote verified: origin https://github.com/Sebastijan-S/shift-flow-basic.git, branch main. Remote fetched and was aligned before the new commit. Normal push only.

@@ -272,10 +272,22 @@ a { text-decoration: none; color: inherit; }
 .employee-empty { margin: 0; padding: 24px 10px; color: var(--muted-foreground); font-size: 13px; text-align: center; border-top: 1px solid var(--border); }
 [data-theme="light"] .employee-panel .status-badge { color: #70541b; background: #fff8e8; border-color: #cbb783; }
 [data-theme="light"] .employee-panel .status-badge.published { color: #17633e; background: #e9f6ed; border-color: #a8d3b7; }
-.availability-table { min-width: 1000px; }
+.availability-heading-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.availability-heading-actions .tag { margin: 0; }
+.availability-table { min-width: 1000px; table-layout: fixed; border-collapse: separate; border-spacing: 0; }
+.availability-table th:first-child { width: 180px; }
+.availability-table .person-row { min-width: 0; }
+.availability-table .person-row strong { overflow-wrap: anywhere; }
+.availability-table thead th:first-child, .availability-table tbody td:first-child { position: sticky; left: 0; box-shadow: 1px 0 var(--border); }
+.availability-table thead th:first-child { z-index: 3; }
+.availability-table tbody td:first-child { z-index: 1; background: var(--card); }
 .availability-table th:not(:first-child), .availability-table td:not(:first-child) { text-align: center; }
 .availability-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; color: var(--green-text); background: #238d3c0d; border: 1px solid #35955530; font-size: 12px; padding: 7px 9px; border-radius: 5px; }
 .availability-button.unavailable { color: #89958d; background: var(--surface); border-color: var(--border); }
+.availability-button.partial { color: var(--blue-fg); background: var(--blue-bg); border-color: var(--blue-border); }
+.availability-button.partial span { line-height: 1.25; }
+.availability-button.partial small { display: block; font: 10px var(--font-mono); margin-top: 3px; }
+.availability-empty { padding: 20px; color: var(--muted-foreground); font-size: 13px; }
 input:not([type="checkbox"]), select, textarea { background-color: var(--surface); border: 1px solid var(--input); border-radius: 6px; padding: 9px 11px; color: var(--foreground); font-size: 13px; min-width: 0; }
 .search-field input { background: transparent; border: 0; padding: 5px 0; font-size: 12px; }
 .position-select { background-color: transparent; border: 0; padding: 0; font-size: 12px; }
@@ -315,6 +327,15 @@ textarea { resize: vertical; }
 .history-list strong { font-size: 12px; font-weight: 500; display: block; }
 .history-list small { font-size: 12px; margin-top: 5px; display: block; color: var(--muted-foreground); }
 .history-list .tag { margin-left: auto; }
+.history-panel .panel-heading { align-items: flex-start; }
+.history-panel .panel-heading > div:first-child { min-width: 0; }
+.history-panel .history-actions-help { padding: 12px 14px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--muted-foreground); font: 12px/1.7 var(--font-sans); overflow-wrap: anywhere; }
+.history-panel .history-actions-help p { margin: 0; }
+.history-panel .history-actions-help strong { color: var(--foreground); font-weight: 500; }
+.history-panel .history-icon { flex-shrink: 0; }
+.history-panel .history-copy { min-width: 0; overflow-wrap: anywhere; }
+.history-panel .history-list .tag { flex-shrink: 0; }
+.history-panel [data-slot="button"]:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
 .empty { text-align: center; padding: 70px 25px; color: var(--muted-foreground); font-size: 12px; }
 .empty > svg { margin: 0 auto 15px; opacity: .5; }
 .loading { height: 100vh; display: flex; gap: 15px; align-items: center; justify-content: center; color: var(--muted-foreground); }
@@ -434,6 +455,10 @@ textarea { resize: vertical; }
 .basic-rows { margin-top: 18px; }
 .basic-rows > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 0; border-top: 1px solid var(--border); font-size: 12px; }
 .basic-rows small { display: block; color: var(--muted-foreground); margin-top: 5px; overflow-wrap: anywhere; }
+.availability-conditions { scroll-margin-top: 16px; }
+.availability-records > h3 { margin: 20px 0 8px; color: var(--muted-foreground); font: 11px var(--font-mono); text-transform: uppercase; letter-spacing: .04em; }
+.availability-records > h3:first-child { margin-top: 0; }
+.availability-records > .muted { margin: 0; }
 .trial-panel { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; margin: 0 0 22px; }
 .trial-panel h2 { margin: 10px 0; font-size: 17px; }
 .trial-attention { border-color: #c98b4d; }
@@ -598,6 +623,27 @@ textarea { resize: vertical; }
   .hours-controls > [data-slot="button"], .hours-confirm > [data-slot="button"] { height: auto; min-height: 35px; max-width: 100%; white-space: normal; }
   .basic-rows > div { flex-wrap: wrap; }
   .basic-rows > div > span:first-child { min-width: 0; flex-basis: 100%; }
+}
+
+/* Work rules keep the switch, limit and consequence in one group. */
+.work-rules > .panel { min-width: 0; }
+.work-rules .work-rule-group { min-width: 0; margin: 0; padding: 0 0 20px; border: 0; border-bottom: 1px solid var(--border); }
+.work-rules .work-rule-group legend { padding: 0; font: 600 14px var(--font-sans); }
+.work-rules .rule-field { padding: 0; border: 0; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: end; }
+.work-rules .rule-field > label { min-width: 0; }
+.work-rules .input-unit > span { flex-shrink: 0; white-space: nowrap; font: 12px var(--font-mono); }
+.work-rules .work-rule-help, .work-rules .check-row small { color: var(--muted-foreground); font: 12px/1.7 var(--font-sans); }
+.work-rules .work-rule-help { margin: 12px 0 0; }
+.work-rules .check-row { min-height: 44px; }
+.work-rules .requirements-editor summary { min-height: 44px; }
+.work-rules .requirement-row strong { min-width: 100px; overflow-wrap: anywhere; }
+.work-rules .requirement-row label { overflow-wrap: anywhere; }
+@media (max-width: 480px) {
+  .work-rules .rule-field { grid-template-columns: minmax(0, 1fr); }
+  .work-rules .requirement-row strong { flex-basis: 100%; }
+  .work-rules .requirement-row label { flex: 1 1 76px; }
+  .work-rules .requirement-row input { min-height: 44px; }
+  .work-rules .settings-form > [data-slot="button"] { width: 100%; min-height: 44px; }
 }
 
 /* Notes keeps due work first and opens its editor only when requested. */
@@ -786,4 +832,25 @@ textarea { resize: vertical; }
   .employee-panel .data-table td:nth-child(3) { font-variant-numeric: tabular-nums; }
   .employee-mobile-label { display: inline; margin-right: 5px; color: var(--muted-foreground); }
   .employee-panel .data-table td:last-child [data-slot="button"] { min-width: 44px; min-height: 44px; }
+}
+
+@media (max-width: 760px) {
+  .availability-heading-actions { justify-content: flex-start; width: 100%; }
+  .availability-panel .data-table-scroll { max-height: min(65dvh, 560px); overflow: auto; }
+  .availability-panel .data-table-scroll:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
+  .availability-table thead th { position: sticky; top: 0; z-index: 2; }
+  .availability-table thead th:first-child { z-index: 4; }
+  .availability-table tbody td:first-child { min-width: 170px; }
+  .availability-button { min-height: 44px; }
+  .availability-heading-actions [data-slot="button"], .availability-conditions [data-slot="button"] { min-height: 44px; }
+}
+
+/* Keep the latest history marker and recovery controls visible on phones. */
+@media (max-width: 760px) {
+  .history-panel .panel-heading .heading-actions { flex-wrap: wrap; }
+  .history-panel .heading-actions > [data-slot="button"] { min-height: 44px; white-space: normal; }
+  .history-panel .history-list > div { display: grid; grid-template-columns: 35px minmax(0, 1fr); gap: 8px 12px; align-items: start; }
+  .history-panel .history-icon { grid-column: 1; grid-row: 1 / 3; }
+  .history-panel .history-copy { grid-column: 2; }
+  .history-panel .history-list .tag { display: inline-flex; grid-column: 2; justify-self: start; margin-left: 0; }
 }

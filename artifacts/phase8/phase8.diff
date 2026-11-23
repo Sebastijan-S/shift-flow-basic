@@ -1,0 +1,52 @@
+--- a/src/components/shiftflow.tsx
++++ b/src/components/shiftflow.tsx
+@@ -126,6 +126,7 @@
+   const schedule: Schedule = w.schedules[week] ?? { week, status: "draft", assignments: [] };
+   const dates = weekDates(week);
+   const active = w.employees.filter(e => e.active);
++  const matchingEmployees = w.employees.filter(e => e.name.toLowerCase().includes(query.toLowerCase()));
+   const filtered = w.employees.filter(e => e.active || schedule.assignments.some(a => a.employeeId === e.id)).filter(e => e.name.toLowerCase().includes(query.toLowerCase()) && (position === "all" || e.positions.includes(position as Position)));
+   const requirements = scheduleRequirements(w, schedule);
+   const missing = missingRequirements(schedule.assignments, requirements);
+@@ -189,7 +190,7 @@
+       {page === "Pazar" && showRevenue && <RevenuePanel key={`${authUser}:${cloudId}:revenue`} companyId={cloudId} readOnly={readOnly} />}
+       {page === "Radni sati i obračun" && showHours && <HoursPanel key={`${authUser}:${cloudId}:hours`} companyId={cloudId} workspace={w} readOnly={readOnly} flush={flush} />}
+ 
+-      {page === "Zaposleni" && <section className="panel employee-panel"><div className="panel-heading"><h2>Vaš tim <span className="tag">{w.employees.length}</span></h2><label className="search-field"><RiSearchLine size={16} /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Pretraži zaposlene…" aria-label="Pretraži zaposlene" /></label></div><div className="data-table-scroll"><table className="data-table"><thead><tr><th>IME I PREZIME</th><th>POZICIJE</th><th>NEDELJNI FOND</th><th>STATUS</th><th /></tr></thead><tbody>{w.employees.filter(e => e.name.toLowerCase().includes(query.toLowerCase())).map(e => <tr key={e.id}><td><div className="person-row"><Avatar employee={e} /><strong>{e.name}</strong></div></td><td>{e.positions.map(p => <span className="tag" key={p}>{p}</span>)}</td><td>{e.targetHours} h</td><td><span className={`status-badge ${e.active ? "published" : ""}`}><i />{e.active ? "Aktivan" : "Neaktivan"}</span></td><td><Button variant="ghost" size="sm" onClick={() => { if (plannerMode) return; setEditEmployee(e); setFormError(""); setModal("employee"); }}>Uredi<RiArrowRightSLine size={15} /></Button></td></tr>)}</tbody></table></div><p className="panel-footnote">Zaposleni se vode kao evidencija i ne moraju da imaju korisnički nalog.</p></section>}
++      {page === "Zaposleni" && <section className="panel employee-panel"><div className="panel-heading"><h2>Vaš tim <span className="tag">{w.employees.length}</span></h2><label className="search-field"><RiSearchLine size={16} /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Pretraži zaposlene…" aria-label="Pretraži zaposlene" /></label></div><div className="data-table-scroll"><table className="data-table"><thead><tr><th>IME I PREZIME</th><th>POZICIJE</th><th>NEDELJNI FOND</th><th>STATUS</th><th /></tr></thead><tbody>{matchingEmployees.map(e => <tr key={e.id}><td><div className="person-row"><Avatar employee={e} /><strong>{e.name}</strong></div></td><td>{e.positions.map(p => <span className="tag" key={p}>{p}</span>)}</td><td><span className="employee-mobile-label">Fond: </span>{e.targetHours} h</td><td><span className={`status-badge ${e.active ? "published" : ""}`}><i />{e.active ? "Aktivan" : "Neaktivan"}</span></td><td><Button variant="ghost" size="sm" onClick={() => { if (plannerMode) return; setEditEmployee(e); setFormError(""); setModal("employee"); }}>Uredi<RiArrowRightSLine size={15} /></Button></td></tr>)}</tbody></table></div>{!matchingEmployees.length && <p className="employee-empty" role="status">{query ? "Nema zaposlenih koji odgovaraju pretrazi." : "Još nema zaposlenih u timu. Dodajte prvog zaposlenog."}</p>}<p className="panel-footnote">Zaposleni se vode kao evidencija i ne moraju da imaju korisnički nalog.</p></section>}
+ 
+       {page === "Dostupnost" && <section className="panel"><div className="panel-heading"><div><h2>Nedeljna dostupnost</h2><p className="muted">Kliknite na dan da promenite dostupnost. Pravila se ponavljaju svake nedelje.</p></div><span className="tag">Europe/Belgrade</span></div><div className="data-table-scroll"><table className="data-table availability-table"><thead><tr><th>ZAPOSLENI</th>{DAY_NAMES.map(d => <th key={d}>{d.slice(0, 3).toUpperCase()}</th>)}</tr></thead><tbody>{active.map(e => <tr key={e.id}><td><div className="person-row"><Avatar small employee={e} /><strong>{e.name}</strong></div></td>{DAY_NAMES.map((d, i) => <td key={i}><button className={`availability-button ${e.daysOff.includes(i) ? "unavailable" : ""}`} aria-label={`${e.name}, ${d}: ${e.daysOff.includes(i) ? "nedostupan" : "dostupan"}`} aria-pressed={!e.daysOff.includes(i)} onClick={() => { commit({ ...w, employees: w.employees.map(person => person.id === e.id ? { ...person, daysOff: person.daysOff.includes(i) ? person.daysOff.filter(d => d !== i) : [...person.daysOff, i] } : person) }, `Dostupnost: ${e.name}, ${d}`); }}>{e.daysOff.includes(i) ? <RiCloseLine size={16} /> : <RiCheckLine size={16} />}<span>{e.daysOff.includes(i) ? "Slobodan" : "Dostupan"}</span></button></td>)}</tr>)}</tbody></table></div></section>}
+ 
+--- a/src/app/shiftflow.css
++++ b/src/app/shiftflow.css
+@@ -268,6 +268,10 @@
+ .data-table .person-row { min-width: 170px; }
+ .data-table td > .tag { white-space: nowrap; }
+ .panel-footnote { color: var(--muted-foreground); font-size: 13px; padding-top: 20px; margin: 0; border-top: 1px solid var(--border); }
++.employee-mobile-label { display: none; }
++.employee-empty { margin: 0; padding: 24px 10px; color: var(--muted-foreground); font-size: 13px; text-align: center; border-top: 1px solid var(--border); }
++[data-theme="light"] .employee-panel .status-badge { color: #70541b; background: #fff8e8; border-color: #cbb783; }
++[data-theme="light"] .employee-panel .status-badge.published { color: #17633e; background: #e9f6ed; border-color: #a8d3b7; }
+ .availability-table { min-width: 1000px; }
+ .availability-table th:not(:first-child), .availability-table td:not(:first-child) { text-align: center; }
+ .availability-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; color: var(--green-text); background: #238d3c0d; border: 1px solid #35955530; font-size: 12px; padding: 7px 9px; border-radius: 5px; }
+@@ -767,3 +771,19 @@
+   .settings-form > [data-slot="button"], .panel-heading > [data-slot="button"] { max-width: 100%; height: auto; min-height: 35px; white-space: normal; }
+ }
+ 
++@media (max-width: 760px) {
++  .employee-panel .data-table-scroll { margin: 0; overflow: visible; max-width: none; }
++  .employee-panel .data-table { display: block; min-width: 0; }
++  .employee-panel .data-table thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
++  .employee-panel .data-table tbody { display: grid; gap: 8px; }
++  .employee-panel .data-table tr { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 7px 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; }
++  .employee-panel .data-table td { min-width: 0; padding: 0; border: 0; }
++  .employee-panel .data-table td:first-child, .employee-panel .data-table td:nth-child(2) { grid-column: 1 / -1; }
++  .employee-panel .data-table .person-row { min-width: 0; align-items: flex-start; }
++  .employee-panel .person-row strong { font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; }
++  .employee-panel .data-table td:nth-child(2) { display: flex; flex-wrap: wrap; gap: 4px; }
++  .employee-panel .data-table td:nth-child(2) .tag { margin: 0; white-space: normal; overflow-wrap: anywhere; }
++  .employee-panel .data-table td:nth-child(3) { font-variant-numeric: tabular-nums; }
++  .employee-mobile-label { display: inline; margin-right: 5px; color: var(--muted-foreground); }
++  .employee-panel .data-table td:last-child [data-slot="button"] { min-width: 44px; min-height: 44px; }
++}

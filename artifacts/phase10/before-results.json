@@ -1,0 +1,226 @@
+[
+  {
+    "device": "mobile",
+    "theme": "dark",
+    "controls": [
+      {
+        "name": "restEnabled",
+        "value": "on",
+        "checked": true,
+        "min": "",
+        "max": "",
+        "step": ""
+      },
+      {
+        "name": "rest",
+        "value": "12",
+        "checked": false,
+        "min": "0",
+        "max": "48",
+        "step": ""
+      },
+      {
+        "name": "restSeverity",
+        "value": "block"
+      },
+      {
+        "name": "hoursEnabled",
+        "value": "on",
+        "checked": true,
+        "min": "",
+        "max": "",
+        "step": ""
+      },
+      {
+        "name": "hours",
+        "value": "40",
+        "checked": false,
+        "min": "8",
+        "max": "168",
+        "step": "1"
+      },
+      {
+        "name": "hoursSeverity",
+        "value": "block"
+      },
+      {
+        "name": "multiple",
+        "value": "on",
+        "checked": false,
+        "min": "",
+        "max": "",
+        "step": ""
+      }
+    ],
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "device": "mobile",
+    "theme": "light",
+    "controls": [
+      {
+        "name": "restEnabled",
+        "value": "on",
+        "checked": true,
+        "min": "",
+        "max": "",
+        "step": ""
+      },
+      {
+        "name": "rest",
+        "value": "12",
+        "checked": false,
+        "min": "0",
+        "max": "48",
+        "step": ""
+      },
+      {
+        "name": "restSeverity",
+        "value": "block"
+      },
+      {
+        "name": "hoursEnabled",
+        "value": "on",
+        "checked": true,
+        "min": "",
+        "max": "",
+        "step": ""
+      },
+      {
+        "name": "hours",
+        "value": "40",
+        "checked": false,
+        "min": "8",
+        "max": "168",
+        "step": "1"
+      },
+      {
+        "name": "hoursSeverity",
+        "value": "block"
+      },
+      {
+        "name": "multiple",
+        "value": "on",
+        "checked": false,
+        "min": "",
+        "max": "",
+        "step": ""
+      }
+    ],
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "device": "desktop",
+    "theme": "dark",
+    "controls": [
+      {
+        "name": "restEnabled",
+        "value": "on",
+        "checked": true,
+        "min": "",
+        "max": "",
+        "step": ""
+      },
+      {
+        "name": "rest",
+        "value": "12",
+        "checked": false,
+        "min": "0",
+        "max": "48",
+        "step": ""
+      },
+      {
+        "name": "restSeverity",
+        "value": "block"
+      },
+      {
+        "name": "hoursEnabled",
+        "value": "on",
+        "checked": true,
+        "min": "",
+        "max": "",
+        "step": ""
+      },
+      {
+        "name": "hours",
+        "value": "40",
+        "checked": false,
+        "min": "8",
+        "max": "168",
+        "step": "1"
+      },
+      {
+        "name": "hoursSeverity",
+        "value": "block"
+      },
+      {
+        "name": "multiple",
+        "value": "on",
+        "checked": false,
+        "min": "",
+        "max": "",
+        "step": ""
+      }
+    ],
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "device": "desktop",
+    "theme": "light",
+    "controls": [
+      {
+        "name": "restEnabled",
+        "value": "on",
+        "checked": true,
+        "min": "",
+        "max": "",
+        "step": ""
+      },
+      {
+        "name": "rest",
+        "value": "12",
+        "checked": false,
+        "min": "0",
+        "max": "48",
+        "step": ""
+      },
+      {
+        "name": "restSeverity",
+        "value": "block"
+      },
+      {
+        "name": "hoursEnabled",
+        "value": "on",
+        "checked": true,
+        "min": "",
+        "max": "",
+        "step": ""
+      },
+      {
+        "name": "hours",
+        "value": "40",
+        "checked": false,
+        "min": "8",
+        "max": "168",
+        "step": "1"
+      },
+      {
+        "name": "hoursSeverity",
+        "value": "block"
+      },
+      {
+        "name": "multiple",
+        "value": "on",
+        "checked": false,
+        "min": "",
+        "max": "",
+        "step": ""
+      }
+    ],
+    "overflow": false,
+    "errors": []
+  }
+]

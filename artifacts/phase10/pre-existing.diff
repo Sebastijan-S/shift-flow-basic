@@ -1,0 +1,113 @@
+diff --git a/next-env.d.ts b/next-env.d.ts
+index ce4e94a..a419cbe 100644
+--- a/next-env.d.ts
++++ b/next-env.d.ts
+@@ -1,7 +1,7 @@
+ /// <reference types="next" />
+ /// <reference types="next/image-types/global" />
+-import "./.next/types/routes.d.ts";
+-import "./.next/types/root-params.d.ts";
++import "./.next/dev/types/routes.d.ts";
++import "./.next/dev/types/root-params.d.ts";
+ 
+ // NOTE: This file should not be edited
+ // see https://nextjs.org/docs/app/api-reference/config/typescript for more information.
+diff --git a/src/app/shiftflow.css b/src/app/shiftflow.css
+index b4550ac..220ac22 100644
+--- a/src/app/shiftflow.css
++++ b/src/app/shiftflow.css
+@@ -272,10 +272,22 @@ a { text-decoration: none; color: inherit; }
+ .employee-empty { margin: 0; padding: 24px 10px; color: var(--muted-foreground); font-size: 13px; text-align: center; border-top: 1px solid var(--border); }
+ [data-theme="light"] .employee-panel .status-badge { color: #70541b; background: #fff8e8; border-color: #cbb783; }
+ [data-theme="light"] .employee-panel .status-badge.published { color: #17633e; background: #e9f6ed; border-color: #a8d3b7; }
+-.availability-table { min-width: 1000px; }
++.availability-heading-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
++.availability-heading-actions .tag { margin: 0; }
++.availability-table { min-width: 1000px; table-layout: fixed; border-collapse: separate; border-spacing: 0; }
++.availability-table th:first-child { width: 180px; }
++.availability-table .person-row { min-width: 0; }
++.availability-table .person-row strong { overflow-wrap: anywhere; }
++.availability-table thead th:first-child, .availability-table tbody td:first-child { position: sticky; left: 0; box-shadow: 1px 0 var(--border); }
++.availability-table thead th:first-child { z-index: 3; }
++.availability-table tbody td:first-child { z-index: 1; background: var(--card); }
+ .availability-table th:not(:first-child), .availability-table td:not(:first-child) { text-align: center; }
+ .availability-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; color: var(--green-text); background: #238d3c0d; border: 1px solid #35955530; font-size: 12px; padding: 7px 9px; border-radius: 5px; }
+ .availability-button.unavailable { color: #89958d; background: var(--surface); border-color: var(--border); }
++.availability-button.partial { color: var(--blue-fg); background: var(--blue-bg); border-color: var(--blue-border); }
++.availability-button.partial span { line-height: 1.25; }
++.availability-button.partial small { display: block; font: 10px var(--font-mono); margin-top: 3px; }
++.availability-empty { padding: 20px; color: var(--muted-foreground); font-size: 13px; }
+ input:not([type="checkbox"]), select, textarea { background-color: var(--surface); border: 1px solid var(--input); border-radius: 6px; padding: 9px 11px; color: var(--foreground); font-size: 13px; min-width: 0; }
+ .search-field input { background: transparent; border: 0; padding: 5px 0; font-size: 12px; }
+ .position-select { background-color: transparent; border: 0; padding: 0; font-size: 12px; }
+@@ -434,6 +446,10 @@ textarea { resize: vertical; }
+ .basic-rows { margin-top: 18px; }
+ .basic-rows > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 0; border-top: 1px solid var(--border); font-size: 12px; }
+ .basic-rows small { display: block; color: var(--muted-foreground); margin-top: 5px; overflow-wrap: anywhere; }
++.availability-conditions { scroll-margin-top: 16px; }
++.availability-records > h3 { margin: 20px 0 8px; color: var(--muted-foreground); font: 11px var(--font-mono); text-transform: uppercase; letter-spacing: .04em; }
++.availability-records > h3:first-child { margin-top: 0; }
++.availability-records > .muted { margin: 0; }
+ .trial-panel { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; margin: 0 0 22px; }
+ .trial-panel h2 { margin: 10px 0; font-size: 17px; }
+ .trial-attention { border-color: #c98b4d; }
+@@ -787,3 +803,14 @@ textarea { resize: vertical; }
+   .employee-mobile-label { display: inline; margin-right: 5px; color: var(--muted-foreground); }
+   .employee-panel .data-table td:last-child [data-slot="button"] { min-width: 44px; min-height: 44px; }
+ }
++
++@media (max-width: 760px) {
++  .availability-heading-actions { justify-content: flex-start; width: 100%; }
++  .availability-panel .data-table-scroll { max-height: min(65dvh, 560px); overflow: auto; }
++  .availability-panel .data-table-scroll:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
++  .availability-table thead th { position: sticky; top: 0; z-index: 2; }
++  .availability-table thead th:first-child { z-index: 4; }
++  .availability-table tbody td:first-child { min-width: 170px; }
++  .availability-button { min-height: 44px; }
++  .availability-heading-actions [data-slot="button"], .availability-conditions [data-slot="button"] { min-height: 44px; }
++}
+diff --git a/src/components/basic-panels.tsx b/src/components/basic-panels.tsx
+index 5ae6803..0774adc 100644
+--- a/src/components/basic-panels.tsx
++++ b/src/components/basic-panels.tsx
+@@ -27,16 +27,20 @@ export function BasicAvailability({ workspace: w, commit }: Props) {
+     }
+     setEditing(null); event.currentTarget.reset();
+   };
+-  return <section className="panel basic-panel"><h2>Odsustva, želje i delimična dostupnost</h2><p className="muted">Odsustvo i nedostupnost sprečavaju dodelu smene. Želja za slobodnim danom utiče na predlog rasporeda.</p>
++  const absences = w.absences ?? [];
++  const datedIntervals = w.dateAvailability ?? [];
++  const weeklyIntervals = w.employees.flatMap(e => (e.availability ?? []).map(interval => ({ employee: e, interval })));
++  return <section id="availability-conditions" className="panel basic-panel availability-conditions"><h2>Odsustva, želje i delimična dostupnost</h2><p className="muted">Odsustvo i nedostupnost sprečavaju dodelu smene. Želja za slobodnim danom utiče na predlog rasporeda.</p>
+     {!w.employees.some(e => e.active) ? <p>Prvo dodajte zaposlene.</p> : <form key={editing?.id ?? "new"} className="settings-form" onSubmit={submit}>
+       <div className="form-columns"><label>Zaposleni<select name="employee" required defaultValue={editing?.employeeId}>{w.employees.filter(e => e.active || e.id === editing?.employeeId).map(e => <option key={e.id} value={e.id}>{e.name}</option>)}</select></label><label>Vrsta<select value={kind} onChange={e => { const next = e.target.value; setKind(next); if (next === "available" || next === "recurring") setEditing(null); }}><option value="absence">Odobreno odsustvo</option><option value="unavailable">Nedostupnost</option><option value="wish">Želja za slobodnim danom</option><option value="available">Dostupnost za datum</option><option value="recurring">Nedeljna dostupnost u delu dana</option></select></label></div>
+       {kind === "recurring" ? <label>Dan<select name="day">{DAY_NAMES.map((d, i) => <option key={d} value={i}>{d}</option>)}</select></label> : <div className="form-columns"><label>{kind === "available" ? "Datum" : "Od"}<input type="date" name="from" required defaultValue={editing?.from} /></label>{kind !== "available" && <label>Do<input type="date" name="to" required defaultValue={editing?.to} /></label>}</div>}
+       {kind === "available" || kind === "recurring" ? <div className="form-columns"><label>Od<input type="time" name="start" required defaultValue="08:00" /></label><label>Do<input type="time" name="end" required defaultValue="16:00" /></label></div> : <label>Interni razlog / napomena<input name="reason" maxLength={300} defaultValue={editing?.reason} /></label>}
+       {error && <p role="alert" className="form-error">{error}</p>}<Button type="submit">{editing ? "Sačuvaj izmenu" : "Dodaj uslov"}</Button>{editing && <Button type="button" variant="outline" onClick={() => setEditing(null)}>Otkaži izmenu</Button>}
+     </form>}
+-    <div className="basic-rows">{(w.absences ?? []).map(a => <div key={a.id}><span><strong>{w.employees.find(e => e.id === a.employeeId)?.name}</strong><small>{a.from}–{a.to} · {a.kind === "wish" ? "Želja" : a.kind === "absence" ? "Odobreno odsustvo" : "Nedostupnost"}{a.reason && ` · ${a.reason}`}</small></span><Button variant="ghost" size="sm" onClick={() => { setEditing(a); setKind(a.kind); setError(""); }}>Uredi</Button><Button variant="ghost" size="sm" onClick={() => commit({ ...w, absences: w.absences?.filter(v => v.id !== a.id) }, "Uklonjeno odsustvo ili želja")}>Ukloni</Button></div>)}
+-      {(w.dateAvailability ?? []).map(a => <div key={a.id}><span><strong>{w.employees.find(e => e.id === a.employeeId)?.name}</strong><small>{a.date} · dostupan {a.start}–{a.end}</small></span><Button variant="ghost" size="sm" onClick={() => commit({ ...w, dateAvailability: w.dateAvailability?.filter(v => v.id !== a.id) }, "Uklonjen datumski interval")}>Ukloni</Button></div>)}
+-      {w.employees.flatMap(e => (e.availability ?? []).map(a => <div key={`${e.id}-${a.day}`}><span><strong>{e.name}</strong><small>Svaki {DAY_NAMES[a.day].toLowerCase()} · {a.start}–{a.end}</small></span><Button variant="ghost" size="sm" onClick={() => commit({ ...w, employees: w.employees.map(p => p.id === e.id ? { ...p, availability: p.availability?.filter(v => v.day !== a.day) } : p) }, "Uklonjen nedeljni interval")}>Ukloni</Button></div>))}
++    <div className="basic-rows availability-records">{!absences.length && !datedIntervals.length && !weeklyIntervals.length && <p className="muted">Još nema dodatih uslova za datume ili delove dana.</p>}
++      {!!absences.length && <h3>Odsustva i želje za datume</h3>}{absences.map(a => <div key={a.id}><span><strong>{w.employees.find(e => e.id === a.employeeId)?.name}</strong><small>{a.from}–{a.to} · {a.kind === "wish" ? "Želja" : a.kind === "absence" ? "Odobreno odsustvo" : "Nedostupnost"}{a.reason && ` · ${a.reason}`}</small></span><Button variant="ghost" size="sm" onClick={() => { setEditing(a); setKind(a.kind); setError(""); }}>Uredi</Button><Button variant="ghost" size="sm" onClick={() => commit({ ...w, absences: w.absences?.filter(v => v.id !== a.id) }, "Uklonjeno odsustvo ili želja")}>Ukloni</Button></div>)}
++      {!!datedIntervals.length && <h3>Dostupnost za datum</h3>}{datedIntervals.map(a => <div key={a.id}><span><strong>{w.employees.find(e => e.id === a.employeeId)?.name}</strong><small>{a.date} · dostupan {a.start}–{a.end}</small></span><Button variant="ghost" size="sm" onClick={() => commit({ ...w, dateAvailability: w.dateAvailability?.filter(v => v.id !== a.id) }, "Uklonjen datumski interval")}>Ukloni</Button></div>)}
++      {!!weeklyIntervals.length && <h3>Ponavlja se svake nedelje</h3>}{weeklyIntervals.map(({ employee: e, interval: a }) => <div key={`${e.id}-${a.day}`}><span><strong>{e.name}</strong><small>Svaki {DAY_NAMES[a.day].toLowerCase()} · {a.start}–{a.end}</small></span><Button variant="ghost" size="sm" onClick={() => commit({ ...w, employees: w.employees.map(p => p.id === e.id ? { ...p, availability: p.availability?.filter(v => v.day !== a.day) } : p) }, "Uklonjen nedeljni interval")}>Ukloni</Button></div>)}
+     </div>
+   </section>;
+ }
+diff --git a/src/components/shiftflow.tsx b/src/components/shiftflow.tsx
+index 31b250d..4579fad 100644
+--- a/src/components/shiftflow.tsx
++++ b/src/components/shiftflow.tsx
+@@ -192,7 +192,10 @@ export default function ShiftFlow() {
+ 
+       {page === "Zaposleni" && <section className="panel employee-panel"><div className="panel-heading"><h2>Vaš tim <span className="tag">{w.employees.length}</span></h2><label className="search-field"><RiSearchLine size={16} /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Pretraži zaposlene…" aria-label="Pretraži zaposlene" /></label></div><div className="data-table-scroll"><table className="data-table"><thead><tr><th>IME I PREZIME</th><th>POZICIJE</th><th>NEDELJNI FOND</th><th>STATUS</th><th /></tr></thead><tbody>{matchingEmployees.map(e => <tr key={e.id}><td><div className="person-row"><Avatar employee={e} /><strong>{e.name}</strong></div></td><td>{e.positions.map(p => <span className="tag" key={p}>{p}</span>)}</td><td><span className="employee-mobile-label">Fond: </span>{e.targetHours} h</td><td><span className={`status-badge ${e.active ? "published" : ""}`}><i />{e.active ? "Aktivan" : "Neaktivan"}</span></td><td><Button variant="ghost" size="sm" onClick={() => { if (plannerMode) return; setEditEmployee(e); setFormError(""); setModal("employee"); }}>Uredi<RiArrowRightSLine size={15} /></Button></td></tr>)}</tbody></table></div>{!matchingEmployees.length && <p className="employee-empty" role="status">{query ? "Nema zaposlenih koji odgovaraju pretrazi." : "Još nema zaposlenih u timu. Dodajte prvog zaposlenog."}</p>}<p className="panel-footnote">Zaposleni se vode kao evidencija i ne moraju da imaju korisnički nalog.</p></section>}
+ 
+-      {page === "Dostupnost" && <section className="panel"><div className="panel-heading"><div><h2>Nedeljna dostupnost</h2><p className="muted">Kliknite na dan da promenite dostupnost. Pravila se ponavljaju svake nedelje.</p></div><span className="tag">Europe/Belgrade</span></div><div className="data-table-scroll"><table className="data-table availability-table"><thead><tr><th>ZAPOSLENI</th>{DAY_NAMES.map(d => <th key={d}>{d.slice(0, 3).toUpperCase()}</th>)}</tr></thead><tbody>{active.map(e => <tr key={e.id}><td><div className="person-row"><Avatar small employee={e} /><strong>{e.name}</strong></div></td>{DAY_NAMES.map((d, i) => <td key={i}><button className={`availability-button ${e.daysOff.includes(i) ? "unavailable" : ""}`} aria-label={`${e.name}, ${d}: ${e.daysOff.includes(i) ? "nedostupan" : "dostupan"}`} aria-pressed={!e.daysOff.includes(i)} onClick={() => { commit({ ...w, employees: w.employees.map(person => person.id === e.id ? { ...person, daysOff: person.daysOff.includes(i) ? person.daysOff.filter(d => d !== i) : [...person.daysOff, i] } : person) }, `Dostupnost: ${e.name}, ${d}`); }}>{e.daysOff.includes(i) ? <RiCloseLine size={16} /> : <RiCheckLine size={16} />}<span>{e.daysOff.includes(i) ? "Slobodan" : "Dostupan"}</span></button></td>)}</tr>)}</tbody></table></div></section>}
++      {page === "Dostupnost" && <section className="panel availability-panel">
++        <div className="panel-heading"><div><h2>Nedeljna dostupnost</h2><p className="muted">Kliknite na dan da promenite dostupnost. Pravila se ponavljaju svake nedelje.</p></div><div className="availability-heading-actions"><span className="tag">Europe/Belgrade</span><Button variant="outline" size="sm" onClick={() => { const section = document.getElementById("availability-conditions"); section?.scrollIntoView({ block: "start" }); (section?.querySelector('select[name="employee"]') as HTMLSelectElement | null)?.focus({ preventScroll: true }); }}><RiArrowRightSLine size={16} />Odsustva i izuzeci</Button></div></div>
++        <div className="data-table-scroll" role="region" aria-label="Nedeljna dostupnost zaposlenih" tabIndex={0}><table className="data-table availability-table"><thead><tr><th scope="col">ZAPOSLENI</th>{DAY_NAMES.map(d => <th scope="col" aria-label={d} key={d}>{d.slice(0, 3).toUpperCase()}</th>)}</tr></thead><tbody>{active.map(e => <tr key={e.id}><td><div className="person-row"><Avatar small employee={e} /><strong>{e.name}</strong></div></td>{DAY_NAMES.map((d, i) => { const off = e.daysOff.includes(i); const partial = !off ? e.availability?.find(a => a.day === i) : undefined; return <td key={i}><button className={`availability-button ${off ? "unavailable" : partial ? "partial" : ""}`} aria-label={`${e.name}, ${d}: ${off ? "nedostupan" : partial ? `delimično dostupan od ${partial.start} do ${partial.end}` : "dostupan"}`} aria-pressed={!off} onClick={() => { commit({ ...w, employees: w.employees.map(person => person.id === e.id ? { ...person, daysOff: person.daysOff.includes(i) ? person.daysOff.filter(d => d !== i) : [...person.daysOff, i] } : person) }, `Dostupnost: ${e.name}, ${d}`); }}>{off ? <RiCloseLine size={16} /> : partial ? <RiTimeLine size={16} /> : <RiCheckLine size={16} />}<span>{off ? "Slobodan" : partial ? <>Delimično<small>{partial.start}–{partial.end}</small></> : "Dostupan"}</span></button></td>; })}</tr>)}</tbody></table>{!active.length && <p className="availability-empty">Nema aktivnih zaposlenih za nedeljnu dostupnost.</p>}</div>
++      </section>}
+ 
+       {page === "Dostupnost" && <BasicAvailability workspace={w} commit={commit} />}
+ 

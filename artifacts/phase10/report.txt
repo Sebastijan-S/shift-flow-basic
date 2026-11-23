@@ -1,0 +1,41 @@
+Faza 10 - Pravila rada
+
+Scope: src/components/shiftflow.tsx (only the Pravila rada branch), src/app/shiftflow.css (new .work-rules scoped selectors).
+Baseline: current uncommitted Phase 9 work retained. Original tracked diff is pre-existing.diff; source baselines are *.before.*.txt. No commit or push was performed.
+
+Confirmed before editing:
+- The unit sati wrapped into two lines at both 390x844 and 1440x900.
+- Both severity controls had the same generic label Pravilo, with only a shared explanation above the form.
+- Explicit rule submission and immediate staffing-count saves were not distinguished in the screen copy.
+- On mobile the shift label/time became a narrow column alongside staffing inputs.
+
+Changes:
+- Group rest, weekly hours and same-day shifts with semantic fieldsets and legends.
+- Give severity selects distinct names and associated consequence descriptions; explain employee-specific maximum precedence and the existing same-day warning.
+- Keep sati unbroken, preserve mobile shift identity above staffing inputs and provide 44px mobile staffing inputs/save action.
+- Label manual versus immediate save behavior. Existing save feedback is reused.
+
+Review:
+phase10.diff is the exact patch relative to the initial working tree, excluding Phase 9.
+rules-review.diff expands compressed JSX tags onto separate lines for easier review.
+Checked exact equality of all source outside Pravila rada, the form submit handler, requirements map/handler and every pre-existing CSS rule.
+Defaults, native min/max/step, checkbox states and severity defaults match before-results.json in all four viewport/theme combinations.
+
+Verification:
+- npm test: 60 passed, 0 failed, 0 skipped; scheduler, database/role checks and planner navigation smoke included. See tests.log.
+- npm run check: passed. See typecheck.log.
+- npm run build: passed, static export. See build.log.
+- git diff --check: passed.
+- Installed Google Chrome, headless isolated fresh contexts: 390x844 and 1440x900, dark and light. Final after screenshots and results use the production static export served from out/.
+- All 7 controls inspected; changed rest/hours values, both severities and all checkboxes, saved and reloaded successfully. Staffing-count immediate save persisted after reload.
+- Native invalid rest (49) blocked submission. Keyboard Tab showed a 2px visible focus outline. All seven weekday summaries operated with Enter. Long shift/position labels and empty template/requirements fixtures rendered without horizontal page overflow or page errors.
+- before/after screenshots include normal screens, requirements, keyboard focus, save feedback, long labels and empty states. See after-results.json, browser.log and verify.cjs.
+
+Environment and limitations:
+- Integrated/browser Chrome connector was unavailable. Used the installed Google Chrome through the bundled Playwright package, with fresh disposable browser storage and no authenticated cloud session.
+- Phone checks use a 390x844 browser viewport, not physical phone hardware. Screenshots marked normal/empty/long-labels use full-page capture at that viewport width; focus/save/requirements images show the viewport.
+- Authenticated owner/manager/read-only cloud save flows were not exercised interactively; existing access/role tests passed and access/commit guards were unchanged.
+- pnpm attempted a registry/dependency preflight and failed; no dependency installation was performed. Repository scripts ran via npm. Node child-process commands required execution outside the restrictive sandbox after spawn EPERM.
+- next start is incompatible with this repository's output: export setting, so Python's local static server served out/ for final verification.
+- Both local servers started for this task were stopped. Port 3000 was verified without a listener.
+- No Phase 11 work, commit, push or publication.
