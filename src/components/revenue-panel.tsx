@@ -19,9 +19,7 @@ function errorText(e: unknown) {
 const amountInput = (value: number | null) => value === null ? "" : `${Math.floor(value / 100)}.${String(value % 100).padStart(2, "0")}`;
 const displayAmount = (value: number | null) => value === null ? "Nije uneto" : money(value);
 
-export function RevenueSettings() {
-  return <section className="panel basic-panel"><h2>Podešavanja pazara</h2><p>Valuta: RSD · Preciznost: dve decimale · Vremenska zona: Europe/Belgrade.</p><p className="muted">Dnevni i smenski unosi koriste isti obrazac. Oznaka smene je opciona; datum i iznose možete naknadno menjati. Prazno polje nije nula. Isključivanje modula u izboru iznad čuva sve zapise.</p></section>;
-}
+
 
 export function RevenuePanel({ companyId, readOnly }: { companyId: string | null; readOnly: boolean }) {
   const [data, setData] = useState<RevenueData | null>(null), [error, setError] = useState(""), [busy, setBusy] = useState(false), [status, setStatus] = useState("");

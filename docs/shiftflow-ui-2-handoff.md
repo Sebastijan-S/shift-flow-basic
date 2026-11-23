@@ -1,0 +1,63 @@
+# ShiftFlow — handoff za korak 2
+
+## Kontekst i trenutno stanje
+
+- Radni repozitorijum: `C:\Users\Cebo\Documents\shift-flow-basic-main`.
+- Remote: `origin`, `https://github.com/Sebastijan-S/shift-flow-basic.git`; grana `main`.
+- Glavni plan: `docs/shiftflow-annotation-plan.md`. Pročitaj ga pre nastavka, zajedno sa `AGENTS.md` i relevantnim instaliranim Next.js vodičem.
+- Korisnik je pregledao i odobrio korak 1 „UI i podešavanja“ i zatražio commit/push sa porukom **`UI - 1`**. Identifikator commita proveri preko `git log`/remote istorije; nemoj pretpostavljati da je to i dalje HEAD ako je u međuvremenu bilo novog rada.
+- Koraci 2, 3 i 4 još nisu implementirani. Sledeći zadatak je **samo korak 2**.
+- Preview na `http://localhost:3000` namerno je ostavljen upaljen. Proveri da li već radi pre pokretanja novog servera. Ne diraj korisnikove podatke u postojećem browser profilu.
+- `next-env.d.ts` je imao lokalnu automatski generisanu izmenu pre koraka 1: importi upućuju na `.next/dev/types/` umesto `.next/types/`. Ta izmena je sačuvana lokalno i nije deo UI commita. Nemoj je tretirati kao novu poslovnu izmenu ili prepisivati nepovezan rad.
+
+## Šta je završeno u koraku 1
+
+Uklonjeni su označeni suvišni opisi, indeks podešavanja je dobio jednake neutralne okvire, naslovi podešavanja koriste postojeću prigušenu zelenu, a osnovna podešavanja rasporeda imaju jednu kolonu. Obavezni Raspored skriven je samo iz izbora opcionih modula. Informativni Notes/Pazar paneli i njihove prečice su uklonjeni. U gornjoj traci je prijava, odnosno meni naloga sa postojećom odjavom i zaštitom nesačuvanih promena.
+
+Nova UI komponenta je `src/components/account-control.tsx`. Autentifikacija, prava pristupa, čuvanje, generator i brojčana validacija nisu menjani.
+
+Provere: **61/61 testova**, TypeScript i produkcioni build prolaze. Google Chrome provere obuhvataju 390 × 844 i 1440 × 900, obe teme, indeks/fokus, minimalne i sve uključene module, trajnost izbora, greške učitavanja i otvaranje prijave. Test odjave proverava blokiranje duplog poziva, grešku i ponovni pokušaj preko mock callback-a; stvarni korisnički nalog nije odjavljen. Snimci, diff i logovi su u `artifacts/ui-1/`.
+
+## Korak 2 — tačno dogovoreno ponašanje
+
+Originalni komentar 20 tražio je pražnjenje pri kliku. Posle razjašnjenja korisnik je izabrao **označavanje postojećeg unosa**, bez pražnjenja ili vraćanja vrednosti.
+
+- Pri ulasku u brojčano polje ili kratak tekstualni unos označiti celu postojeću vrednost, tako da je prvi ukucani znak zameni.
+- Obuhvatiti iznose, količine, sate, broj ljudi, nazive i kratke oznake širom aplikacije. Ne oslanjati se samo na `type="number"`: novac i količine često koriste tekstualni unos sa `inputMode="decimal"`.
+- Izuzeti pretragu, duge beleške/napomene, datume, vremena, prijavu, neizmenjiva i onemogućena polja. Postojeće označavanje linkova za kopiranje ostaviti kako radi.
+- Označavanje važi jednom pri dobijanju fokusa. Naknadni klikovi unutar već fokusiranog polja moraju omogućiti normalno postavljanje kursora i delimične izmene.
+- Fokus i označavanje ne smeju da promene vrednost, aktiviraju `onChange`, sačuvaju zapis ili dodaju istoriju izmene.
+- Očuvati tipove polja, postojeće handlere, validaciju, decimale, preciznost i razliku između praznog unosa i nule.
+- Proveriti ulazak mišem, tastaturom i dodirom. Ne primenjivati globalno pražnjenje polja: neka od njih odmah čuvaju promene i pretvaraju prazan string u nulu.
+
+Tokom planiranja je u izolovanom Google Chrome-u potvrđeno da `select()` omogućava zamenu prvom unetom cifrom i za `type="number"` i za decimalno tekstualno polje. I dalje je obavezna provera stvarnih kontrolisanih/nekontrolisanih obrazaca i mobilnih interakcija; ne pretpostavljati da će jednostavan handler pokriti sve slučajeve dodira.
+
+## Gde početi i šta proveriti
+
+1. Pregledaj postojeće native `input` elemente i njihove handlere u glavnom ekranu i panelima: zaposleni, pravila, potrebe, podešavanja, radni sati, pazar i knjiga šanka. Evidentiraj eksplicitno uključena i izuzeta polja.
+2. Koristi zajednički pomoćni mehanizam za označavanje i minimalne izmene obrazaca. Izbegni menjanje poslovne logike ili globalno presretanje svih inputa bez izuzetaka.
+3. Važni izvori su `src/components/shiftflow.tsx`, `basic-panels.tsx`, `hours-panel.tsx`, `revenue-panel.tsx` i `bar-panel.tsx`. Notes tekst i postojeći auth obrazac su izuzeti; kratke oznake proceni prema dogovorenom obuhvatu.
+4. Proveri početni klik/tap, Tab i Shift+Tab, zamenu prvom cifrom/slovom, slučajan fokus i izlazak bez izmene, ponovni klik radi kursora, ponovno fokusiranje, nulu, prazan unos, decimale, validacione granice i onemogućena/neizmenjiva polja.
+5. Za automatski sačuvana polja potvrdi da samo označavanje ne upisuje ništa. Zatim proveri stvarnu izmenu i reload u izolovanim demo podacima.
+
+## Alati i provere
+
+- Postojeće komande: `npm test`, `npm run check`, `npm run build`. One izvršavaju iste skripte iz `package.json`; ne menjati zavisnosti.
+- `pnpm` je ranije pokretao neuspešan mrežni/dependency preflight, pa je korišćen `npm`.
+- Na Windows sandboxu Node child procesi, browser launch i server mogu zahtevati standardnu eskalaciju zbog `spawn EPERM`.
+- Za izolovane browser testove korišćen je instalirani Google Chrome preko već prisutnog Playwright paketa. Primer skripte i podrazumevana putanja paketa su u `artifacts/ui-1/verify.cjs`; ne instalirati novi browser/dependency bez potrebe.
+- Projekat koristi statički izvoz (`output: export`): `next start` nije odgovarajući način provere produkcije. Po potrebi privremeno posluži `out/` na slobodnom test portu, uz očuvanje preview-a na portu 3000.
+- Dev-mode provere su povremeno ostajale na početnom učitavanju; kompletne provere koraka 1 prošle su nad produkcionim izvozom, a na kraju je osvežen i provereno funkcionalan dev server. Ne menjati lifecycle/autentifikaciju u sklopu koraka 2 bez novog dogovora.
+- Posle builda proveri da korisnički preview i dalje radi. Privremene servere ugasi po proverenom identitetu procesa; nemoj gasiti sve Node/Python procese ili pokretati više servera na istom portu.
+
+## Granice zadatka i predaja
+
+- Ne implementirati korak 3 (kopiranje potreba) ili korak 4 (randomizacija generatora) u ovom zadatku.
+- Sačuvati sve postojeće izmene i fajlove. Koristiti izolovane demo podatke za upise i ne menjati korisnikov stvarni cloud nalog.
+- Sačuvati pre/posle snimke za obe teme i veličine, pregledan diff, rezultate i ograničenja. Pokrenuti odgovarajuće testove, TypeScript i produkcioni build.
+- Ažurirati napredak u glavnom planu tek prema stvarno završenom radu.
+- Na kraju ostaviti korak 2 lokalno za korisnički pregled i port 3000 upaljen. Sačekati odobrenje pre novog commita ili push-a; odobrenje za `UI - 1` nije unapred dato odobrenje za korak 2.
+
+## Predlog poruke za novi chat
+
+> Nastavi samo korak 2 iz `docs/shiftflow-annotation-plan.md`. Prvo pročitaj `docs/shiftflow-ui-2-handoff.md`, `AGENTS.md` i relevantni instalirani Next.js vodič. Korak 1 je pregledan i isporučen kao `UI - 1`; sačuvaj postojeći rad. Implementiraj označavanje postojećih brojčanih i kratkih tekstualnih unosa prema dogovorenim izuzecima, bez promene vrednosti na fokus i bez poslovnih promena. Proveri telefon/desktop, obe teme, miš/tastaturu/dodir, izolovano čuvanje i reload, testove, TypeScript i build. Ne diraj korake 3–4. Ostavi port 3000 upaljen i sačekaj moj pregled pre commita ili push-a.

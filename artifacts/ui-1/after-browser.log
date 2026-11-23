@@ -1,0 +1,26 @@
+[
+  {
+    "device": "mobile",
+    "theme": "dark",
+    "errors": [],
+    "checked": "removals, layout, index focus, module persistence and login"
+  },
+  {
+    "device": "mobile",
+    "theme": "light",
+    "errors": [],
+    "checked": "removals, layout, index focus, module persistence and login"
+  },
+  {
+    "device": "desktop",
+    "theme": "dark",
+    "errors": [],
+    "checked": "removals, layout, index focus, module persistence and login"
+  },
+  {
+    "device": "desktop",
+    "theme": "light",
+    "errors": [],
+    "checked": "removals, layout, index focus, module persistence and login"
+  }
+]

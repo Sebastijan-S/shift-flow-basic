@@ -179,3 +179,29 @@ test("main screen smoke: all existing navigation destinations render; planner on
     for (const label of ["Poslednji unos pazara", "Radni sati i obračun", "Aktivni podsetnici", "Knjiga šanka i inventar"]) assert.ok(!html.includes(label));
   } finally { planner.unmount(); }
 });
+
+test("account control: duplicate sign-out is blocked and a failed flush remains visible and retryable", async t => {
+  const env = environment(t); await env.hook.settle();
+  const rejected = deferred<void>();
+  let operation = rejected.promise, calls = 0;
+  const errors: string[] = [];
+  const panel = hookHarness<any>("src/components/account-control.tsx", "AccountControl", {}, [{
+    signedIn: true, label: "Test account", onSignIn() {},
+    onSignOut: () => { calls++; return operation; },
+    onError: (error: string) => errors.push(error),
+  }]);
+  const walk = (node: any): any[] => Array.isArray(node) ? node.flatMap(walk) : node?.props ? [node, ...walk(node.props.children)] : [];
+  const button = () => walk(panel.value).find(node => node.props.onClick);
+  try {
+    const first = button().props.onClick();
+    await panel.settle(); assert.equal(button().props.disabled, true);
+    await button().props.onClick(); assert.equal(calls, 1);
+    rejected.reject(new Error("Sačekajte da se izmene sačuvaju."));
+    await first; await panel.settle();
+    assert.deepEqual(errors, ["Sačekajte da se izmene sačuvaju."]);
+    assert.equal(button().props.disabled, false);
+    operation = Promise.resolve();
+    await button().props.onClick(); await panel.settle();
+    assert.equal(calls, 2); assert.equal(button().props.disabled, false);
+  } finally { panel.unmount(); }
+});

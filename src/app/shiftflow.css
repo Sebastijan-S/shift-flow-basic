@@ -419,14 +419,26 @@ textarea { resize: vertical; }
 .basic-panel { margin-top: 22px; }
 .module-settings > .muted { margin-top: 10px; font-size: 14px; line-height: 1.6; }
 .settings-index { padding: 17px 20px; }
+.account-signin { min-height: 36px; }
+.account-menu { position: relative; }
+.account-menu summary { display: flex; align-items: center; gap: 7px; min-height: 36px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; list-style: none; font: 500 13px var(--font-sans); background: var(--surface); }
+.account-menu summary::-webkit-details-marker { display: none; }
+.account-menu summary:hover { background: var(--hover); }
+.account-dropdown { position: absolute; top: calc(100% + 8px); right: 0; z-index: 40; display: flex; flex-direction: column; gap: 12px; width: 240px; max-width: calc(100vw - 34px); padding: 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--popover); box-shadow: 0 8px 24px #0003; }
+.account-dropdown > strong { font: 500 13px var(--font-sans); overflow-wrap: anywhere; }
+.account-dropdown > [data-slot="button"] { justify-content: flex-start; min-height: 44px; }
+@media (max-width: 760px) {
+  .topbar .breadcrumb { min-width: 0; overflow: hidden; }
+  .topbar .breadcrumb > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .topbar .topbar-right { flex-shrink: 0; }
+  .account-signin, .account-menu summary { min-height: 44px; }
+}
 .settings-index-title { display: block; color: var(--muted-foreground); font: 11px var(--font-mono); margin-bottom: 12px; text-transform: uppercase; letter-spacing: .06em; }
-.settings-index-links { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 18px; align-items: start; }
-.settings-index a { display: inline-flex; align-items: center; min-height: 40px; color: var(--blue-fg); font-size: 13px; text-decoration: none; }
-.settings-index a:hover { text-decoration: underline; }
-.settings-index-group { min-width: 0; }
-.settings-index-group > a { font-weight: 600; }
-.settings-index-sub { display: flex; flex-wrap: wrap; gap: 0 12px; }
-.settings-index-sub a { color: var(--muted-foreground); font-size: 12px; min-height: 36px; }
+.settings-index-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.settings-index a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--foreground); font: 500 13px var(--font-sans); text-align: center; text-decoration: none; }
+.settings-index a:hover { background: var(--hover); border-color: var(--primary); }
+.settings-page h2, .settings-page .settings-module-heading { color: var(--green-text); }
+.settings-page .schedule-settings { grid-template-columns: minmax(0, 1fr); }
 .settings-section { margin-top: 27px; scroll-margin-top: 18px; }
 .settings-section-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 5px 16px; }
 .settings-section > .settings-section-heading { margin-bottom: 12px; }
@@ -440,7 +452,7 @@ textarea { resize: vertical; }
 .settings-module-heading { margin: 18px 0 10px; }
 .settings-section .settings-index-target + .basic-panel, .settings-section .settings-index-target + .settings-index-target, .settings-section .basic-panel + .settings-index-target { margin-top: 18px; }
 .settings-access .basic-panel { margin-top: 18px; }
-@media (max-width: 760px) { .settings-index-links { grid-template-columns: repeat(2, minmax(0, 1fr)); } .settings-index-group { grid-column: 1 / -1; grid-row: 2; } .settings-index-sub { gap: 0 14px; } .settings-section { margin-top: 23px; } .settings-section-heading > span { line-height: 1.4; } }
+@media (max-width: 760px) { .settings-index-links { grid-template-columns: repeat(2, minmax(0, 1fr)); } .settings-section { margin-top: 23px; } .settings-section-heading > span { line-height: 1.4; } }
 .module-list { margin-top: 20px; }
 .module-option { display: flex; align-items: center; justify-content: space-between; gap: 20px; border-top: 1px solid var(--border); padding: 16px 0; cursor: pointer; }
 .module-option > span { min-width: 0; }

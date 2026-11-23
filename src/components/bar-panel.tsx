@@ -126,7 +126,6 @@ export function BarPanel({ companyId, companyName, readOnly, settingsOnly = fals
     <div className="panel-heading"><h2>{settingsOnly ? "Artikli knjige šanka" : "Stanje i knjige"}</h2><Button variant="outline" disabled={busy} onClick={() => void load()}>Osveži pregled</Button></div>
     {error && <p className="form-error" role="alert">{error}</p>}{error && data && operation.current && <Button disabled={busy || readOnly} variant="outline" onClick={async () => { const command = operation.current!.command; const next = await execute(command); if (next) { setEditing(null); setItem(null); setItemVersion(null); newItemId.current = null; newBookId.current = null; setItemKey(k => k + 1); } }}>Ponovi isti zahtev</Button>}<p role="status">{status}</p>
     {!data ? <p>{error ? "Podaci nisu dostupni. Pokušajte osvežavanje." : "Učitavanje knjige…"}</p> : settingsOnly ? <>
-      <p className="muted">Početno stanje važi dok artikal nema potvrđen inventar.</p>
       <form key={itemKey} className="settings-form bar-item-form" onSubmit={async e => {
         e.preventDefault(); const form = new FormData(e.currentTarget);
         try {

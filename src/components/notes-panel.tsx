@@ -15,9 +15,7 @@ function errorText(error: unknown) {
   if (message.includes("INVALID_DST_TIME")) return "To vreme ne postoji zbog prolećne promene sata. Izaberite drugo vreme.";
   return message;
 }
-export function NotesSettings() {
-  return <section className="panel basic-panel"><h2>Podešavanja Notes i podsetnika</h2><p>Vremenska zona: Europe/Belgrade. Aktivni podsetnici se prikazuju u ovom modulu i operativnom pregledu.</p><p className="muted">Datum bez vremena važi do kraja izabranog dana. Nepostojeće vreme pri prolećnoj promeni sata se odbija; ponovljeni jesenji sat znači drugo pojavljivanje (zimsko vreme). Isključivanje modula čuva podatke.</p></section>;
-}
+
 export function NotesPanel({ companyId, readOnly }: { companyId: string | null; readOnly: boolean }) {
   const [data, setData] = useState<NotesData | null>(null), [error, setError] = useState(""), [status, setStatus] = useState(""), [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState<NoteEntry | null>(null), [text, setText] = useState(""), [date, setDate] = useState(""), [time, setTime] = useState("");

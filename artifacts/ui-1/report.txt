@@ -1,0 +1,30 @@
+UI - 1: UI i podesavanja
+
+Status: user reviewed and approved Step 1 and explicitly authorized commit/push as UI - 1. Steps 2-4 have not been implemented.
+
+Changes
+- Removed only the annotated redundant text in Overview, Employees, Availability, positions and bar item settings.
+- Preserved missing-coverage information, loading/unavailable states and errors.
+- Flattened the settings index into equal neutral bordered links; retained focus/scroll navigation.
+- Hid the mandatory Schedule row in the optional-module chooser, preserving required-module data and guards.
+- Removed permanent success copy from module settings; saving/loading/failure and retry remain visible.
+- Made Basic schedule settings one column and colored settings section headings using existing green theme tokens.
+- Removed Notes/Revenue informational settings panels and index links. Their modules remain intact.
+- Added an account control in the top bar: existing login dialog for demo, native keyboard-accessible account disclosure with guarded sign-out for connected/planner access. Outside pointerdown/Escape close the disclosure. Errors are forwarded to the existing notification.
+
+Validation
+- 61 tests passed, 0 failed/skipped: tests.log. Includes existing tenant/role/scheduler tests and a new account control test for duplicate sign-out, rejected flush feedback and retry.
+- npm run check passed: typecheck.log.
+- npm run build passed: build.log.
+- Source git diff --check passed.
+- Installed Google Chrome, disposable contexts: 390x844 and 1440x900, dark/light. Production screenshots and assertions passed for removals, no horizontal page overflow, one-column settings, section-index destinations/focus, optional-module persistence after reload, minimal configuration, retained load-error/retry UI and opening login.
+- Before/after images and results: this directory. Exact source patch including the new component: ui-1.diff. Repeatable browser test: verify.cjs.
+- Real authenticated account sign-out was not performed. The real signOut/flush implementation is unchanged; rejection/retry behavior was tested through a mocked callback. Phone checks use browser viewports, not physical phone hardware.
+
+Environment and handoff
+- Used existing repository scripts via npm; no dependency changes, database queries, migrations or real cloud writes.
+- Supabase skill/docs were consulted for the account entry point; existing authentication and authorization implementations were reused.
+- Dev-mode multi-context baseline probing stalled at workspace loading; stable production export was used for complete before/after checks. Final dev server was restarted for user review.
+- Temporary static preview on port 3002 was stopped. Port 3000 remains running intentionally at user request.
+- Existing next-env.d.ts dev-generated change and the uncommitted annotation plan were preserved; the plan progress was updated.
+- User approval was received for the UI - 1 commit and push. Next chat continues Step 2 only; see docs/shiftflow-ui-2-handoff.md.

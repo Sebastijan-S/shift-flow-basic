@@ -60,6 +60,8 @@ export function DashboardPanel({ companyId, workspace, settings, readOnly, go }:
   const required = requirements.reduce((sum, item) => sum + item.count, 0);
   const missing = missingRequirements(schedule?.assignments ?? [], requirements).reduce((sum, item) => sum + item.missing, 0);
   const due = values.reminders.filter(note => note.date! <= today);
+  const coverageDetail = schedule ? required ? missing ? `Nedostaje ${missing} ${missing === 1 ? "mesto" : "mesta"}` : null : "Nema planiranih mesta" : "Za današnji dan nema sačuvanog rasporeda";
+  const remindersDetail = data.notes?.data ? due.length ? "aktivnih podsetnika" : null : data.notes?.error ? "Pokušajte osvežavanje" : "Učitavanje podsetnika";
   const actions = dashboardActions(settings);
   const cards = [
     ...(settings.hours ? [{ id: "hours", title: "Evidentirani sati", value: value("hours", values.minutes === null ? "Period nije otvoren" : `${Math.floor(values.minutes / 60)} h ${values.minutes % 60} min`), detail: "Otvoreni period" }] : []),
@@ -71,15 +73,15 @@ export function DashboardPanel({ companyId, workspace, settings, readOnly, go }:
     <div className={`dashboard-today-grid ${settings.notes ? "has-reminders" : ""}`}>
       <section className="stat-card dashboard-today-card" aria-label="Popunjenost smena danas">
         <h2>Popunjenost smena danas</h2>
-        <div className="dashboard-today-values"><div><span>Danas na rasporedu</span><strong>{scheduledToday(workspace, now)}</strong><small>zaposlenih</small></div><div><span>Popunjena mesta</span><strong>{schedule ? `${required - missing}/${required}` : "Nema rasporeda"}</strong><small>{schedule ? required ? missing ? `Nedostaje ${missing} ${missing === 1 ? "mesto" : "mesta"}` : "Sva mesta su popunjena" : "Nema planiranih mesta" : "Za današnji dan nema sačuvanog rasporeda"}</small></div></div>
+        <div className="dashboard-today-values"><div><span>Danas na rasporedu</span><strong>{scheduledToday(workspace, now)}</strong></div><div><span>Popunjena mesta</span><strong>{schedule ? `${required - missing}/${required}` : "Nema rasporeda"}</strong>{coverageDetail && <small>{coverageDetail}</small>}</div></div>
       </section>
       {settings.notes && <section className="stat-card dashboard-today-card dashboard-due-card" aria-label="Podsetnici za danas">
         <h2>Podsetnici za danas</h2>
-        <div className="dashboard-today-values"><div><span>Danas ili ranije</span><strong>{value("notes", String(due.length))}</strong><small>{data.notes?.data ? due.length ? "aktivnih podsetnika" : "Nema dospelih podsetnika" : data.notes?.error ? "Pokušajte osvežavanje" : "Učitavanje podsetnika"}</small></div><div><span>Svi aktivni</span><strong>{value("notes", String(values.reminders.length))}</strong><small>sa rokom</small></div></div>
+        <div className="dashboard-today-values"><div><span>Danas ili ranije</span><strong>{value("notes", String(due.length))}</strong>{remindersDetail && <small>{remindersDetail}</small>}</div><div><span>Svi aktivni</span><strong>{value("notes", String(values.reminders.length))}</strong></div></div>
       </section>}
     </div>
     {settings.notes && <section className="panel dashboard-reminders" aria-label="Aktivni podsetnici" aria-busy={busy}>
-      <div className="panel-heading"><div><h2>Aktivni podsetnici</h2><p className="muted">Najbliži rokovi na jednom mestu</p></div><Button variant="outline" className="dashboard-module-link" onClick={() => go("Notes i podsetnici")}>Sve beleške i podsetnici →</Button></div>
+      <div className="panel-heading"><div><h2>Aktivni podsetnici</h2></div><Button variant="outline" className="dashboard-module-link" onClick={() => go("Notes i podsetnici")}>Sve beleške i podsetnici →</Button></div>
       {!data.notes?.data ? <p className="muted">{data.notes?.error ?? "Učitavanje podsetnika…"}</p> : !values.reminders.length ? <p className="muted">Nema aktivnih podsetnika.</p> : <ul>{values.reminders.slice(0, 3).map(note => <li key={note.id}>
         <div><p className="dashboard-note-text">{note.text}</p><small className={noteOverdue(note, now) ? "note-deadline" : "muted"}>{dateLabel(note.date!)}{note.time ? ` · ${note.time}` : " · do kraja dana"}{noteOverdue(note, now) ? " · Rok je prošao" : ""}</small></div>
         <Button size="sm" variant="outline" disabled={busy || readOnly} aria-label={`Završi podsetnik: ${note.text.slice(0, 80)}`} onClick={() => void finish(note)}>Završi</Button>
