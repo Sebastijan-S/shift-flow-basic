@@ -27,4 +27,4 @@ Environment and handoff
 - Dev-mode multi-context baseline probing stalled at workspace loading; stable production export was used for complete before/after checks. Final dev server was restarted for user review.
 - Temporary static preview on port 3002 was stopped. Port 3000 remains running intentionally at user request.
 - Existing next-env.d.ts dev-generated change and the uncommitted annotation plan were preserved; the plan progress was updated.
-- User approval was received for the UI - 1 commit and push. Next chat continues Step 2 only; see docs/shiftflow-ui-2-handoff.md.
+- User approval was received for the UI - 1 commit and push. Next chat continues Step 2 only; handoff is provided in chat as a copyable prompt, without a separate handoff file.

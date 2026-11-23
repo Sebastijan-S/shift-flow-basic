@@ -1,0 +1,23 @@
+src\components\bar-panel.tsx: <input {...selectOnFocus} maxLength={80} value={shift} 
+src\components\bar-panel.tsx: <input {...selectOnFocus} aria-label={`${row.name} — ${label}`} aria-invalid={!!rowError} inputMode="decimal" value={entry.invalid[field] ?? entry.typing?.[field] ?? quantityInput(row[field])} 
+src\components\bar-panel.tsx: <input {...selectOnFocus} name="name" required maxLength={120} defaultValue={item?.name ?? ""} /
+src\components\bar-panel.tsx: <input {...selectOnFocus} name="unit" list="bar-units" required maxLength={20} defaultValue={item?.unit ?? "kom"} /
+src\components\bar-panel.tsx: <input {...selectOnFocus} name="initial" inputMode="decimal" required defaultValue={quantityInput(item?.initial ?? 0)} /
+src\components\basic-panels.tsx: <input {...selectOnFocus} name="position" required maxLength={40} /
+src\components\basic-panels.tsx: <input {...selectOnFocus} name="name" required maxLength={60} placeholder="Međusmena" /
+src\components\basic-panels.tsx: <input {...selectOnFocus} type="number" min={0} max={20} value={requirements.find(r =
+src\components\hours-panel.tsx: <input {...selectOnFocus} name="amount" inputMode="decimal" required defaultValue={(rate.cents / 100).toFixed(2)} /
+src\components\hours-panel.tsx: <input {...selectOnFocus} name="overtime" inputMode="decimal" required defaultValue={((extra?.overtime ?? 0) / 100).toFixed(2)} /
+src\components\hours-panel.tsx: <input {...selectOnFocus} name="monthly" inputMode="decimal" required defaultValue={extra?.monthly === null || extra?.monthly === undefined ? "" : (extra.monthly / 100).toFixed(2)} /
+src\components\hours-panel.tsx: <input {...selectOnFocus} aria-label={`Sati: ${a.date}, ${e.name}`} name="hours" type="number" min="0" max="24" step="any" required defaultValue={Number((a.minutes / 60).toFixed(6))} /
+src\components\revenue-panel.tsx: <input {...selectOnFocus} ref={cashRef} inputMode="decimal" value={cash} 
+src\components\revenue-panel.tsx: <input {...selectOnFocus} inputMode="decimal" value={cards} 
+src\components\revenue-panel.tsx: <input {...selectOnFocus} maxLength={80} value={shift} 
+src\components\shiftflow.tsx: <input {...selectOnFocus} name="rest" type="number" min="0" max="48" defaultValue={w.rules.minRestHours} required /
+src\components\shiftflow.tsx: <input {...selectOnFocus} name="hours" type="number" min="8" max="168" step="1" defaultValue={w.rules.maxWeeklyHours} required /
+src\components\shiftflow.tsx: <input {...selectOnFocus} type="number" min="0" max="20" aria-label={`${name}, ${t.name}, ${p}`} value={w.requirements.find(r =
+src\components\shiftflow.tsx: <input {...selectOnFocus} name="name" required maxLength={80} defaultValue={w.name} disabled={role === "manager"} /
+src\components\shiftflow.tsx: <input {...selectOnFocus} name={`${t.id}-name`} defaultValue={t.name} required /
+src\components\shiftflow.tsx: <input {...selectOnFocus} name="name" autoFocus required minLength={2} maxLength={80} defaultValue={editEmployee?.name} placeholder="npr. Ana Petrović" /
+src\components\shiftflow.tsx: <input {...selectOnFocus} type="number" name="maximum" min="1" max="168" defaultValue={editEmployee?.maxHours} placeholder="Bez posebnog limita" /
+src\components\shiftflow.tsx: <input {...selectOnFocus} type="number" name="hours" min="8" max="80" step="1" defaultValue={editEmployee?.targetHours ?? 40} required /

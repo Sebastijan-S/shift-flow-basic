@@ -1,0 +1,26 @@
+[
+  {
+    "device": "desktop",
+    "theme": "dark",
+    "checks": "mouse/touch, Tab/Shift+Tab, caret, controlled/uncontrolled, zero/empty/decimal, native limits, autosave/history/reload, search/auth exclusions",
+    "errors": []
+  },
+  {
+    "device": "desktop",
+    "theme": "light",
+    "checks": "mouse/touch, Tab/Shift+Tab, caret, controlled/uncontrolled, zero/empty/decimal, native limits, autosave/history/reload, search/auth exclusions",
+    "errors": []
+  },
+  {
+    "device": "mobile",
+    "theme": "dark",
+    "checks": "mouse/touch, Tab/Shift+Tab, caret, controlled/uncontrolled, zero/empty/decimal, native limits, autosave/history/reload, search/auth exclusions",
+    "errors": []
+  },
+  {
+    "device": "mobile",
+    "theme": "light",
+    "checks": "mouse/touch, Tab/Shift+Tab, caret, controlled/uncontrolled, zero/empty/decimal, native limits, autosave/history/reload, search/auth exclusions",
+    "errors": []
+  }
+]

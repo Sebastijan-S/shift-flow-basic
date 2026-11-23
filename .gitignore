@@ -8,3 +8,6 @@ out/
 .sites-runtime/
 .sites-checkout*
 supabase/.temp/
+
+# Live preview request logs (screenshots and verification reports stay versioned).
+/artifacts/ui-2/preview-static*.log

@@ -1,0 +1,33 @@
+ShiftFlow — korak 2, 23. novembar 2026.
+
+Implementacija:
+- Zajednički selectOnFocus, izričito uključen na 23 JSX mesta (uključujući mapirane obrasce).
+- Pokrivena su sva type=number i inputMode=decimal polja, nazivi i kratke oznake.
+- onFocus označava, prvi pointer click očuva selekciju, kasniji klik postavlja kursor; naredni dodir otpušta selekciju pre standardnog pomeranja kursora u Chrome-u.
+- Bez izmene vrednosti, događaja input/change, automatskog submit-a ili čuvanja na fokus.
+- Očuvani tipovi, atributi, handleri za promenu, validacija i bar onBlur čišćenje privremenog unosa.
+- Izuzeci nisu uključeni: pretrage, textarea i razlog/napomena, datumi/vremena, prijava, readonly linkovi. Helper dodatno proverava readonly i :disabled (uključujući fieldset).
+- Bez izmena kopiranja potreba i generatora.
+
+Provere:
+- npm test: 61/61; npm run check: uspešan; npm run build: uspešan.
+- Chrome 1440x900 i 390x844, obe teme, izolovani privremeni konteksti bez korisnikovih podataka.
+- Miš / emulirani dodir, Tab i Shift+Tab, prvo kucanje, sledeći klik/dodir, autofocus naziva zaposlenog.
+- Kontrolisan broj ljudi, nekontrolisani sati i nazivi, kontrolisan decimalni pazar i nekontrolisano početno stanje artikla; prazan unos, nula, tačka/zarez, preciznost i native validation granice.
+- Fokus/blur ne menjaju localStorage; promena broja ljudi daje tačno jednu istorijsku stavku, opstaje posle reload-a i zadržava clamp 0–20.
+- Pretraga i naziv firme na prijavi zadržavaju normalan fokus. Ostali izuzeci i obuhvat pregledani u izvoru; nije svaki poslovni obrazac zasebno sačuvan.
+- Snimci before-mobile-dark-* potiču pre implementacije; before-focus/after-focus prikazuju selekciju u četiri kombinacije dimenzije/teme. Vizuelno pregledani mobile-light i desktop-dark.
+- Nema provere na fizičkom telefonu, Safari-ju ili produkcionim/cloud podacima.
+
+Dokazi:
+- verify.cjs, results.json, browser.log: ponovljive provere i rezultati.
+- tests.log, typecheck.log, build.log: završne komande.
+- input-inventory.txt: pregled svih uključenih mesta.
+- ui-2.diff: pregledana izmena koda i plana, uključujući novi helper.
+- pre-existing.diff: zatečene lokalne izmene; nisu vraćane.
+- Početna baseline skripta završila je samo jednu kombinaciju pre isteka čekanja. Browser provere su zatim zamenjene fokusiranom skriptom. Windows sandbox EPERM za procese rešen je odobrenim pokretanjem testova izvan sandboxa. Jedan ponovljeni browser prolaz prekinut je paralelnim Next buildom; Next dev je i posle restarta povremeno prijavljivao internu grešku Router action dispatched before initialization. Završni prolaz nad statičkim produkcionim preview-om prolazi u sve četiri kombinacije bez pageerror grešaka.
+
+Predaja:
+- Plan ažuriran; koraci 3 i 4 ostaju nezapočeti.
+- Obrisani handoff nije vraćen. Zatečeni report i generisane .next/dev/types putanje sačuvani.
+- Korisnik je naknadno odobrio commit/push kao UI - 2, pa implementaciju i zasebnu isporuku UI - 3. Preview ostaje na http://localhost:3000 za korisnički pregled, kao provereni produkcioni build iz out/ (python -m http.server 3000 --bind 127.0.0.1 --directory out). Nema automatskog osvežavanja budućih izmena koda; za to treba ponovo pokrenuti npm run dev ili obnoviti build.

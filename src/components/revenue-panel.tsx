@@ -1,5 +1,7 @@
 "use client";
 
+import { selectOnFocus } from "./select-on-focus";
+
 import { readRevenue } from "@/lib/module-data";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -88,7 +90,7 @@ export function RevenuePanel({ companyId, readOnly }: { companyId: string | null
     {!data ? <div className="revenue-unavailable"><p>{error ? "Podaci nisu dostupni. Pokušajte ponovo." : "Učitavanje pazara…"}</p>{error && <Button variant="outline" disabled={busy} onClick={() => void load()}>Osveži pazar</Button>}</div> : <>
       <form ref={editorRef} className="settings-form revenue-form" onSubmit={e => { e.preventDefault(); void save(); }}>
         <fieldset disabled={busy || readOnly}><legend>{editing ? `Izmena zapisa · ${editing.date}` : "Novi unos"}</legend>
-          <div className="revenue-fields"><label className="revenue-date">Datum pazara<input ref={dateRef} type="date" required min="0001-01-01" max="9999-12-31" value={date} onChange={e => setDate(e.target.value)} /></label><label className="revenue-cash">Gotovina (RSD)<input ref={cashRef} inputMode="decimal" value={cash} onChange={e => setCash(e.target.value)} placeholder="Nije uneto" /></label><label className="revenue-cards">Kartice (RSD)<input inputMode="decimal" value={cards} onChange={e => setCards(e.target.value)} placeholder="Nije uneto" /></label><label className="revenue-shift">Oznaka smene (opciono)<input maxLength={80} value={shift} onChange={e => setShift(e.target.value)} placeholder="npr. Jutarnja" /></label></div>
+          <div className="revenue-fields"><label className="revenue-date">Datum pazara<input ref={dateRef} type="date" required min="0001-01-01" max="9999-12-31" value={date} onChange={e => setDate(e.target.value)} /></label><label className="revenue-cash">Gotovina (RSD)<input {...selectOnFocus} ref={cashRef} inputMode="decimal" value={cash} onChange={e => setCash(e.target.value)} placeholder="Nije uneto" /></label><label className="revenue-cards">Kartice (RSD)<input {...selectOnFocus} inputMode="decimal" value={cards} onChange={e => setCards(e.target.value)} placeholder="Nije uneto" /></label><label className="revenue-shift">Oznaka smene (opciono)<input {...selectOnFocus} maxLength={80} value={shift} onChange={e => setShift(e.target.value)} placeholder="npr. Jutarnja" /></label></div>
           <div className="revenue-total">Ukupno <output>{preview}</output></div>
           <div className="revenue-actions"><Button type="submit">{busy ? "Čuvanje…" : editing ? "Sačuvaj izmenu" : "Sačuvaj unos"}</Button>{editing && <Button type="button" variant="outline" disabled={busy} onClick={() => { reset(); setError(""); }}>Otkaži izmenu</Button>}</div>
         </fieldset>

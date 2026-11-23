@@ -2,7 +2,7 @@
 
 Dogovoreno: 23. novembra 2026.
 
-Status: celina 1 je završena, korisnik ju je pregledao i odobrio. Odobreni commit i push: `UI - 1`. Celine 2–4 nisu započete.
+Status: celina 1 je završena, korisnik ju je pregledao i odobrio. Odobreni commit i push: `UI - 1`. Celina 2 je pregledana i odobrena za commit/push `UI - 2`; celine 3–4 nisu započete.
 
 ## Način rada i nastavak
 
@@ -137,7 +137,7 @@ Trenutni generator je namerno determinističan. Korisnik želi novu kombinaciju 
 
 - [x] Razjašnjene anotacije i sačuvan plan.
 - [x] Celina 1: UI i podešavanja — završeno, pregledano i odobreno; isporuka `UI - 1`.
-- [ ] Celina 2: označavanje postojećeg unosa.
+- [x] Celina 2: označavanje postojećeg unosa — implementirano, provereno i odobreno za isporuku `UI - 2`.
 - [ ] Celina 3: kopiranje potreba tima.
 - [ ] Celina 4: raznovrsnije generisanje.
 - [ ] Završni pregled diffa, snimaka, testova, TypeScript-a i builda.
@@ -153,4 +153,16 @@ Pri nastavku ažurirati ovaj spisak prema stvarno završenom radu i zabeležiti 
 - Snimci, test skripta, logovi i pregled izmena nalaze se u `artifacts/ui-1/`.
 - Preview na portu 3000 ostaje dostupan korisniku.
 - Korisnik je pregledao i odobrio rezultat i izričito zatražio commit/push sa porukom `UI - 1`.
-- Sledeći chat nastavlja samo celinu 2; handoff: `docs/shiftflow-ui-2-handoff.md`.
+- Sledeći chat nastavlja samo celinu 2; korisnik dobija handoff kao prompt za kopiranje, bez zasebnog handoff fajla.
+
+## Pregled celine 2 — 23. novembar 2026.
+
+- Implementiran je zajednički `selectOnFocus` mehanizam, izričito dodat brojčanim poljima, decimalnim tekstualnim unosima, nazivima i kratkim oznakama u rasporedu, zaposlenima, pravilima rada, podešavanjima, pazaru, obračunu i knjizi šanka.
+- Fokus samo označava vrednost. Prvi znak je zamenjuje; naredni klik/dodir omogućava kursor. Sačuvani su tipovi, postojeći handleri, validacija, preciznost i postojeće tumačenje praznog unosa/nule. Pretraga, napomene, datumi/vremena, prijava, readonly/disabled polja i selekcija linkova ostaju izuzeti.
+- Chrome provere u izolovanim profilima: 1440 × 900 i 390 × 844, svetla/tamna tema, miš i emulirani dodir, Tab/Shift+Tab, autofocus u dijalogu zaposlenog, kontrolisani i nekontrolisani unosi, nula/prazno/decimale, postojeće granice. Nije rađena provera na fizičkom telefonu ili u Safari-ju.
+- Automatsko čuvanje potreba: fokus i izlazak iz polja nisu promenili skladište; unos pravi tačno jednu istorijsku stavku i opstaje posle reload-a. Provereno i postojeće ograničavanje vrednosti na 0–20. Koraci 3 i 4 nisu menjani.
+- Prošlo je 61/61 testova, `npm run check` i `npm run build`. Snimci, ponovljiva browser skripta, logovi, pregled diffa i izveštaj su u `artifacts/ui-2/`.
+- Sačuvane su zatečene lokalne izmene, uključujući obrisani handoff i automatske `.next/dev/types` putanje. Handoff nije vraćen.
+- Preview ostaje na portu 3000 kao statički produkcioni build. Next dev je pri ponovljenim reload-ima povremeno prijavljivao internu grešku „Router action dispatched before initialization“ i posle restarta; završni browser prolaz nad produkcionim preview-om prolazi bez grešaka. Preview ne osvežava buduće izmene koda automatski. Nema novog commita ili push-a; potreban je korisnički pregled i posebno odobrenje.
+
+- Naknadni dogovor: korisnik je odobrio commit/push celine 2 kao `UI - 2`, zatim implementaciju i zaseban commit/push celine 3 kao `UI - 3`. Celina 4 ostaje van ovog zahteva.
