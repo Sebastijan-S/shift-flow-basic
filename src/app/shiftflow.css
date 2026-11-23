@@ -866,3 +866,7 @@ textarea { resize: vertical; }
   .history-panel .history-copy { grid-column: 2; }
   .history-panel .history-list .tag { display: inline-flex; grid-column: 2; justify-self: start; margin-left: 0; }
 }
+
+.requirement-copy-action { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; padding: 12px 0; }
+.requirement-copy-action small { flex: 1 1 240px; color: var(--muted-foreground); line-height: 1.5; }
+@media (max-width: 480px) { .requirement-copy-action [data-slot="button"] { min-height: 44px; width: 100%; white-space: normal; } }

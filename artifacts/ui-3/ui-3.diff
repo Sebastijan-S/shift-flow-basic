@@ -1,0 +1,245 @@
+diff --git a/docs/shiftflow-annotation-plan.md b/docs/shiftflow-annotation-plan.md
+index 7a9e744..56eb381 100644
+--- a/docs/shiftflow-annotation-plan.md
++++ b/docs/shiftflow-annotation-plan.md
+@@ -2,7 +2,7 @@
+ 
+ Dogovoreno: 23. novembra 2026.
+ 
+-Status: celina 1 je završena, korisnik ju je pregledao i odobrio. Odobreni commit i push: `UI - 1`. Celina 2 je pregledana i odobrena za commit/push `UI - 2`; celine 3–4 nisu započete.
++Status: celine 1 i 2 su završene i pushovane kao `UI - 1` (`cf46f28`) i `UI - 2` (`8fcaacd`). Celina 3 je implementirana i proverena, uz korisnikovo odobrenje za neposredni commit/push `UI - 3`. Celina 4 nije započeta.
+ 
+ ## Način rada i nastavak
+ 
+@@ -137,8 +137,8 @@ Trenutni generator je namerno determinističan. Korisnik želi novu kombinaciju
+ 
+ - [x] Razjašnjene anotacije i sačuvan plan.
+ - [x] Celina 1: UI i podešavanja — završeno, pregledano i odobreno; isporuka `UI - 1`.
+-- [x] Celina 2: označavanje postojećeg unosa — implementirano, provereno i odobreno za isporuku `UI - 2`.
+-- [ ] Celina 3: kopiranje potreba tima.
++- [x] Celina 2: označavanje postojećeg unosa — završeno i pushovano kao `UI - 2` (`8fcaacd`).
++- [x] Celina 3: kopiranje potreba tima — implementirano i provereno; odobrena isporuka `UI - 3`.
+ - [ ] Celina 4: raznovrsnije generisanje.
+ - [ ] Završni pregled diffa, snimaka, testova, TypeScript-a i builda.
+ 
+@@ -166,3 +166,14 @@ Pri nastavku ažurirati ovaj spisak prema stvarno završenom radu i zabeležiti
+ - Preview ostaje na portu 3000 kao statički produkcioni build. Next dev je pri ponovljenim reload-ima povremeno prijavljivao internu grešku „Router action dispatched before initialization“ i posle restarta; završni browser prolaz nad produkcionim preview-om prolazi bez grešaka. Preview ne osvežava buduće izmene koda automatski. Nema novog commita ili push-a; potreban je korisnički pregled i posebno odobrenje.
+ 
+ - Naknadni dogovor: korisnik je odobrio commit/push celine 2 kao `UI - 2`, zatim implementaciju i zaseban commit/push celine 3 kao `UI - 3`. Celina 4 ostaje van ovog zahteva.
++
++## Pregled celine 3 — 23. novembar 2026.
++
++- Dodata je akcija „Kopiraj na ostale dane“ uz svaki dan u osnovnom obrascu (Pravila rada) i potrebama izabrane nedelje (Podešavanja), sa upozorenjem da zamenjuje potrebe ostalih šest dana i uputstvom za poništavanje.
++- Jedan klik čuva jednu izmenu kroz postojeću istoriju. Kopira sve postojeće smene i pozicije, uključujući nulu i podrazumevanu nulu za nedostajuće vrednosti; izvor ostaje isti, a dani se zatim uređuju nezavisno.
++- Kopiranje poštuje dozvoljene dane korišćenja smena. Smena neaktivna izvornog dana prenosi nulu na dozvoljene ciljne dane; ne pravi potrebe na danima kojima smena ne pripada. Zapisi van trenutnog editora ostaju sačuvani.
++- Osnovni obrazac i `requirementOverrides` za konkretnu nedelju ostaju razdvojeni, kao i ostale nedelje. Postojeći rasporedi i njihovi snimci potreba ostaju nepromenjeni do novog generisanja. Nema migracije, promene validacionih granica ili izmena generatora.
++- Prošlo je 65/65 testova (četiri nova testa kopiranja/istorije), `npm run check` i `npm run build`.
++- Browser provere: Chrome 390 × 844 i 1440 × 900, obe teme; tastatura/Enter i emulirani dodir; oba editora, nula/20/prilagođena pozicija, ograničeni dani smene, jedna istorijska stavka, reload, undo/redo i naknadna nezavisna izmena jednog dana. Isključivo izolovani demo profili, bez produkcionih upisa.
++- Dokazi su u `artifacts/ui-3/`: skripta i demo primer, snimci pre/posle kopiranja, rezultati, logovi i pregledan diff. Nije testiran fizički telefon/Safari.
++- Preview na portu 3000 i dalje poslužuje uspešan produkcioni build; sad sadrži korak 3. Korisnik je izričito odobrio zaseban commit/push `UI - 3` odmah po implementaciji i proverama. Korak 4 ostaje za kasnije.
+diff --git a/src/app/shiftflow.css b/src/app/shiftflow.css
+index a52cc66..24534e4 100644
+--- a/src/app/shiftflow.css
++++ b/src/app/shiftflow.css
+@@ -866,3 +866,7 @@ textarea { resize: vertical; }
+   .history-panel .history-copy { grid-column: 2; }
+   .history-panel .history-list .tag { display: inline-flex; grid-column: 2; justify-self: start; margin-left: 0; }
+ }
++
++.requirement-copy-action { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; padding: 12px 0; }
++.requirement-copy-action small { flex: 1 1 240px; color: var(--muted-foreground); line-height: 1.5; }
++@media (max-width: 480px) { .requirement-copy-action [data-slot="button"] { min-height: 44px; width: 100%; white-space: normal; } }
+diff --git a/src/components/basic-panels.tsx b/src/components/basic-panels.tsx
+index 091d6b4..3432e5b 100644
+--- a/src/components/basic-panels.tsx
++++ b/src/components/basic-panels.tsx
+@@ -1,5 +1,7 @@
+ "use client";
+ 
++import { copyDayRequirements } from "@/lib/requirements";
++import { CopyRequirementsAction } from "./copy-requirements-action";
+ import { selectOnFocus } from "./select-on-focus";
+ 
+ import { useEffect, useState, type FormEvent } from "react";
+@@ -47,7 +49,7 @@ export function BasicAvailability({ workspace: w, commit }: Props) {
+   </section>;
+ }
+ 
+-export function BasicSettings({ workspace: w, commit, week }: Props & { week: string }) {
++export function BasicSettings({ workspace: w, commit, week, readOnly = false }: Props & { week: string; readOnly?: boolean }) {
+   const [error, setError] = useState(""); const [override, setOverride] = useState(false);
+   const positions = w.positions ?? ["Barista", "Konobar", "Menadžer"];
+   const requirements = w.requirementOverrides?.[week] ?? w.requirements;
+@@ -58,7 +60,7 @@ export function BasicSettings({ workspace: w, commit, week }: Props & { week: st
+       <label>Naziv<input {...selectOnFocus} name="name" required maxLength={60} placeholder="Međusmena" /></label><div className="form-columns"><label>Početak<input type="time" name="start" required defaultValue="11:00" /></label><label>Kraj<input type="time" name="end" required defaultValue="19:00" /></label></div><label>Boja<select name="color">{["mint", "blue", "purple", "peach", "pink", "yellow"].map(c => <option key={c}>{c}</option>)}</select></label><fieldset><legend>Dani korišćenja</legend><div className="position-options">{DAY_NAMES.map((d, i) => <label key={d}><input type="checkbox" name="days" value={i} defaultChecked />{d.slice(0, 3)}</label>)}</div></fieldset><Button type="submit">Dodaj smenu</Button>
+     </form></section>
+     <section className="panel basic-wide"><div className="settings-section-heading"><h2>Potrebe za ovu nedelju</h2><span className="settings-save-mode">Čuva se odmah</span></div><p className="muted">Važe samo ove nedelje. Ponovo generišite raspored da ih primenite.</p><Button variant="outline" onClick={() => setOverride(v => !v)}>{override ? "Zatvori izuzetak" : "Uredi potrebe ove nedelje"}</Button>{w.requirementOverrides?.[week] && <Button variant="ghost" onClick={() => { const next = { ...w.requirementOverrides }; delete next[week]; commit({ ...w, requirementOverrides: next }, "Vraćen osnovni obrazac potreba"); }}>Vrati osnovni obrazac</Button>}
+-      {override && <div className="requirements-editor">{DAY_NAMES.map((d, day) => <details key={d}><summary>{d}</summary>{w.templates.filter(t => !t.days || t.days.includes(day)).map(t => <div className="requirement-row" key={t.id}><strong>{t.name}</strong>{positions.map(p => <label key={p}>{p}<input {...selectOnFocus} type="number" min={0} max={20} value={requirements.find(r => r.day === day && r.templateId === t.id && r.position === p)?.count ?? 0} onChange={e => changeRequirement({ day, templateId: t.id, position: p, count: Math.max(0, Math.min(20, Number(e.target.value))) })} /></label>)}</div>)}</details>)}</div>}
++      {override && <div className="requirements-editor">{DAY_NAMES.map((d, day) => <details key={d}><summary>{d}</summary><CopyRequirementsAction day={day} disabled={readOnly} onCopy={() => commit({ ...w, requirementOverrides: { ...w.requirementOverrides, [week]: copyDayRequirements(requirements, w.templates, positions, day) } }, `Kopirane potrebe ove nedelje: ${d}`)} />{w.templates.filter(t => !t.days || t.days.includes(day)).map(t => <div className="requirement-row" key={t.id}><strong>{t.name}</strong>{positions.map(p => <label key={p}>{p}<input {...selectOnFocus} type="number" min={0} max={20} value={requirements.find(r => r.day === day && r.templateId === t.id && r.position === p)?.count ?? 0} onChange={e => changeRequirement({ day, templateId: t.id, position: p, count: Math.max(0, Math.min(20, Number(e.target.value))) })} /></label>)}</div>)}</details>)}</div>}
+     </section>{error && <p className="form-error" role="alert">{error}</p>}
+   </div>;
+ }
+diff --git a/src/components/shiftflow.tsx b/src/components/shiftflow.tsx
+index 0a49616..242aa7c 100644
+--- a/src/components/shiftflow.tsx
++++ b/src/components/shiftflow.tsx
+@@ -1,5 +1,7 @@
+ "use client";
+ 
++import { copyDayRequirements } from "@/lib/requirements";
++import { CopyRequirementsAction } from "./copy-requirements-action";
+ import { selectOnFocus } from "./select-on-focus";
+ 
+ import { useEffect, useRef, useState, type FormEvent, type MouseEvent as ReactMouseEvent, type ReactNode } from "react";
+@@ -202,7 +204,7 @@ export default function ShiftFlow() {
+ 
+       {page === "Dostupnost" && <BasicAvailability workspace={w} commit={commit} />}
+ 
+-      {page === "Pravila rada" && <div className="settings-grid work-rules"><section className="panel"><h2>Pravila raspoređivanja</h2><p className="muted">Izmene primenite dugmetom „Sačuvaj pravila“.</p><form className="settings-form" onSubmit={e => { e.preventDefault(); const f = new FormData(e.currentTarget); commit({ ...w, rules: { minRestHours: Number(f.get("rest")), maxWeeklyHours: Number(f.get("hours")), restSeverity: f.get("restSeverity") as "warning" | "block", hoursSeverity: f.get("hoursSeverity") as "warning" | "block", allowMultiple: f.get("multiple") === "on", restEnabled: f.get("restEnabled") === "on", hoursEnabled: f.get("hoursEnabled") === "on" } }, "Izmenjena pravila rada"); notify("Pravila su sačuvana. Proverite postojeći raspored ili generišite novi."); }}><fieldset className="work-rule-group"><legend>Odmor između smena</legend><label className="check-row"><input type="checkbox" name="restEnabled" defaultChecked={w.rules.restEnabled !== false} />Primeni pravilo odmora</label><div className="rule-field"><label>Minimalni odmor između smena<div className="input-unit"><input {...selectOnFocus} name="rest" type="number" min="0" max="48" defaultValue={w.rules.minRestHours} required /><span>sati</span></div></label><label>Primena pravila odmora<select aria-describedby="rest-severity-help" name="restSeverity" defaultValue={w.rules.restSeverity}><option value="block">Zabrana</option><option value="warning">Upozorenje</option></select></label></div><p id="rest-severity-help" className="work-rule-help">Zabrana blokira smenu bez dovoljnog odmora. Upozorenje dozvoljava izmenu i prikazuje upozorenje.</p></fieldset><fieldset className="work-rule-group"><legend>Nedeljni fond sati</legend><label className="check-row"><input type="checkbox" name="hoursEnabled" defaultChecked={w.rules.hoursEnabled !== false} />Primeni maksimum sati</label><div className="rule-field"><label>Maksimalni nedeljni fond<div className="input-unit"><input {...selectOnFocus} name="hours" type="number" min="8" max="168" step="1" defaultValue={w.rules.maxWeeklyHours} required /><span>sati</span></div></label><label>Primena maksimuma sati<select aria-describedby="hours-severity-help" name="hoursSeverity" defaultValue={w.rules.hoursSeverity}><option value="block">Zabrana</option><option value="warning">Upozorenje</option></select></label></div><p id="hours-severity-help" className="work-rule-help">Zabrana blokira prekoračenje fonda. Upozorenje dozvoljava izmenu i prikazuje upozorenje. Poseban maksimum zaposlenog ima prednost nad ovim fondom.</p></fieldset><fieldset className="work-rule-group"><legend>Smene u istom danu</legend><label className="check-row"><input type="checkbox" name="multiple" defaultChecked={w.rules.allowMultiple} /><span>Dozvoli više smena dnevno<small>Više smena istog dana prikazuje upozorenje. Preklapanje termina je uvek zabranjeno.</small></span></label></fieldset><Button type="submit">Sačuvaj pravila</Button></form></section><section className="panel"><h2>Potreban broj ljudi</h2><p className="muted">Podesite broj zaposlenih po danu, smeni i poziciji.</p><p className="settings-auto-label">Promene broja ljudi čuvaju se odmah.</p><div className="requirements-editor">{DAY_NAMES.map((name, dayIndex) => <details key={name} open={dayIndex === 0}><summary>{name}<RiArrowDownSLine size={16} /></summary>{w.templates.map(t => <div key={t.id} className="requirement-row"><strong>{t.name}<small>{t.start}–{t.end}</small></strong>{positions.map(p => <label key={p}>{p}<input {...selectOnFocus} type="number" min="0" max="20" aria-label={`${name}, ${t.name}, ${p}`} value={w.requirements.find(r => r.day === dayIndex && r.templateId === t.id && r.position === p)?.count ?? 0} onChange={e => { const count = Math.max(0, Math.min(20, Number(e.target.value))); const rest = w.requirements.filter(r => !(r.day === dayIndex && r.templateId === t.id && r.position === p)); commit({ ...w, requirements: [...rest, { day: dayIndex, templateId: t.id, position: p, count }] }, "Promenjene potrebe tima"); }} /></label>)}</div>)}</details>)}</div></section></div>}
++      {page === "Pravila rada" && <div className="settings-grid work-rules"><section className="panel"><h2>Pravila raspoređivanja</h2><p className="muted">Izmene primenite dugmetom „Sačuvaj pravila“.</p><form className="settings-form" onSubmit={e => { e.preventDefault(); const f = new FormData(e.currentTarget); commit({ ...w, rules: { minRestHours: Number(f.get("rest")), maxWeeklyHours: Number(f.get("hours")), restSeverity: f.get("restSeverity") as "warning" | "block", hoursSeverity: f.get("hoursSeverity") as "warning" | "block", allowMultiple: f.get("multiple") === "on", restEnabled: f.get("restEnabled") === "on", hoursEnabled: f.get("hoursEnabled") === "on" } }, "Izmenjena pravila rada"); notify("Pravila su sačuvana. Proverite postojeći raspored ili generišite novi."); }}><fieldset className="work-rule-group"><legend>Odmor između smena</legend><label className="check-row"><input type="checkbox" name="restEnabled" defaultChecked={w.rules.restEnabled !== false} />Primeni pravilo odmora</label><div className="rule-field"><label>Minimalni odmor između smena<div className="input-unit"><input {...selectOnFocus} name="rest" type="number" min="0" max="48" defaultValue={w.rules.minRestHours} required /><span>sati</span></div></label><label>Primena pravila odmora<select aria-describedby="rest-severity-help" name="restSeverity" defaultValue={w.rules.restSeverity}><option value="block">Zabrana</option><option value="warning">Upozorenje</option></select></label></div><p id="rest-severity-help" className="work-rule-help">Zabrana blokira smenu bez dovoljnog odmora. Upozorenje dozvoljava izmenu i prikazuje upozorenje.</p></fieldset><fieldset className="work-rule-group"><legend>Nedeljni fond sati</legend><label className="check-row"><input type="checkbox" name="hoursEnabled" defaultChecked={w.rules.hoursEnabled !== false} />Primeni maksimum sati</label><div className="rule-field"><label>Maksimalni nedeljni fond<div className="input-unit"><input {...selectOnFocus} name="hours" type="number" min="8" max="168" step="1" defaultValue={w.rules.maxWeeklyHours} required /><span>sati</span></div></label><label>Primena maksimuma sati<select aria-describedby="hours-severity-help" name="hoursSeverity" defaultValue={w.rules.hoursSeverity}><option value="block">Zabrana</option><option value="warning">Upozorenje</option></select></label></div><p id="hours-severity-help" className="work-rule-help">Zabrana blokira prekoračenje fonda. Upozorenje dozvoljava izmenu i prikazuje upozorenje. Poseban maksimum zaposlenog ima prednost nad ovim fondom.</p></fieldset><fieldset className="work-rule-group"><legend>Smene u istom danu</legend><label className="check-row"><input type="checkbox" name="multiple" defaultChecked={w.rules.allowMultiple} /><span>Dozvoli više smena dnevno<small>Više smena istog dana prikazuje upozorenje. Preklapanje termina je uvek zabranjeno.</small></span></label></fieldset><Button type="submit">Sačuvaj pravila</Button></form></section><section className="panel"><h2>Potreban broj ljudi</h2><p className="muted">Podesite broj zaposlenih po danu, smeni i poziciji.</p><p className="settings-auto-label">Promene broja ljudi čuvaju se odmah.</p><div className="requirements-editor">{DAY_NAMES.map((name, dayIndex) => <details key={name} open={dayIndex === 0}><summary>{name}<RiArrowDownSLine size={16} /></summary><CopyRequirementsAction day={dayIndex} disabled={readOnly} onCopy={() => commit({ ...w, requirements: copyDayRequirements(w.requirements, w.templates, positions, dayIndex) }, `Kopiran osnovni obrazac potreba: ${name}`)} />{w.templates.map(t => <div key={t.id} className="requirement-row"><strong>{t.name}<small>{t.start}–{t.end}</small></strong>{positions.map(p => <label key={p}>{p}<input {...selectOnFocus} type="number" min="0" max="20" aria-label={`${name}, ${t.name}, ${p}`} value={w.requirements.find(r => r.day === dayIndex && r.templateId === t.id && r.position === p)?.count ?? 0} onChange={e => { const count = Math.max(0, Math.min(20, Number(e.target.value))); const rest = w.requirements.filter(r => !(r.day === dayIndex && r.templateId === t.id && r.position === p)); commit({ ...w, requirements: [...rest, { day: dayIndex, templateId: t.id, position: p, count }] }, "Promenjene potrebe tima"); }} /></label>)}</div>)}</details>)}</div></section></div>}
+ 
+       {page === "Istorija izmena" && <section className="panel history-panel">
+         <div className="panel-heading">
+@@ -245,7 +247,7 @@ export default function ShiftFlow() {
+           <ModuleSettingsPanel {...modules} readOnly={readOnly} />
+           <section id="settings-configuration" className="settings-section" tabIndex={-1} aria-labelledby="settings-configuration-title">
+             <div className="settings-section-heading"><h2 id="settings-configuration-title">Podešavanja modula</h2></div>
+-            <div id="settings-schedule" className="settings-index-target" tabIndex={-1}><h3 className="settings-module-heading">Raspored</h3><BasicSettings workspace={w} commit={commit} week={week} /></div>
++            <div id="settings-schedule" className="settings-index-target" tabIndex={-1}><h3 className="settings-module-heading">Raspored</h3><BasicSettings workspace={w} commit={commit} week={week} readOnly={readOnly} /></div>
+             {showBar && <BarPanel key={`${authUser}:${cloudId}:bar-settings`} companyId={cloudId} companyName={w.name} readOnly={readOnly} settingsOnly />}
+             {showHours && <div id="settings-hours" className="settings-index-target" tabIndex={-1}><HoursPanel key={`${authUser}:${cloudId}:hours-settings`} companyId={cloudId} workspace={w} readOnly={readOnly} flush={flush} settingsOnly /></div>}
+           </section>
+
+--- /dev/null
++++ b/src/lib/requirements.ts
+@@ -0,0 +1,20 @@
++import { DAY_NAMES, type Position, type Requirement, type ShiftTemplate } from "./scheduler";
++
++/** Replace the other days' editable requirements with an independent copy. */
++export function copyDayRequirements(requirements: Requirement[], templates: ShiftTemplate[], positions: Position[], sourceDay: number): Requirement[] {
++  if (!Number.isInteger(sourceDay) || sourceDay < 0 || sourceDay >= DAY_NAMES.length) throw new RangeError("NepostojeÄ‡i dan.");
++  // Keep the source and records outside the current editor's scope intact.
++  const next = requirements.filter(r => r.day === sourceDay || r.day < 0 || r.day >= DAY_NAMES.length || !templates.some(t => t.id === r.templateId) || !positions.includes(r.position));
++  for (let day = 0; day < DAY_NAMES.length; day++) {
++    if (day === sourceDay) continue;
++    for (const template of templates) {
++      if (template.days && !template.days.includes(day)) continue;
++      for (const position of positions) {
++        const sourceIsActive = !template.days || template.days.includes(sourceDay);
++        const count = sourceIsActive ? requirements.find(r => r.day === sourceDay && r.templateId === template.id && r.position === position)?.count ?? 0 : 0;
++        next.push({ day, templateId: template.id, position, count });
++      }
++    }
++  }
++  return next;
++}
+
+--- /dev/null
++++ b/src/components/copy-requirements-action.tsx
+@@ -0,0 +1,11 @@
++import { useId } from "react";
++import { DAY_NAMES } from "@/lib/scheduler";
++import { Button } from "./ui/button";
++
++export function CopyRequirementsAction({ day, onCopy, disabled }: { day: number; onCopy: () => void; disabled?: boolean }) {
++  const descriptionId = useId();
++  return <div className="requirement-copy-action">
++    <Button type="button" variant="outline" disabled={disabled} aria-label={`Kopiraj na ostale dane â€” ${DAY_NAMES[day]}`} aria-describedby={descriptionId} onClick={onCopy}>Kopiraj na ostale dane</Button>
++    <small id={descriptionId}>Zamenjuje potrebe ostalih Å¡est dana. Smene zadrÅ¾avaju svoje dane koriÅ¡Ä‡enja. Promenu moÅ¾ete poniÅ¡titi u Istoriji izmena.</small>
++  </div>;
++}
+
+--- /dev/null
++++ b/tests/requirements.test.ts
+@@ -0,0 +1,91 @@
++import test from "node:test";
++import assert from "node:assert/strict";
++import { copyDayRequirements } from "../src/lib/requirements";
++import { createDemo } from "../src/lib/demo";
++import { applyChange, redoState, undoState, type StoredState } from "../src/lib/storage";
++import { effectiveRequirements, type Requirement, type ShiftTemplate } from "../src/lib/scheduler";
++
++const templates: ShiftTemplate[] = [
++  { id: "regular", name: "Redovna", start: "08:00", end: "16:00", color: "mint" },
++  { id: "extra", name: "Dodatna", start: "10:00", end: "18:00", color: "blue" },
++];
++const positions = ["Barista", "Konobar", "Nova pozicija"];
++const sorted = (rows: Requirement[]) => [...rows].sort((a, b) => `${a.day}:${a.templateId}:${a.position}`.localeCompare(`${b.day}:${b.templateId}:${b.position}`));
++
++test("copy needs replaces all six days, including zero/missing values and custom positions, without linking days", () => {
++  const rows: Requirement[] = [
++    { day: 5, templateId: "regular", position: "Barista", count: 20 },
++    { day: 5, templateId: "regular", position: "Konobar", count: 0 },
++    { day: 5, templateId: "extra", position: "Nova pozicija", count: 3 },
++    { day: 1, templateId: "regular", position: "Konobar", count: 8 },
++    { day: 6, templateId: "extra", position: "Barista", count: 6 },
++  ];
++  const before = structuredClone(rows);
++  const result = copyDayRequirements(rows, templates, positions, 5);
++  assert.deepEqual(rows, before);
++  assert.deepEqual(result.filter(r => r.day === 5), rows.filter(r => r.day === 5));
++  for (let day = 0; day < 7; day++) {
++    if (day === 5) continue;
++    assert.equal(result.filter(r => r.day === day).length, 6);
++    for (const t of templates) for (const position of positions) {
++      assert.equal(result.find(r => r.day === day && r.templateId === t.id && r.position === position)?.count,
++        rows.find(r => r.day === 5 && r.templateId === t.id && r.position === position)?.count ?? 0);
++    }
++  }
++  result.find(r => r.day === 0 && r.templateId === "regular" && r.position === "Barista")!.count = 2;
++  assert.equal(result.find(r => r.day === 1 && r.templateId === "regular" && r.position === "Barista")!.count, 20);
++  assert.deepEqual(rows, before);
++});
++
++test("copy needs respects source and target shift days, and preserves records outside the editor", () => {
++  const shifts = [templates[0], { ...templates[1], days: [0, 5] }];
++  const rows: Requirement[] = [
++    { day: 0, templateId: "extra", position: "Barista", count: 4 },
++    { day: 2, templateId: "extra", position: "Barista", count: 9 },
++    { day: 3, templateId: "removed", position: "Barista", count: 2 },
++  ];
++  const result = copyDayRequirements(rows, shifts, positions, 0);
++  assert.equal(result.find(r => r.day === 5 && r.templateId === "extra" && r.position === "Barista")?.count, 4);
++  assert.equal(result.some(r => r.day !== 0 && r.day !== 5 && r.templateId === "extra"), false);
++  assert.deepEqual(result.find(r => r.templateId === "removed"), rows[2]);
++  // A stale value on an inactive source day must not create active demand.
++  const inactiveSource = copyDayRequirements(rows, shifts, positions, 2);
++  assert.equal(inactiveSource.find(r => r.day === 0 && r.templateId === "extra" && r.position === "Barista")?.count, 0);
++  assert.equal(inactiveSource.find(r => r.day === 2 && r.templateId === "extra")?.count, 9);
++  assert.throws(() => copyDayRequirements(rows, shifts, positions, 7), RangeError);
++});
++
++test("base copy is one undoable change, persists, and leaves weekly overrides and generated schedules intact", () => {
++  const w = createDemo(), week = Object.keys(w.schedules)[0];
++  w.requirementOverrides = { [week]: [{ day: 0, templateId: w.templates[0].id, position: "Barista", count: 8 }] };
++  const original = structuredClone(w);
++  const state: StoredState = { schema: 2, revision: 0, current: w, past: [], future: [] };
++  const copied = copyDayRequirements(w.requirements, w.templates, (w.positions ?? ["Barista", "Konobar", "MenadÅ¾er"]), 5);
++  const next = applyChange(state, { ...w, requirements: copied }, "Kopiran osnovni obrazac potreba: Subota");
++  assert.equal(next.past.length, 1);
++  const reloaded: StoredState = JSON.parse(JSON.stringify(next));
++  assert.deepEqual(reloaded.current.requirements, copied);
++  assert.deepEqual(reloaded.current.schedules, original.schedules);
++  assert.deepEqual(reloaded.current.requirementOverrides, original.requirementOverrides);
++  const undone = undoState(reloaded);
++  assert.deepEqual(sorted(undone.current.requirements), sorted(original.requirements));
++  assert.deepEqual(sorted(redoState(undone).current.requirements), sorted(copied));
++});
++
++test("weekly copy uses that week's effective needs and undo restores inheritance or an existing override", () => {
++  for (const hasOverride of [false, true]) {
++    const w = createDemo(), week = Object.keys(w.schedules)[0];
++    w.requirementOverrides = { "2099-01-05": [{ day: 0, templateId: w.templates[0].id, position: "Barista", count: 20 }] };
++    if (hasOverride) w.requirementOverrides[week] = [{ day: 5, templateId: w.templates[0].id, position: "Barista", count: 4 }];
++    const before = structuredClone(w);
++    const copied = copyDayRequirements(effectiveRequirements(w, week), w.templates, (w.positions ?? ["Barista", "Konobar", "MenadÅ¾er"]), 5);
++    const state: StoredState = { schema: 2, revision: 0, current: w, past: [], future: [] };
++    const next = applyChange(state, { ...w, requirementOverrides: { ...w.requirementOverrides, [week]: copied } }, "Kopirane potrebe ove nedelje: Subota");
++    assert.equal(next.past.length, 1);
++    assert.deepEqual(next.current.requirements, before.requirements);
++    assert.deepEqual(next.current.schedules, before.schedules);
++    assert.deepEqual(next.current.requirementOverrides!["2099-01-05"], before.requirementOverrides!["2099-01-05"]);
++    assert.deepEqual(undoState(next).current.requirementOverrides, before.requirementOverrides);
++  }
++});
++

@@ -1,0 +1,26 @@
+[
+  {
+    "device": "desktop",
+    "theme": "dark",
+    "checks": "both editors, keyboard/touch, zero/20/custom positions, source/target shift days, single history entry, reload, undo/redo, independent edits, base/week separation, generated schedules unchanged",
+    "errors": []
+  },
+  {
+    "device": "desktop",
+    "theme": "light",
+    "checks": "both editors, keyboard/touch, zero/20/custom positions, source/target shift days, single history entry, reload, undo/redo, independent edits, base/week separation, generated schedules unchanged",
+    "errors": []
+  },
+  {
+    "device": "mobile",
+    "theme": "dark",
+    "checks": "both editors, keyboard/touch, zero/20/custom positions, source/target shift days, single history entry, reload, undo/redo, independent edits, base/week separation, generated schedules unchanged",
+    "errors": []
+  },
+  {
+    "device": "mobile",
+    "theme": "light",
+    "checks": "both editors, keyboard/touch, zero/20/custom positions, source/target shift days, single history entry, reload, undo/redo, independent edits, base/week separation, generated schedules unchanged",
+    "errors": []
+  }
+]

@@ -1,0 +1,1418 @@
+{
+  "schema": 2,
+  "revision": 0,
+  "current": {
+    "name": "Kafe Central",
+    "employees": [
+      {
+        "id": "employee-1",
+        "name": "Ana Petrović",
+        "initials": "AP",
+        "positions": [
+          "Barista"
+        ],
+        "color": "mint",
+        "targetHours": 40,
+        "active": true,
+        "daysOff": [
+          1
+        ],
+        "preferredShift": "morning"
+      },
+      {
+        "id": "employee-2",
+        "name": "Marko Jovanović",
+        "initials": "MJ",
+        "positions": [
+          "Barista",
+          "Konobar"
+        ],
+        "color": "blue",
+        "targetHours": 40,
+        "active": true,
+        "daysOff": []
+      },
+      {
+        "id": "employee-3",
+        "name": "Jelena Nikolić",
+        "initials": "JN",
+        "positions": [
+          "Konobar"
+        ],
+        "color": "purple",
+        "targetHours": 40,
+        "active": true,
+        "daysOff": [
+          3
+        ]
+      },
+      {
+        "id": "employee-4",
+        "name": "Luka Stojanović",
+        "initials": "LS",
+        "positions": [
+          "Konobar"
+        ],
+        "color": "peach",
+        "targetHours": 40,
+        "active": true,
+        "daysOff": [],
+        "preferredShift": "morning"
+      },
+      {
+        "id": "employee-5",
+        "name": "Milica Đorđević",
+        "initials": "MĐ",
+        "positions": [
+          "Barista"
+        ],
+        "color": "pink",
+        "targetHours": 40,
+        "active": true,
+        "daysOff": []
+      },
+      {
+        "id": "employee-6",
+        "name": "Nikola Ilić",
+        "initials": "NI",
+        "positions": [
+          "Konobar"
+        ],
+        "color": "yellow",
+        "targetHours": 40,
+        "active": true,
+        "daysOff": []
+      },
+      {
+        "id": "employee-7",
+        "name": "Sara Pavlović",
+        "initials": "SP",
+        "positions": [
+          "Konobar"
+        ],
+        "color": "blue",
+        "targetHours": 40,
+        "active": true,
+        "daysOff": [],
+        "preferredShift": "morning"
+      },
+      {
+        "id": "employee-8",
+        "name": "Stefan Marković",
+        "initials": "SM",
+        "positions": [
+          "Barista",
+          "Menadžer"
+        ],
+        "color": "purple",
+        "targetHours": 40,
+        "active": true,
+        "daysOff": []
+      },
+      {
+        "id": "employee-9",
+        "name": "Teodora Savić",
+        "initials": "TS",
+        "positions": [
+          "Konobar"
+        ],
+        "color": "mint",
+        "targetHours": 40,
+        "active": true,
+        "daysOff": []
+      },
+      {
+        "id": "employee-10",
+        "name": "Vuk Popović",
+        "initials": "VP",
+        "positions": [
+          "Konobar",
+          "Menadžer"
+        ],
+        "color": "peach",
+        "targetHours": 40,
+        "active": true,
+        "daysOff": [],
+        "preferredShift": "morning"
+      }
+    ],
+    "templates": [
+      {
+        "id": "morning",
+        "name": "Prva smena",
+        "start": "07:00",
+        "end": "15:00",
+        "color": "mint"
+      },
+      {
+        "id": "evening",
+        "name": "Druga smena",
+        "start": "15:00",
+        "end": "23:00",
+        "color": "blue"
+      },
+      {
+        "id": "extra",
+        "name": "Dodatna smena",
+        "start": "11:00",
+        "end": "19:00",
+        "color": "purple",
+        "days": [
+          0,
+          5
+        ]
+      }
+    ],
+    "rules": {
+      "minRestHours": 12,
+      "maxWeeklyHours": 40,
+      "restSeverity": "block",
+      "hoursSeverity": "block",
+      "allowMultiple": false
+    },
+    "requirements": [
+      {
+        "day": 0,
+        "templateId": "morning",
+        "position": "Barista",
+        "count": 0
+      },
+      {
+        "day": 0,
+        "templateId": "morning",
+        "position": "Konobar",
+        "count": 1
+      },
+      {
+        "day": 0,
+        "templateId": "morning",
+        "position": "Kasir",
+        "count": 2
+      },
+      {
+        "day": 0,
+        "templateId": "evening",
+        "position": "Barista",
+        "count": 1
+      },
+      {
+        "day": 0,
+        "templateId": "evening",
+        "position": "Konobar",
+        "count": 2
+      },
+      {
+        "day": 0,
+        "templateId": "evening",
+        "position": "Kasir",
+        "count": 3
+      },
+      {
+        "day": 0,
+        "templateId": "extra",
+        "position": "Barista",
+        "count": 2
+      },
+      {
+        "day": 0,
+        "templateId": "extra",
+        "position": "Konobar",
+        "count": 3
+      },
+      {
+        "day": 0,
+        "templateId": "extra",
+        "position": "Kasir",
+        "count": 4
+      },
+      {
+        "day": 1,
+        "templateId": "morning",
+        "position": "Barista",
+        "count": 1
+      },
+      {
+        "day": 1,
+        "templateId": "morning",
+        "position": "Konobar",
+        "count": 2
+      },
+      {
+        "day": 1,
+        "templateId": "morning",
+        "position": "Kasir",
+        "count": 3
+      },
+      {
+        "day": 1,
+        "templateId": "evening",
+        "position": "Barista",
+        "count": 2
+      },
+      {
+        "day": 1,
+        "templateId": "evening",
+        "position": "Konobar",
+        "count": 3
+      },
+      {
+        "day": 1,
+        "templateId": "evening",
+        "position": "Kasir",
+        "count": 4
+      },
+      {
+        "day": 2,
+        "templateId": "morning",
+        "position": "Barista",
+        "count": 2
+      },
+      {
+        "day": 2,
+        "templateId": "morning",
+        "position": "Konobar",
+        "count": 3
+      },
+      {
+        "day": 2,
+        "templateId": "morning",
+        "position": "Kasir",
+        "count": 4
+      },
+      {
+        "day": 2,
+        "templateId": "evening",
+        "position": "Barista",
+        "count": 3
+      },
+      {
+        "day": 2,
+        "templateId": "evening",
+        "position": "Konobar",
+        "count": 4
+      },
+      {
+        "day": 2,
+        "templateId": "evening",
+        "position": "Kasir",
+        "count": 5
+      },
+      {
+        "day": 3,
+        "templateId": "morning",
+        "position": "Barista",
+        "count": 3
+      },
+      {
+        "day": 3,
+        "templateId": "morning",
+        "position": "Konobar",
+        "count": 4
+      },
+      {
+        "day": 3,
+        "templateId": "morning",
+        "position": "Kasir",
+        "count": 5
+      },
+      {
+        "day": 3,
+        "templateId": "evening",
+        "position": "Barista",
+        "count": 4
+      },
+      {
+        "day": 3,
+        "templateId": "evening",
+        "position": "Konobar",
+        "count": 5
+      },
+      {
+        "day": 3,
+        "templateId": "evening",
+        "position": "Kasir",
+        "count": 6
+      },
+      {
+        "day": 4,
+        "templateId": "morning",
+        "position": "Barista",
+        "count": 4
+      },
+      {
+        "day": 4,
+        "templateId": "morning",
+        "position": "Konobar",
+        "count": 5
+      },
+      {
+        "day": 4,
+        "templateId": "morning",
+        "position": "Kasir",
+        "count": 6
+      },
+      {
+        "day": 4,
+        "templateId": "evening",
+        "position": "Barista",
+        "count": 5
+      },
+      {
+        "day": 4,
+        "templateId": "evening",
+        "position": "Konobar",
+        "count": 6
+      },
+      {
+        "day": 4,
+        "templateId": "evening",
+        "position": "Kasir",
+        "count": 7
+      },
+      {
+        "day": 5,
+        "templateId": "morning",
+        "position": "Barista",
+        "count": 0
+      },
+      {
+        "day": 5,
+        "templateId": "morning",
+        "position": "Konobar",
+        "count": 20
+      },
+      {
+        "day": 5,
+        "templateId": "morning",
+        "position": "Kasir",
+        "count": 3
+      },
+      {
+        "day": 5,
+        "templateId": "evening",
+        "position": "Barista",
+        "count": 2
+      },
+      {
+        "day": 5,
+        "templateId": "evening",
+        "position": "Konobar",
+        "count": 1
+      },
+      {
+        "day": 5,
+        "templateId": "evening",
+        "position": "Kasir",
+        "count": 0
+      },
+      {
+        "day": 5,
+        "templateId": "extra",
+        "position": "Barista",
+        "count": 4
+      },
+      {
+        "day": 5,
+        "templateId": "extra",
+        "position": "Konobar",
+        "count": 0
+      },
+      {
+        "day": 5,
+        "templateId": "extra",
+        "position": "Kasir",
+        "count": 2
+      },
+      {
+        "day": 6,
+        "templateId": "morning",
+        "position": "Barista",
+        "count": 6
+      },
+      {
+        "day": 6,
+        "templateId": "morning",
+        "position": "Konobar",
+        "count": 7
+      },
+      {
+        "day": 6,
+        "templateId": "morning",
+        "position": "Kasir",
+        "count": 0
+      },
+      {
+        "day": 6,
+        "templateId": "evening",
+        "position": "Barista",
+        "count": 7
+      },
+      {
+        "day": 6,
+        "templateId": "evening",
+        "position": "Konobar",
+        "count": 0
+      },
+      {
+        "day": 6,
+        "templateId": "evening",
+        "position": "Kasir",
+        "count": 1
+      }
+    ],
+    "schedules": {
+      "2026-11-23": {
+        "week": "2026-11-23",
+        "status": "draft",
+        "assignments": [
+          {
+            "id": "2026-11-23-0-evening-Barista-0",
+            "employeeId": "employee-8",
+            "day": 0,
+            "templateId": "evening",
+            "position": "Barista",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-0-morning-Barista-0",
+            "employeeId": "employee-2",
+            "day": 0,
+            "templateId": "morning",
+            "position": "Barista",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-0-evening-Konobar-0",
+            "employeeId": "employee-3",
+            "day": 0,
+            "templateId": "evening",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-0-evening-Konobar-1",
+            "employeeId": "employee-6",
+            "day": 0,
+            "templateId": "evening",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-0-morning-Konobar-0",
+            "employeeId": "employee-4",
+            "day": 0,
+            "templateId": "morning",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-0-morning-Konobar-1",
+            "employeeId": "employee-7",
+            "day": 0,
+            "templateId": "morning",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-1-evening-Barista-0",
+            "employeeId": "employee-5",
+            "day": 1,
+            "templateId": "evening",
+            "position": "Barista",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-1-morning-Barista-0",
+            "employeeId": "employee-2",
+            "day": 1,
+            "templateId": "morning",
+            "position": "Barista",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-1-evening-Konobar-0",
+            "employeeId": "employee-9",
+            "day": 1,
+            "templateId": "evening",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-1-evening-Konobar-1",
+            "employeeId": "employee-3",
+            "day": 1,
+            "templateId": "evening",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-1-morning-Konobar-0",
+            "employeeId": "employee-10",
+            "day": 1,
+            "templateId": "morning",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-1-morning-Konobar-1",
+            "employeeId": "employee-7",
+            "day": 1,
+            "templateId": "morning",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-2-evening-Barista-0",
+            "employeeId": "employee-5",
+            "day": 2,
+            "templateId": "evening",
+            "position": "Barista",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-2-morning-Barista-0",
+            "employeeId": "employee-1",
+            "day": 2,
+            "templateId": "morning",
+            "position": "Barista",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-2-evening-Konobar-0",
+            "employeeId": "employee-6",
+            "day": 2,
+            "templateId": "evening",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-2-evening-Konobar-1",
+            "employeeId": "employee-9",
+            "day": 2,
+            "templateId": "evening",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-2-morning-Konobar-0",
+            "employeeId": "employee-4",
+            "day": 2,
+            "templateId": "morning",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-2-morning-Konobar-1",
+            "employeeId": "employee-10",
+            "day": 2,
+            "templateId": "morning",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-3-evening-Barista-0",
+            "employeeId": "employee-8",
+            "day": 3,
+            "templateId": "evening",
+            "position": "Barista",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-3-morning-Barista-0",
+            "employeeId": "employee-1",
+            "day": 3,
+            "templateId": "morning",
+            "position": "Barista",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-3-evening-Konobar-0",
+            "employeeId": "employee-2",
+            "day": 3,
+            "templateId": "evening",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-3-evening-Konobar-1",
+            "employeeId": "employee-6",
+            "day": 3,
+            "templateId": "evening",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-3-morning-Konobar-0",
+            "employeeId": "employee-4",
+            "day": 3,
+            "templateId": "morning",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-3-morning-Konobar-1",
+            "employeeId": "employee-7",
+            "day": 3,
+            "templateId": "morning",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-4-evening-Barista-0",
+            "employeeId": "employee-8",
+            "day": 4,
+            "templateId": "evening",
+            "position": "Barista",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-4-morning-Barista-0",
+            "employeeId": "employee-1",
+            "day": 4,
+            "templateId": "morning",
+            "position": "Barista",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-4-evening-Konobar-0",
+            "employeeId": "employee-3",
+            "day": 4,
+            "templateId": "evening",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-4-evening-Konobar-1",
+            "employeeId": "employee-9",
+            "day": 4,
+            "templateId": "evening",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-4-morning-Konobar-0",
+            "employeeId": "employee-10",
+            "day": 4,
+            "templateId": "morning",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-4-morning-Konobar-1",
+            "employeeId": "employee-4",
+            "day": 4,
+            "templateId": "morning",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-5-evening-Barista-0",
+            "employeeId": "employee-5",
+            "day": 5,
+            "templateId": "evening",
+            "position": "Barista",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-5-morning-Barista-0",
+            "employeeId": "employee-1",
+            "day": 5,
+            "templateId": "morning",
+            "position": "Barista",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-5-evening-Konobar-0",
+            "employeeId": "employee-3",
+            "day": 5,
+            "templateId": "evening",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-5-evening-Konobar-1",
+            "employeeId": "employee-6",
+            "day": 5,
+            "templateId": "evening",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-5-morning-Konobar-0",
+            "employeeId": "employee-7",
+            "day": 5,
+            "templateId": "morning",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-5-morning-Konobar-1",
+            "employeeId": "employee-10",
+            "day": 5,
+            "templateId": "morning",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-6-evening-Barista-0",
+            "employeeId": "employee-2",
+            "day": 6,
+            "templateId": "evening",
+            "position": "Barista",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-6-morning-Barista-0",
+            "employeeId": "employee-8",
+            "day": 6,
+            "templateId": "morning",
+            "position": "Barista",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-6-evening-Konobar-0",
+            "employeeId": "employee-9",
+            "day": 6,
+            "templateId": "evening",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-6-evening-Konobar-1",
+            "employeeId": "employee-3",
+            "day": 6,
+            "templateId": "evening",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "15:00",
+            "end": "23:00"
+          },
+          {
+            "id": "2026-11-23-6-morning-Konobar-0",
+            "employeeId": "employee-4",
+            "day": 6,
+            "templateId": "morning",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          },
+          {
+            "id": "2026-11-23-6-morning-Konobar-1",
+            "employeeId": "employee-10",
+            "day": 6,
+            "templateId": "morning",
+            "position": "Konobar",
+            "locked": false,
+            "note": "",
+            "start": "07:00",
+            "end": "15:00"
+          }
+        ],
+        "requirements": [
+          {
+            "day": 0,
+            "templateId": "morning",
+            "position": "Barista",
+            "count": 1
+          },
+          {
+            "day": 0,
+            "templateId": "morning",
+            "position": "Konobar",
+            "count": 2
+          },
+          {
+            "day": 0,
+            "templateId": "evening",
+            "position": "Barista",
+            "count": 1
+          },
+          {
+            "day": 0,
+            "templateId": "evening",
+            "position": "Konobar",
+            "count": 2
+          },
+          {
+            "day": 1,
+            "templateId": "morning",
+            "position": "Barista",
+            "count": 1
+          },
+          {
+            "day": 1,
+            "templateId": "morning",
+            "position": "Konobar",
+            "count": 2
+          },
+          {
+            "day": 1,
+            "templateId": "evening",
+            "position": "Barista",
+            "count": 1
+          },
+          {
+            "day": 1,
+            "templateId": "evening",
+            "position": "Konobar",
+            "count": 2
+          },
+          {
+            "day": 2,
+            "templateId": "morning",
+            "position": "Barista",
+            "count": 1
+          },
+          {
+            "day": 2,
+            "templateId": "morning",
+            "position": "Konobar",
+            "count": 2
+          },
+          {
+            "day": 2,
+            "templateId": "evening",
+            "position": "Barista",
+            "count": 1
+          },
+          {
+            "day": 2,
+            "templateId": "evening",
+            "position": "Konobar",
+            "count": 2
+          },
+          {
+            "day": 3,
+            "templateId": "morning",
+            "position": "Barista",
+            "count": 1
+          },
+          {
+            "day": 3,
+            "templateId": "morning",
+            "position": "Konobar",
+            "count": 2
+          },
+          {
+            "day": 3,
+            "templateId": "evening",
+            "position": "Barista",
+            "count": 1
+          },
+          {
+            "day": 3,
+            "templateId": "evening",
+            "position": "Konobar",
+            "count": 2
+          },
+          {
+            "day": 4,
+            "templateId": "morning",
+            "position": "Barista",
+            "count": 1
+          },
+          {
+            "day": 4,
+            "templateId": "morning",
+            "position": "Konobar",
+            "count": 2
+          },
+          {
+            "day": 4,
+            "templateId": "evening",
+            "position": "Barista",
+            "count": 1
+          },
+          {
+            "day": 4,
+            "templateId": "evening",
+            "position": "Konobar",
+            "count": 2
+          },
+          {
+            "day": 5,
+            "templateId": "morning",
+            "position": "Barista",
+            "count": 1
+          },
+          {
+            "day": 5,
+            "templateId": "morning",
+            "position": "Konobar",
+            "count": 2
+          },
+          {
+            "day": 5,
+            "templateId": "evening",
+            "position": "Barista",
+            "count": 1
+          },
+          {
+            "day": 5,
+            "templateId": "evening",
+            "position": "Konobar",
+            "count": 2
+          },
+          {
+            "day": 6,
+            "templateId": "morning",
+            "position": "Barista",
+            "count": 1
+          },
+          {
+            "day": 6,
+            "templateId": "morning",
+            "position": "Konobar",
+            "count": 2
+          },
+          {
+            "day": 6,
+            "templateId": "evening",
+            "position": "Barista",
+            "count": 1
+          },
+          {
+            "day": 6,
+            "templateId": "evening",
+            "position": "Konobar",
+            "count": 2
+          }
+        ],
+        "rules": {
+          "minRestHours": 12,
+          "maxWeeklyHours": 40,
+          "restSeverity": "block",
+          "hoursSeverity": "block",
+          "allowMultiple": false
+        }
+      }
+    },
+    "positions": [
+      "Barista",
+      "Konobar",
+      "Kasir"
+    ],
+    "requirementOverrides": {
+      "2026-11-23": [
+        {
+          "day": 0,
+          "templateId": "morning",
+          "position": "Barista",
+          "count": 1
+        },
+        {
+          "day": 0,
+          "templateId": "morning",
+          "position": "Konobar",
+          "count": 2
+        },
+        {
+          "day": 0,
+          "templateId": "morning",
+          "position": "Kasir",
+          "count": 3
+        },
+        {
+          "day": 0,
+          "templateId": "evening",
+          "position": "Barista",
+          "count": 2
+        },
+        {
+          "day": 0,
+          "templateId": "evening",
+          "position": "Konobar",
+          "count": 3
+        },
+        {
+          "day": 0,
+          "templateId": "evening",
+          "position": "Kasir",
+          "count": 4
+        },
+        {
+          "day": 0,
+          "templateId": "extra",
+          "position": "Barista",
+          "count": 3
+        },
+        {
+          "day": 0,
+          "templateId": "extra",
+          "position": "Konobar",
+          "count": 4
+        },
+        {
+          "day": 0,
+          "templateId": "extra",
+          "position": "Kasir",
+          "count": 5
+        },
+        {
+          "day": 1,
+          "templateId": "morning",
+          "position": "Barista",
+          "count": 2
+        },
+        {
+          "day": 1,
+          "templateId": "morning",
+          "position": "Konobar",
+          "count": 3
+        },
+        {
+          "day": 1,
+          "templateId": "morning",
+          "position": "Kasir",
+          "count": 4
+        },
+        {
+          "day": 1,
+          "templateId": "evening",
+          "position": "Barista",
+          "count": 3
+        },
+        {
+          "day": 1,
+          "templateId": "evening",
+          "position": "Konobar",
+          "count": 4
+        },
+        {
+          "day": 1,
+          "templateId": "evening",
+          "position": "Kasir",
+          "count": 5
+        },
+        {
+          "day": 2,
+          "templateId": "morning",
+          "position": "Barista",
+          "count": 3
+        },
+        {
+          "day": 2,
+          "templateId": "morning",
+          "position": "Konobar",
+          "count": 4
+        },
+        {
+          "day": 2,
+          "templateId": "morning",
+          "position": "Kasir",
+          "count": 5
+        },
+        {
+          "day": 2,
+          "templateId": "evening",
+          "position": "Barista",
+          "count": 4
+        },
+        {
+          "day": 2,
+          "templateId": "evening",
+          "position": "Konobar",
+          "count": 5
+        },
+        {
+          "day": 2,
+          "templateId": "evening",
+          "position": "Kasir",
+          "count": 6
+        },
+        {
+          "day": 3,
+          "templateId": "morning",
+          "position": "Barista",
+          "count": 4
+        },
+        {
+          "day": 3,
+          "templateId": "morning",
+          "position": "Konobar",
+          "count": 5
+        },
+        {
+          "day": 3,
+          "templateId": "morning",
+          "position": "Kasir",
+          "count": 6
+        },
+        {
+          "day": 3,
+          "templateId": "evening",
+          "position": "Barista",
+          "count": 5
+        },
+        {
+          "day": 3,
+          "templateId": "evening",
+          "position": "Konobar",
+          "count": 6
+        },
+        {
+          "day": 3,
+          "templateId": "evening",
+          "position": "Kasir",
+          "count": 7
+        },
+        {
+          "day": 4,
+          "templateId": "morning",
+          "position": "Barista",
+          "count": 5
+        },
+        {
+          "day": 4,
+          "templateId": "morning",
+          "position": "Konobar",
+          "count": 6
+        },
+        {
+          "day": 4,
+          "templateId": "morning",
+          "position": "Kasir",
+          "count": 7
+        },
+        {
+          "day": 4,
+          "templateId": "evening",
+          "position": "Barista",
+          "count": 6
+        },
+        {
+          "day": 4,
+          "templateId": "evening",
+          "position": "Konobar",
+          "count": 7
+        },
+        {
+          "day": 4,
+          "templateId": "evening",
+          "position": "Kasir",
+          "count": 8
+        },
+        {
+          "day": 5,
+          "templateId": "morning",
+          "position": "Barista",
+          "count": 7
+        },
+        {
+          "day": 5,
+          "templateId": "morning",
+          "position": "Konobar",
+          "count": 7
+        },
+        {
+          "day": 5,
+          "templateId": "morning",
+          "position": "Kasir",
+          "count": 0
+        },
+        {
+          "day": 5,
+          "templateId": "evening",
+          "position": "Barista",
+          "count": 7
+        },
+        {
+          "day": 5,
+          "templateId": "evening",
+          "position": "Konobar",
+          "count": 7
+        },
+        {
+          "day": 5,
+          "templateId": "evening",
+          "position": "Kasir",
+          "count": 0
+        },
+        {
+          "day": 5,
+          "templateId": "extra",
+          "position": "Barista",
+          "count": 7
+        },
+        {
+          "day": 5,
+          "templateId": "extra",
+          "position": "Konobar",
+          "count": 7
+        },
+        {
+          "day": 5,
+          "templateId": "extra",
+          "position": "Kasir",
+          "count": 0
+        },
+        {
+          "day": 6,
+          "templateId": "morning",
+          "position": "Barista",
+          "count": 7
+        },
+        {
+          "day": 6,
+          "templateId": "morning",
+          "position": "Konobar",
+          "count": 8
+        },
+        {
+          "day": 6,
+          "templateId": "morning",
+          "position": "Kasir",
+          "count": 1
+        },
+        {
+          "day": 6,
+          "templateId": "evening",
+          "position": "Barista",
+          "count": 8
+        },
+        {
+          "day": 6,
+          "templateId": "evening",
+          "position": "Konobar",
+          "count": 1
+        },
+        {
+          "day": 6,
+          "templateId": "evening",
+          "position": "Kasir",
+          "count": 2
+        }
+      ],
+      "2099-01-05": [
+        {
+          "day": 0,
+          "templateId": "morning",
+          "position": "Barista",
+          "count": 19
+        }
+      ]
+    }
+  },
+  "past": [],
+  "future": []
+}

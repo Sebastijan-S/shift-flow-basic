@@ -1,0 +1,10 @@
+import { writeFileSync } from 'node:fs';
+import { createDemo } from '../../src/lib/demo';
+const current=createDemo();
+current.positions=['Barista','Konobar','Kasir'];
+current.templates.push({id:'extra',name:'Dodatna smena',start:'11:00',end:'19:00',color:'purple',days:[0,5]});
+current.requirements=Array.from({length:7},(_,day)=>current.templates.filter(t=>!t.days||t.days.includes(day)).flatMap((t,ti)=>current.positions!.map((position,pi)=>({day,templateId:t.id,position,count:day===5?[[0,20,3],[2,1,0],[4,0,2]][ti][pi]:(day+ti+pi)%8})))).flat();
+const week=Object.keys(current.schedules)[0];
+const weekly=current.requirements.map(r=>({...r,count:r.day===5?(r.position==='Kasir'?0:7):(r.count+1)%10}));
+current.requirementOverrides={[week]:weekly,'2099-01-05':[{day:0,templateId:'morning',position:'Barista',count:19}]};
+writeFileSync('artifacts/ui-3/fixture.json',JSON.stringify({schema:2,revision:0,current,past:[],future:[]},null,2));

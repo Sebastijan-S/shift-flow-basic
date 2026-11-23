@@ -1,0 +1,23 @@
+ShiftFlow — UI - 3, kopiranje potreba tima
+
+Implementacija:
+- Zajednički copyDayRequirements i CopyRequirementsAction; akcija uz svaki dan u oba editora.
+- Jasno upozorenje za zamenu šest dana i postojeće poništavanje kroz Istoriju izmena.
+- Jedan commit radnog prostora po akciji; nezavisni ciljni zapisi. Izvor, drugi obim potreba i već generisani rasporedi ostaju isti.
+- Poštovani template.days, postojeća polja i granice 0–20. Nema izmene generatora niti baze.
+- Kopiranje nije dostupno za readOnly prostor; postojeća commit zaštita ostaje na snazi.
+
+Provere:
+- npm test 65/65 (61 postojeći + 4 nova), npm run check i npm run build uspešni.
+- Izolovani Chrome konteksti: desktop 1440x900 i emulirani telefon 390x844, svetla/tamna tema, tastatura/Enter i dodir.
+- Oba editora: izvor Subota, nula, granica 20, prilagođena pozicija Kasir, dodatna smena samo ponedeljkom/subotom; izvor ostaje isti, ostali dani se zamenjuju.
+- Potvrđeno: jedna istorijska stavka, čuvanje posle reload-a, undo/redo, zasebna naknadna izmena nedelje, razdvajanje osnovnog/nedeljnog obrasca i druge nedelje, nepromenjeni već generisani rasporedi.
+- Novi test proverava i formiranje prvog nedeljnog izuzetka uz poništavanje nazad na nasleđeni obrazac, kao i neaktivnu izvornu smenu.
+- Poslednji browser prolaz ima nula pageerror grešaka. Snimci after-* su stanje pre akcije kopiranja u novom UI-ju; copied-* su stanje nakon akcije. Vizuelno pregledani mobile-light/week i desktop-dark/base.
+- Fizički telefon, Safari i cloud upisi nisu deo ove provere; nema korišćenja stvarnih naloga.
+
+Predaja:
+- Korak 2 prvo pushovan kao 8fcaacd (UI - 2).
+- Korak 3 odobren za commit/push kao UI - 3. Korak 4 nije implementiran.
+- Preview ostaje http://localhost:3000 kao produkcioni statički build iz out/. Automatski hot reload nije uključen.
+- Prethodne izmene su sačuvane, obrisani handoff nije vraćen; next-env.d.ts zadržava ranije .next/dev/types putanje.

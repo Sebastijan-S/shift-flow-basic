@@ -2,7 +2,7 @@
 
 Dogovoreno: 23. novembra 2026.
 
-Status: celina 1 je završena, korisnik ju je pregledao i odobrio. Odobreni commit i push: `UI - 1`. Celina 2 je pregledana i odobrena za commit/push `UI - 2`; celine 3–4 nisu započete.
+Status: celine 1 i 2 su završene i pushovane kao `UI - 1` (`cf46f28`) i `UI - 2` (`8fcaacd`). Celina 3 je implementirana i proverena, uz korisnikovo odobrenje za neposredni commit/push `UI - 3`. Celina 4 nije započeta.
 
 ## Način rada i nastavak
 
@@ -137,8 +137,8 @@ Trenutni generator je namerno determinističan. Korisnik želi novu kombinaciju 
 
 - [x] Razjašnjene anotacije i sačuvan plan.
 - [x] Celina 1: UI i podešavanja — završeno, pregledano i odobreno; isporuka `UI - 1`.
-- [x] Celina 2: označavanje postojećeg unosa — implementirano, provereno i odobreno za isporuku `UI - 2`.
-- [ ] Celina 3: kopiranje potreba tima.
+- [x] Celina 2: označavanje postojećeg unosa — završeno i pushovano kao `UI - 2` (`8fcaacd`).
+- [x] Celina 3: kopiranje potreba tima — implementirano i provereno; odobrena isporuka `UI - 3`.
 - [ ] Celina 4: raznovrsnije generisanje.
 - [ ] Završni pregled diffa, snimaka, testova, TypeScript-a i builda.
 
@@ -166,3 +166,14 @@ Pri nastavku ažurirati ovaj spisak prema stvarno završenom radu i zabeležiti 
 - Preview ostaje na portu 3000 kao statički produkcioni build. Next dev je pri ponovljenim reload-ima povremeno prijavljivao internu grešku „Router action dispatched before initialization“ i posle restarta; završni browser prolaz nad produkcionim preview-om prolazi bez grešaka. Preview ne osvežava buduće izmene koda automatski. Nema novog commita ili push-a; potreban je korisnički pregled i posebno odobrenje.
 
 - Naknadni dogovor: korisnik je odobrio commit/push celine 2 kao `UI - 2`, zatim implementaciju i zaseban commit/push celine 3 kao `UI - 3`. Celina 4 ostaje van ovog zahteva.
+
+## Pregled celine 3 — 23. novembar 2026.
+
+- Dodata je akcija „Kopiraj na ostale dane“ uz svaki dan u osnovnom obrascu (Pravila rada) i potrebama izabrane nedelje (Podešavanja), sa upozorenjem da zamenjuje potrebe ostalih šest dana i uputstvom za poništavanje.
+- Jedan klik čuva jednu izmenu kroz postojeću istoriju. Kopira sve postojeće smene i pozicije, uključujući nulu i podrazumevanu nulu za nedostajuće vrednosti; izvor ostaje isti, a dani se zatim uređuju nezavisno.
+- Kopiranje poštuje dozvoljene dane korišćenja smena. Smena neaktivna izvornog dana prenosi nulu na dozvoljene ciljne dane; ne pravi potrebe na danima kojima smena ne pripada. Zapisi van trenutnog editora ostaju sačuvani.
+- Osnovni obrazac i `requirementOverrides` za konkretnu nedelju ostaju razdvojeni, kao i ostale nedelje. Postojeći rasporedi i njihovi snimci potreba ostaju nepromenjeni do novog generisanja. Nema migracije, promene validacionih granica ili izmena generatora.
+- Prošlo je 65/65 testova (četiri nova testa kopiranja/istorije), `npm run check` i `npm run build`.
+- Browser provere: Chrome 390 × 844 i 1440 × 900, obe teme; tastatura/Enter i emulirani dodir; oba editora, nula/20/prilagođena pozicija, ograničeni dani smene, jedna istorijska stavka, reload, undo/redo i naknadna nezavisna izmena jednog dana. Isključivo izolovani demo profili, bez produkcionih upisa.
+- Dokazi su u `artifacts/ui-3/`: skripta i demo primer, snimci pre/posle kopiranja, rezultati, logovi i pregledan diff. Nije testiran fizički telefon/Safari.
+- Preview na portu 3000 i dalje poslužuje uspešan produkcioni build; sad sadrži korak 3. Korisnik je izričito odobrio zaseban commit/push `UI - 3` odmah po implementaciji i proverama. Korak 4 ostaje za kasnije.

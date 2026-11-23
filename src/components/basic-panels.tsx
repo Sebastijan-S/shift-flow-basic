@@ -1,5 +1,7 @@
 "use client";
 
+import { copyDayRequirements } from "@/lib/requirements";
+import { CopyRequirementsAction } from "./copy-requirements-action";
 import { selectOnFocus } from "./select-on-focus";
 
 import { useEffect, useState, type FormEvent } from "react";
@@ -47,7 +49,7 @@ export function BasicAvailability({ workspace: w, commit }: Props) {
   </section>;
 }
 
-export function BasicSettings({ workspace: w, commit, week }: Props & { week: string }) {
+export function BasicSettings({ workspace: w, commit, week, readOnly = false }: Props & { week: string; readOnly?: boolean }) {
   const [error, setError] = useState(""); const [override, setOverride] = useState(false);
   const positions = w.positions ?? ["Barista", "Konobar", "Menadžer"];
   const requirements = w.requirementOverrides?.[week] ?? w.requirements;
@@ -58,7 +60,7 @@ export function BasicSettings({ workspace: w, commit, week }: Props & { week: st
       <label>Naziv<input {...selectOnFocus} name="name" required maxLength={60} placeholder="Međusmena" /></label><div className="form-columns"><label>Početak<input type="time" name="start" required defaultValue="11:00" /></label><label>Kraj<input type="time" name="end" required defaultValue="19:00" /></label></div><label>Boja<select name="color">{["mint", "blue", "purple", "peach", "pink", "yellow"].map(c => <option key={c}>{c}</option>)}</select></label><fieldset><legend>Dani korišćenja</legend><div className="position-options">{DAY_NAMES.map((d, i) => <label key={d}><input type="checkbox" name="days" value={i} defaultChecked />{d.slice(0, 3)}</label>)}</div></fieldset><Button type="submit">Dodaj smenu</Button>
     </form></section>
     <section className="panel basic-wide"><div className="settings-section-heading"><h2>Potrebe za ovu nedelju</h2><span className="settings-save-mode">Čuva se odmah</span></div><p className="muted">Važe samo ove nedelje. Ponovo generišite raspored da ih primenite.</p><Button variant="outline" onClick={() => setOverride(v => !v)}>{override ? "Zatvori izuzetak" : "Uredi potrebe ove nedelje"}</Button>{w.requirementOverrides?.[week] && <Button variant="ghost" onClick={() => { const next = { ...w.requirementOverrides }; delete next[week]; commit({ ...w, requirementOverrides: next }, "Vraćen osnovni obrazac potreba"); }}>Vrati osnovni obrazac</Button>}
-      {override && <div className="requirements-editor">{DAY_NAMES.map((d, day) => <details key={d}><summary>{d}</summary>{w.templates.filter(t => !t.days || t.days.includes(day)).map(t => <div className="requirement-row" key={t.id}><strong>{t.name}</strong>{positions.map(p => <label key={p}>{p}<input {...selectOnFocus} type="number" min={0} max={20} value={requirements.find(r => r.day === day && r.templateId === t.id && r.position === p)?.count ?? 0} onChange={e => changeRequirement({ day, templateId: t.id, position: p, count: Math.max(0, Math.min(20, Number(e.target.value))) })} /></label>)}</div>)}</details>)}</div>}
+      {override && <div className="requirements-editor">{DAY_NAMES.map((d, day) => <details key={d}><summary>{d}</summary><CopyRequirementsAction day={day} disabled={readOnly} onCopy={() => commit({ ...w, requirementOverrides: { ...w.requirementOverrides, [week]: copyDayRequirements(requirements, w.templates, positions, day) } }, `Kopirane potrebe ove nedelje: ${d}`)} />{w.templates.filter(t => !t.days || t.days.includes(day)).map(t => <div className="requirement-row" key={t.id}><strong>{t.name}</strong>{positions.map(p => <label key={p}>{p}<input {...selectOnFocus} type="number" min={0} max={20} value={requirements.find(r => r.day === day && r.templateId === t.id && r.position === p)?.count ?? 0} onChange={e => changeRequirement({ day, templateId: t.id, position: p, count: Math.max(0, Math.min(20, Number(e.target.value))) })} /></label>)}</div>)}</details>)}</div>}
     </section>{error && <p className="form-error" role="alert">{error}</p>}
   </div>;
 }
